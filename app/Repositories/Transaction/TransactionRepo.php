@@ -184,6 +184,7 @@ class TransactionRepo extends BaseRepo
             'time_payment',
             'status',
             'created_by',
+            'original_fee'
         ];
 
         $insert = [];
@@ -211,7 +212,7 @@ class TransactionRepo extends BaseRepo
      * @param $id
      * @return bool
      */
-    public function update($params, $id)
+    public function update($params)
     {
         $fillable = [
             'category_id',
@@ -231,6 +232,7 @@ class TransactionRepo extends BaseRepo
             'time_payment',
             'status',
             'created_by',
+            'original_fee'
         ];
 
         $update = [];
@@ -238,13 +240,13 @@ class TransactionRepo extends BaseRepo
         // Lặp qua các trường fillable và kiểm tra xem chúng có trong $params không
         foreach ($fillable as $field) {
             // Kiểm tra xem trường tồn tại trong $params và không rỗng
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $update[$field] = $params[$field];
             }
         }
 
         // Tìm đối tượng theo ID và cập nhật thông tin nếu tìm thấy
-        return Transaction::where('id', $id)->update($update);
+        return Transaction::where('id', $params['id'])->update($update);
     }
 
 

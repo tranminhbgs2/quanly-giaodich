@@ -37,7 +37,7 @@ Route::group(['namespace' => 'Api'], function () {
         includeRouteFiles(__DIR__ . '/Api/Log/');
         includeRouteFiles(__DIR__ . '/Api/Student/');
         includeRouteFiles(__DIR__ . '/Api/Upload/');
-        includeRouteFiles(__DIR__ . '/Api/Va/');
+        includeRouteFiles(__DIR__ . '/Api/Transaction/');
     });
 });
 

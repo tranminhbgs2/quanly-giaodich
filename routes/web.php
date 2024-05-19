@@ -36,6 +36,6 @@ Route::group([
     'middleware' => ['cors']
 ], function () {
     // http://ssc.dcv.vn/deep-link-app-android
-    Route::get('deep-link-app-android', 'CommonController@android')->name('deep_link_android');
+    // Route::get('deep-link-app-android', 'CommonController@android')->name('deep_link_android');
 
 });

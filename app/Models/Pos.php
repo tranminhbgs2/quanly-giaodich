@@ -4,10 +4,12 @@ namespace App\Models;
 
 use App\Helpers\Constants;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class Pos extends Model
 {
+    use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_POS;
     public $timestamps = true;
 

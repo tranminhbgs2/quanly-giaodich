@@ -7,7 +7,7 @@ use App\Helpers\Constants;
 use App\Repositories\BaseRepo;
 use Carbon\Carbon;
 
-class HoKinhDoanhRepository extends BaseRepo
+class HoKinhDoanhRepo extends BaseRepo
 {
     public function getListing($params, $is_counting = false)
     {

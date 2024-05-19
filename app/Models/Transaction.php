@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Helpers\Constants;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
 {
+    use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_TRANSACTION;
     public $timestamps = true;
 
@@ -28,6 +30,7 @@ class Transaction extends Model
         'time_payment',
         'status',
         'created_by',
+        'original_fee',
     ];
 
     /**

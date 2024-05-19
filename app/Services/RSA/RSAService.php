@@ -16,8 +16,8 @@ class RSAService
     private function init()
     {
         $this->rsa = new NewRSA();
-        $this->rsa->setPrivateKey('storage/key/app_core_private_key.pem');
-        $this->rsa->setPublicKey('storage/key/app_core_public_key.pem');
+        $this->rsa->setPrivateKey('storage/key/api_private.key');
+        $this->rsa->setPublicKey('storage/key/app_public.key');
 
         //$this->rsa->setPrivateKey('storage/key/api_fsc_private.pem');
         //$this->rsa->setPublicKey('storage/key/api_fsc_public.pem');

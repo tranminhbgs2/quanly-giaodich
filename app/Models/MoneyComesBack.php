@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Helpers\Constants;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MoneyComesBack extends Model
 {
+    use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_MONEY_COMES_BACK;
     public $timestamps = true;
 

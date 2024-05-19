@@ -2,24 +2,16 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Customer\CusAddSscidRequest;
 use App\Http\Requests\Customer\CusChangePasswordRequest;
 use App\Http\Requests\Customer\CusDeleteRequest;
 use App\Http\Requests\Customer\CusGetDetailRequest;
 use App\Http\Requests\Customer\CusGetListingRequest;
-use App\Http\Requests\Customer\CusGetPaymentMethodRequest;
-use App\Http\Requests\Customer\CusGetSscCardRequest;
-use App\Http\Requests\Customer\CusPaymentHistoryRequest;
-use App\Http\Requests\Customer\CusRemoveSscidRequest;
 use App\Http\Requests\Customer\CusStoreRequest;
 use App\Http\Requests\Customer\CusUpdateAvatarRequest;
-use App\Http\Requests\Customer\CusUpdateInfoSscidRequest;
 use App\Http\Requests\Customer\CusUpdateRequest;
 use App\Repositories\Customer\CustomerRepo;
 use App\Repositories\Upload\UploadRepo;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class CustomerController extends Controller

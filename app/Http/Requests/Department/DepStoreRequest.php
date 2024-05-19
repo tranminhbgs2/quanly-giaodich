@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests\Department;
 
+use App\Helpers\Constants;
+use App\Models\Department;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class DepListingRequest extends FormRequest
+class DepStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,34 +27,30 @@ class DepListingRequest extends FormRequest
      */
     public function rules()
     {
+        $rule = [
+            'name' => ['required'],
+            'code' => ['required'],
+            'platform' => [
+                'in:' . Constants::PLATFORM
+            ]
+        ];
+
+        return $rule;
+    }
+
+    public function attributes()
+    {
         return [
-            'keyword' => [],
-            'page_index' => 'integer|min:1|required_with:page_size',
-            'page_size' => 'integer|min:1|required_with:page_index'
+            'name' => 'Tên nhóm quyền',
+            'code' => 'Mã nhóm quyền',
         ];
     }
 
-    /**
-     * @return array
-     */
-    public function attributes()
-    {
-        return [];
-    }
-
-    /**
-     * @return array
-     */
     public function messages()
     {
         return [
-            'page_index.integer' => 'Tham số page_index phải là số nguyên',
-            'page_index.min' => "Tham số page_index tối thiểu phải là :min",
-            'page_index.required_with' => 'Truyền thiếu tham số page_index',
-
-            'page_size.integer' => 'Tham số page_size phải là số nguyên',
-            'page_size.min' => "Tham số page_size tối thiểu phải là :min",
-            'page_size.required_with' => 'Truyền thiếu tham số page_size',
+            'name.required' => 'Truyền thiếu tham số name',
+            'code.required' => 'Truyền thiếu tham số code',
         ];
     }
 
@@ -62,9 +60,16 @@ class DepListingRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Check key keyword
-            if (!$this->request->has('keyword')) {
-                $validator->errors()->add('check_exist', 'Truyền thiếu tham số keyword');
+            // Check username
+            $dep = Department::where('name', $this->request->get('name'))->withTrashed()->first();
+
+            if ($dep) {
+                $validator->errors()->add('check_exist', 'Tên nhóm quyền đã tồn tại');
+            }
+
+            $dep_code = Department::where('code', $this->request->get('code'))->withTrashed()->first();
+            if ($dep_code) {
+                $validator->errors()->add('check_exist', 'Mã nhóm quyền đã tồn tại');
             }
         });
     }
