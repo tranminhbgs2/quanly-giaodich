@@ -137,19 +137,19 @@ class SendEmail implements ShouldQueue
             <div class="adL"></div>
         </div>';
         }
-                                    
+
         $mail             = new PHPMailer\PHPMailer(); // create a n
         $mail->SMTPDebug  = 0; // debugging: 1 = errors and messages, 2 = messages only
         $mail->IsSMTP();
         $mail->CharSet = 'UTF-8';
         $mail->SMTPAuth   = true; // authentication enabled
         $mail->SMTPSecure = 'ssl'; // secure transfer enabled REQUIRED for Gmail
-        $mail->Host       = "smtp.yandex.com";
-        $mail->Port       = 465; // or 587
+        $mail->Host       = env('MAIL_HOST');
+        $mail->Port       = env('MAIL_PORT'); // or 587
         $mail->IsHTML(true);
-        $mail->Username = "noreply@dcvinvest.com";
-        $mail->Password = "Dcvinvest@123#";
-        $mail->SetFrom("noreply@dcvinvest.com", 'DCVINVEST');
+        $mail->Username = env('MAIL_USERNAME');
+        $mail->Password = env('MAIL_PASSWORD');
+        $mail->SetFrom(env('MAIL_FROM_ADDRESS'), env('MAIL_FROM_NAME'));
         if($this->action != null) {
             if($this->action == 'OWNER'){
                 $mail->AddAddress($this->receiver_email, "Receiver Name");
