@@ -62,7 +62,7 @@ class Pos extends Model
         $this->deactivateAgents();
 
         // Add the new agent record
-        $this->agents()->attach($agentId, ['status' => Constants::USER_STATUS_ACTIVE, 'fee' => $fee]);
+        $this->agents()->attach($agentId, ['status' => Constants::USER_STATUS_ACTIVE, 'fee' => $fee, 'created_at' => now(), 'updated_at' => now(), 'created_by' => auth()->id()]);
     }
 
     /**

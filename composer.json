@@ -9,12 +9,11 @@
     "license": "MIT",
     "require": {
         "php": "^7.2.5|^8.0",
-        "anchu/ftp": "~2.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^6.3.1|^7.0.1",
         "ixudra/curl": "6.x",
-        "laravel/framework": "^7.29",
+        "laravel/framework": "^8.75",
         "laravel/tinker": "^2.5",
         "league/flysystem-sftp": "1.0.22",
         "mpdf/mpdf": "^8.1",
