@@ -137,7 +137,7 @@ class MoneyComesBackRepo extends BaseRepo
             if ($moneyComesBack->status == Constants::USER_STATUS_DELETED) {
                 return [
                     'code' => 200,
-                    'message' => 'Lô tiền về đã bị xóa',
+                    'error' => 'Lô tiền về đã bị xóa',
                     'data' => null
                 ];
             } else {
@@ -147,13 +147,13 @@ class MoneyComesBackRepo extends BaseRepo
                 if ($moneyComesBack->save()) {
                     return [
                         'code' => 200,
-                        'message' => 'Xóa lô tiền về thành công',
+                        'error' => 'Xóa lô tiền về thành công',
                         'data' => null
                     ];
                 } else {
                     return [
                         'code' => 400,
-                        'message' => 'Xóa lô tiền về không thành công',
+                        'error' => 'Xóa lô tiền về không thành công',
                         'data' => null
                     ];
                 }
@@ -161,7 +161,7 @@ class MoneyComesBackRepo extends BaseRepo
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy giao dịch',
+                'error' => 'Không tìm thấy giao dịch',
                 'data' => null
             ];
         }

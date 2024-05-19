@@ -223,13 +223,13 @@ class WithdrawPosRepo extends BaseRepo
         if ($withdrawPos) {
             return [
                 'code' => 200,
-                'message' => 'Thông tin chi tiết',
+                'error' => 'Thông tin chi tiết',
                 'data' => $withdrawPos
             ];
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin chi tiết ',
+                'error' => 'Không tìm thấy thông tin chi tiết ',
                 'data' => null
             ];
         }
@@ -244,7 +244,7 @@ class WithdrawPosRepo extends BaseRepo
             if ($withdrawPos->status == Constants::USER_STATUS_DELETED) {
                 return [
                     'code' => 200,
-                    'message' => 'Giao dịch đã bị xóa',
+                    'error' => 'Giao dịch đã bị xóa',
                     'data' => null
                 ];
             } else {
@@ -254,13 +254,13 @@ class WithdrawPosRepo extends BaseRepo
                 if ($withdrawPos->save()) {
                     return [
                         'code' => 200,
-                        'message' => 'Xóa rút tiền pos thành công',
+                        'error' => 'Xóa rút tiền pos thành công',
                         'data' => null
                     ];
                 } else {
                     return [
                         'code' => 400,
-                        'message' => 'Xóa rút tiền pos không thành công',
+                        'error' => 'Xóa rút tiền pos không thành công',
                         'data' => null
                     ];
                 }
@@ -268,7 +268,7 @@ class WithdrawPosRepo extends BaseRepo
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin rút tiền',
+                'error' => 'Không tìm thấy thông tin rút tiền',
                 'data' => null
             ];
         }

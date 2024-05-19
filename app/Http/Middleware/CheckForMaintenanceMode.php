@@ -21,7 +21,7 @@ class CheckForMaintenanceMode extends Middleware
         if ($this->app->isDownForMaintenance()) {
             return response()->json([
                 'code' => 503,
-                'message' => 'Hệ thống đang nâng cấp, bảo trì. Bạn vui lòng, thử lại sau',
+                'error' => 'Hệ thống đang nâng cấp, bảo trì. Bạn vui lòng, thử lại sau',
                 'data' => null
             ]);
         }

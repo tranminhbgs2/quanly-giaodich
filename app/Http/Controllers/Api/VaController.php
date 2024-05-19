@@ -38,7 +38,7 @@ class VaController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Danh sách thẻ ảo',
+                'error' => 'Danh sách thẻ ảo',
                 'data' => $data,
                 'meta' => [
                     'page_index' => intval($params['page_index']),
@@ -51,7 +51,7 @@ class VaController extends Controller
 
         return response()->json([
             'code' => 404,
-            'message' => 'Không tìm thấy thông tin thẻ ảo',
+            'error' => 'Không tìm thấy thông tin thẻ ảo',
             'data' => null
         ]);
     }
@@ -72,14 +72,14 @@ class VaController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Thông tin thẻ ảo',
+                'error' => 'Thông tin thẻ ảo',
                 'data' => $data
             ]);
         }
 
         return response()->json([
             'code' => 404,
-            'message' => 'Không tìm thấy thông tin thẻ ảo',
+            'error' => 'Không tìm thấy thông tin thẻ ảo',
             'data' => null
         ]);
     }

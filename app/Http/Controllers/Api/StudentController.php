@@ -31,14 +31,14 @@ class StudentController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Thông tin học sinh',
+                'error' => 'Thông tin học sinh',
                 'data' => $data
             ]);
         }
 
         return response()->json([
             'code' => 404,
-            'message' => 'Không tìm thấy thông tin học sinh',
+            'error' => 'Không tìm thấy thông tin học sinh',
             'data' => null
         ]);
     }
@@ -60,14 +60,14 @@ class StudentController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Thông tin học sinh',
+                'error' => 'Thông tin học sinh',
                 'data' => $data
             ]);
         }
 
         return response()->json([
             'code' => 404,
-            'message' => 'Không tìm thấy thông tin học sinh',
+            'error' => 'Không tìm thấy thông tin học sinh',
             'data' => null
         ]);
     }
@@ -92,7 +92,7 @@ class StudentController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Danh sách học sinh',
+                'error' => 'Danh sách học sinh',
                 'data' => $data,
                 'meta' => [
                     'page_index' => intval($params['page_index']),
@@ -105,7 +105,7 @@ class StudentController extends Controller
 
         return response()->json([
             'code' => 404,
-            'message' => 'Không tìm thấy thông tin học sinh',
+            'error' => 'Không tìm thấy thông tin học sinh',
             'data' => null
         ]);
     }

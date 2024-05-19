@@ -138,13 +138,13 @@ class PosRepo extends BaseRepo
         if ($pos) {
             return [
                 'code' => 200,
-                'message' => 'Thông tin chi tiết',
+                'error' => 'Thông tin chi tiết',
                 'data' => $pos
             ];
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin chi tiết',
+                'error' => 'Không tìm thấy thông tin chi tiết',
                 'data' => null
             ];
         }
@@ -165,7 +165,7 @@ class PosRepo extends BaseRepo
             if ($pos->status == Constants::USER_STATUS_DELETED) {
                 return [
                     'code' => 200,
-                    'message' => 'Điểm POS đã bị xóa',
+                    'error' => 'Điểm POS đã bị xóa',
                     'data' => null
                 ];
             } else {
@@ -175,13 +175,13 @@ class PosRepo extends BaseRepo
                 if ($pos->save()) {
                     return [
                         'code' => 200,
-                        'message' => 'Xóa điểm POS thành công',
+                        'error' => 'Xóa điểm POS thành công',
                         'data' => null
                     ];
                 } else {
                     return [
                         'code' => 400,
-                        'message' => 'Xóa điểm POS không thành công',
+                        'error' => 'Xóa điểm POS không thành công',
                         'data' => null
                     ];
                 }
@@ -189,7 +189,7 @@ class PosRepo extends BaseRepo
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin điểm POS',
+                'error' => 'Không tìm thấy thông tin điểm POS',
                 'data' => null
             ];
         }
@@ -225,13 +225,13 @@ class PosRepo extends BaseRepo
 
             return [
                 'code' => 200,
-                'message' => 'Gán POS cho đại lý thành công',
+                'error' => 'Gán POS cho đại lý thành công',
                 'data' => null
             ];
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin POS',
+                'error' => 'Không tìm thấy thông tin POS',
                 'data' => null
             ];
         }

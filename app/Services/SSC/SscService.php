@@ -394,7 +394,7 @@ class SscService
             return [
                 'code' => 200,
                 'status' => Constants::BILL_STATUS_OUT_OF_DEBIT,
-                'message' => 'Bạn không còn nợ học phí',
+                'error' => 'Bạn không còn nợ học phí',
                 'data' => null
             ];
         }
@@ -403,7 +403,7 @@ class SscService
         $pay_result = [
             'code' => 404,
             'status' => Constants::BILL_STATUS_BILL_NOT_FOUND,
-            'message' => 'Không tìm thấy hóa đơn',
+            'error' => 'Không tìm thấy hóa đơn',
             'data' => null
         ];
 
@@ -442,7 +442,7 @@ class SscService
                     $pay_result = [
                         'code' => 200,
                         'status' => Constants::BILL_STATUS_PAYMENT_SUCCESSFULLY,
-                        'message' => 'Thanh toán hóa đơn thành công',
+                        'error' => 'Thanh toán hóa đơn thành công',
                         'data' => $result
                     ];
 
@@ -452,7 +452,7 @@ class SscService
                         $pay_result = [
                             'code' => 200,
                             'status' => Constants::BILL_STATUS_SYSTEM_BUSY,
-                            'message' => 'Không tìm thấy hóa đơn thanh toán hoặc bạn không còn nợ học phí',
+                            'error' => 'Không tìm thấy hóa đơn thanh toán hoặc bạn không còn nợ học phí',
                             'data' => null
                         ];
                     }

@@ -39,6 +39,6 @@ class CrontjobCommand extends Command
      */
     public function handle()
     {
-        Crontjob::create(['message' => 'Crontjob is called at ' . Carbon::now()]);
+        Crontjob::create(['error' => 'Crontjob is called at ' . Carbon::now()]);
     }
 }

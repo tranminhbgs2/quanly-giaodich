@@ -220,13 +220,13 @@ class CustomerRepo extends BaseRepo
 
             return [
                 'code' => 200,
-                'message' => 'Thông tin chi tiết ' . $message,
+                'error' => 'Thông tin chi tiết ' . $message,
                 'data' => $data
             ];
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin chi tiết ' . $message,
+                'error' => 'Không tìm thấy thông tin chi tiết ' . $message,
                 'data' => null
             ];
         }
@@ -251,7 +251,7 @@ class CustomerRepo extends BaseRepo
             if ($user->status == Constants::USER_STATUS_DELETED) {
                 return [
                     'code' => 200,
-                    'message' => 'Thông tin ' . $message . ' đang bị khóa vĩnh viễn',
+                    'error' => 'Thông tin ' . $message . ' đang bị khóa vĩnh viễn',
                     'data' => null
                 ];
             } else {
@@ -261,13 +261,13 @@ class CustomerRepo extends BaseRepo
                 if ($user->save()) {
                     return [
                         'code' => 200,
-                        'message' => 'Khóa thông tin ' . $message . ' vĩnh viễn thành công',
+                        'error' => 'Khóa thông tin ' . $message . ' vĩnh viễn thành công',
                         'data' => null
                     ];
                 } else {
                     return [
                         'code' => 400,
-                        'message' => 'Xóa thông tin ' . $message . ' không thành công',
+                        'error' => 'Xóa thông tin ' . $message . ' không thành công',
                         'data' => null
                     ];
                 }
@@ -275,7 +275,7 @@ class CustomerRepo extends BaseRepo
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin ' . $message,
+                'error' => 'Không tìm thấy thông tin ' . $message,
                 'data' => null
             ];
         }

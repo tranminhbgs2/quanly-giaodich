@@ -73,7 +73,7 @@ class AuthController extends Controller
                 ]));
                 return response()->json([
                     'code' => 401,
-                    'message' => 'Đăng nhập không thành công',
+                    'error' => 'Đăng nhập không thành công',
                     'data' => null
                 ]);
             }
@@ -93,7 +93,7 @@ class AuthController extends Controller
             // Something went wrong whilst attempting to encode the token
             return response()->json([
                 'code' => 500,
-                'message' => 'Đã có lỗi xảy ra, Bạn vui lòng thử lại sau',
+                'error' => 'Đã có lỗi xảy ra, Bạn vui lòng thử lại sau',
                 'data' => null
             ]);
         }
@@ -141,7 +141,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'code' => 200,
-                'message' => 'Đăng nhập thành công',
+                'error' => 'Đăng nhập thành công',
                 'data' => $data
             ]);
 
@@ -179,7 +179,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'code' => 400,
-                'message' => $message,
+                'error' => $message,
                 'data' => null
             ]);
         }
@@ -207,14 +207,14 @@ class AuthController extends Controller
         if ($resutl) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Thêm mới khách hàng thành công',
+                'error' => 'Thêm mới khách hàng thành công',
                 'data' => null
             ]);
         }
 
         return response()->json([
             'code' => 400,
-            'message' => 'Thêm mới khách hàng không thành công',
+            'error' => 'Thêm mới khách hàng không thành công',
             'data' => null
         ]);
     }
@@ -235,14 +235,14 @@ class AuthController extends Controller
         if ($result) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Mật khẩu đã được gửi về email. Bạn vui lòng, kiểm tra email để lấy thông tin',
+                'error' => 'Mật khẩu đã được gửi về email. Bạn vui lòng, kiểm tra email để lấy thông tin',
                 'data' => null
             ]);
         }
 
         return response()->json([
             'code' => 400,
-            'message' => 'Đã có lỗi xảy ra. Bạn vui lòng, thử lại sau',
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng, thử lại sau',
             'data' => null
         ]);
     }
@@ -269,7 +269,7 @@ class AuthController extends Controller
         JWTAuth::invalidate();  // add it to the blacklist
         return response()->json([
             'code' => 200,
-            'message' => 'Đăng xuất thành công',
+            'error' => 'Đăng xuất thành công',
             'data' => null
         ]);
     }
@@ -295,7 +295,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'code' => 200,
-            'message' => 'Đăng nhập thành công.',
+            'error' => 'Đăng nhập thành công.',
             'data' => [
                 'user_id' => Auth::id(),
                 'email' => Auth::user()->email,

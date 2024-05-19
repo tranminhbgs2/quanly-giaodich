@@ -129,13 +129,13 @@ class VaRepo extends BaseRepo
             if ($data) {
                 return [
                     'code' => 200,
-                    'message' => 'Thông tin thẻ ảo',
+                    'error' => 'Thông tin thẻ ảo',
                     'data' => $data
                 ];
             } else {
                 return [
                     'code' => 404,
-                    'message' => 'Không tìm thấy thông tin thẻ ảo',
+                    'error' => 'Không tìm thấy thông tin thẻ ảo',
                     'data' => null
                 ];
             }
@@ -143,7 +143,7 @@ class VaRepo extends BaseRepo
 
         return [
             'code' => 400,
-            'message' => 'Đã có lỗi xảy ra. Bạn vui lòng, thử lại sau.',
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng, thử lại sau.',
             'data' => null
         ];
 

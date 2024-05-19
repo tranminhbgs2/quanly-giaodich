@@ -58,7 +58,7 @@ class AnnouncementController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => ($params['is_listing'] == 1) ? 'Danh sách thông báo' : 'Thông báo ở trang chủ',
+                'error' => ($params['is_listing'] == 1) ? 'Danh sách thông báo' : 'Thông báo ở trang chủ',
                 'data' => $data,
                 'meta' => [
                     'page_index' => $params['page_index'],
@@ -71,7 +71,7 @@ class AnnouncementController extends Controller
 
         return response()->json([
             'code' => 400,
-            'message' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
             'data' => null
         ]);
     }
@@ -90,7 +90,7 @@ class AnnouncementController extends Controller
         } else {
             $data = [
                 'code' => 422,
-                'message' => 'Id phải là số nguyên dương, nhỏ nhất là 1',
+                'error' => 'Id phải là số nguyên dương, nhỏ nhất là 1',
                 'data' => null
             ];
         }
@@ -112,7 +112,7 @@ class AnnouncementController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Tổng số thông báo chưa đọc',
+                'error' => 'Tổng số thông báo chưa đọc',
                 'data' => [
                     'total_unread' => $data
                 ]
@@ -121,7 +121,7 @@ class AnnouncementController extends Controller
 
         return response()->json([
             'code' => 400,
-            'message' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
             'data' => null
         ]);
     }
@@ -149,14 +149,14 @@ class AnnouncementController extends Controller
         if ($response) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Tạo mới thông báo thành công',
+                'error' => 'Tạo mới thông báo thành công',
                 'data' => $response
             ]);
         }
 
         return response()->json([
             'code' => 400,
-            'message' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
             'data' => null
         ]);
 
@@ -179,21 +179,21 @@ class AnnouncementController extends Controller
             if ($response) {
                 return response()->json([
                     'code' => 200,
-                    'message' => 'Xóa thông báo thành công',
+                    'error' => 'Xóa thông báo thành công',
                     'data' => null
                 ]);
             }
 
             return response()->json([
                 'code' => 400,
-                'message' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
+                'error' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
                 'data' => null
             ]);
 
         } else {
             return response()->json([
                 'code' => 422,
-                'message' => 'Truyền thiếu SSC-ID',
+                'error' => 'Truyền thiếu SSC-ID',
                 'data' => null
             ]);
         }

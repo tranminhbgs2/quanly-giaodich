@@ -103,20 +103,20 @@ class BankAccountsRepo extends BaseRepo
             if ($bankAccount->save()) {
                 return [
                     'code' => 200,
-                    'message' => 'Xóa tài khoản ngân hàng thành công',
+                    'error' => 'Xóa tài khoản ngân hàng thành công',
                     'data' => null
                 ];
             } else {
                 return [
                     'code' => 400,
-                    'message' => 'Xóa tài khoản ngân hàng không thành công',
+                    'error' => 'Xóa tài khoản ngân hàng không thành công',
                     'data' => null
                 ];
             }
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy tài khoản ngân hàng',
+                'error' => 'Không tìm thấy tài khoản ngân hàng',
                 'data' => null
             ];
         }

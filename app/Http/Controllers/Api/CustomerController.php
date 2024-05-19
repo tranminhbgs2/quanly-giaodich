@@ -61,7 +61,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'code' => 200,
-            'message' => 'Danh sách khách hàng',
+            'error' => 'Danh sách khách hàng',
             'data' => $data,
             'meta' => [
                 'page_index' => intval($params['page_index']),
@@ -89,7 +89,7 @@ class CustomerController extends Controller
         } else {
             $data = [
                 'code' => 422,
-                'message' => 'Truyền thiếu SSC-ID',
+                'error' => 'Truyền thiếu SSC-ID',
                 'data' => null
             ];
         }
@@ -133,14 +133,14 @@ class CustomerController extends Controller
         if ($resutl) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Thêm mới nhân viên thành công',
+                'error' => 'Thêm mới nhân viên thành công',
                 'data' => null
             ]);
         }
 
         return response()->json([
             'code' => 400,
-            'message' => 'Thêm mới nhân viên không thành công',
+            'error' => 'Thêm mới nhân viên không thành công',
             'data' => null
         ]);
     }
@@ -191,20 +191,20 @@ class CustomerController extends Controller
                 if ($resutl) {
                     return response()->json([
                         'code' => 200,
-                        'message' => 'Cập nhật thông tin nhân viên thành công',
+                        'error' => 'Cập nhật thông tin nhân viên thành công',
                         'data' => null
                     ]);
                 }
 
                 return response()->json([
                     'code' => 400,
-                    'message' => 'Cập nhật thông tin nhân viên không thành công',
+                    'error' => 'Cập nhật thông tin nhân viên không thành công',
                     'data' => null
                 ]);
             } else {
                 return response()->json([
                     'code' => 422,
-                    'message' => 'Mã nhân viên không hợp lệ',
+                    'error' => 'Mã nhân viên không hợp lệ',
                     'data' => null
                 ]);
             }
@@ -212,7 +212,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'code' => 422,
-            'message' => 'Truyền thiếu id của Nhân viên',
+            'error' => 'Truyền thiếu id của Nhân viên',
             'data' => null
         ]);
 
@@ -235,14 +235,14 @@ class CustomerController extends Controller
             } else {
                 return response()->json([
                     'code' => 422,
-                    'message' => 'ID không hợp lệ',
+                    'error' => 'ID không hợp lệ',
                     'data' => null
                 ]);
             }
         } else {
             $data = [
                 'code' => 422,
-                'message' => 'Truyền thiếu ID',
+                'error' => 'Truyền thiếu ID',
                 'data' => null
             ];
         }
@@ -274,7 +274,7 @@ class CustomerController extends Controller
                 if ($result) {
                     return response()->json([
                         'code' => 200,
-                        'message' => 'Cập nhật thông avatar thành công',
+                        'error' => 'Cập nhật thông avatar thành công',
                         'data' => [
                             'avatar' => asset('storage/' . $path)
                         ]
@@ -282,7 +282,7 @@ class CustomerController extends Controller
                 } else {
                     return response()->json([
                         'code' => 400,
-                        'message' => 'Cập nhật thông avatar không thành công',
+                        'error' => 'Cập nhật thông avatar không thành công',
                         'data' => null
                     ]);
                 }
@@ -291,7 +291,7 @@ class CustomerController extends Controller
 
         return response()->json([
             'code' => 400,
-            'message' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
             'data' => null
         ]);
     }
@@ -312,14 +312,14 @@ class CustomerController extends Controller
         if ($result) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Thay đổi mật khẩu thành công',
+                'error' => 'Thay đổi mật khẩu thành công',
                 'data' => null
             ]);
         }
 
         return response()->json([
             'code' => 400,
-            'message' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
             'data' => null
         ]);
     }

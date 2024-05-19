@@ -95,7 +95,7 @@ class StudentListingRequest extends FormRequest
         throw new HttpResponseException(
             response()->json([
                 'code' => 422,
-                'message' => $validator->errors()->first(),
+                'error' => $validator->errors()->first(),
                 'data' => null
             ])
         );

@@ -42,7 +42,7 @@ class FilterPassword
                     } else {
                         return response()->json([
                             'code' => 422,
-                            'message' => 'Tham số ' . $field . ' không hợp lệ',
+                            'error' => 'Tham số ' . $field . ' không hợp lệ',
                             'data' => null
                         ]);
 
@@ -50,14 +50,14 @@ class FilterPassword
                             if (isset($input['type']) && !in_array($input['type'], ['FORGOT_PASSWORD', 'CREATE_OTP_PASSWORD', 'CUSTOMER_REGISTER', 'CUSTOMER_VERIFY'])) {
                                 return response()->json([
                                     'code' => 422,
-                                    'message' => 'Tham số ' . $field . ' không hợp lệ',
+                                    'error' => 'Tham số ' . $field . ' không hợp lệ',
                                     'data' => null
                                 ]);
                             }
                         } else {
                             return response()->json([
                                 'code' => 422,
-                                'message' => 'Tham số ' . $field . ' không hợp lệ',
+                                'error' => 'Tham số ' . $field . ' không hợp lệ',
                                 'data' => null
                             ]);
                         }*/

@@ -29,14 +29,14 @@ class FilterSignature
             } else {
                 return response()->json([
                     'code' => 422,
-                    'message' => 'Chữ ký không hợp lệ',
+                    'error' => 'Chữ ký không hợp lệ',
                     'data' => null
                 ]);
             }
         } else {
             return response()->json([
                 'code' => 422,
-                'message' => 'Không tìm thấy chữ ký xác thực',
+                'error' => 'Không tìm thấy chữ ký xác thực',
                 'data' => null
             ]);
          }*/

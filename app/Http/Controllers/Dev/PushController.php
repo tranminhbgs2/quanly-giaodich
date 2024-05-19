@@ -46,7 +46,7 @@ class PushController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'code' => 422,
-                'message' => $validator->errors()->first(),
+                'error' => $validator->errors()->first(),
                 'data' => null
             ]);
         }
@@ -69,7 +69,7 @@ class PushController extends Controller
 
         return response()->json([
             'code' => 200,
-            'message' => 'Kết quả do firebase trả về',
+            'error' => 'Kết quả do firebase trả về',
             'data' => $result
         ]);
     }

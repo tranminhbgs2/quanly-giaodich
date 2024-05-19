@@ -55,7 +55,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof UnauthorizedHttpException ) {
             return response()->json([
                 'code' => 401,
-                'message' => 'Bạn vui lòng, đăng nhập',
+                'error' => 'Bạn vui lòng, đăng nhập',
                 'data' => null,
             ]);
         }
@@ -63,7 +63,7 @@ class Handler extends ExceptionHandler
         if ($exception->getCode() === 2002 || $exception instanceof QueryException) {
             return response()->json([
                 'code' => 500,
-                'message' => 'Bạn vui lòng, kiểm tra kết nối CSDL',
+                'error' => 'Bạn vui lòng, kiểm tra kết nối CSDL',
                 'data' => null,
             ]);
         }
@@ -98,7 +98,7 @@ class Handler extends ExceptionHandler
 
     	    return response()->json([
                 'code' => 401,
-                'message' => 'Bạn vui lòng, đăng nhập',
+                'error' => 'Bạn vui lòng, đăng nhập',
                 'data' => null,
             ]);
         }
@@ -106,7 +106,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof QueryException) {
             return response()->json([
                 'code' => 400,
-                'message' => 'Hệ thống đang bận, Bạn vui lòng thử lại sau',
+                'error' => 'Hệ thống đang bận, Bạn vui lòng thử lại sau',
                 'message_dev' => $exception->getMessage(),
                 'data' => null,
             ]);
@@ -115,7 +115,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof NotFoundHttpException) {
             return response()->json([
                 'code' => 404,
-                'message' => 'Sai đường dẫn api.',
+                'error' => 'Sai đường dẫn api.',
                 'data' => null,
             ]);
         }
@@ -123,7 +123,7 @@ class Handler extends ExceptionHandler
         if ($exception instanceof MethodNotAllowedHttpException) {
             return response()->json([
                 'code' => '405',
-                'message' => 'Sai phương thức gọi api.',
+                'error' => 'Sai phương thức gọi api.',
                 'data' => null,
             ]);
         }
@@ -149,7 +149,7 @@ class Handler extends ExceptionHandler
         if (strpos($request->getUri(), '/api') > 0) {
             return response()->json([
                 'code' => 401,
-                'message' => 'Bạn vui lòng, đăng nhập.',
+                'error' => 'Bạn vui lòng, đăng nhập.',
                 'data' => null,
             ]);
         }

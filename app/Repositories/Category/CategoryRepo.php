@@ -101,20 +101,20 @@ class CategoriesRepository extends BaseRepo
             if ($category->save()) {
                 return [
                     'code' => 200,
-                    'message' => 'Xóa danh mục thành công',
+                    'error' => 'Xóa danh mục thành công',
                     'data' => null
                 ];
             } else {
                 return [
                     'code' => 400,
-                    'message' => 'Xóa danh mục không thành công',
+                    'error' => 'Xóa danh mục không thành công',
                     'data' => null
                 ];
             }
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy danh mục',
+                'error' => 'Không tìm thấy danh mục',
                 'data' => null
             ];
         }

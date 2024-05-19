@@ -35,7 +35,7 @@ class DepartmentController extends Controller
 
         return response()->json([
             'code' => 200,
-            'message' => 'Danh sách Nhóm quyền',
+            'error' => 'Danh sách Nhóm quyền',
             'data' => $data,
             'meta' => [
                 'page_index' => intval($params['page_index']),
@@ -82,14 +82,14 @@ class DepartmentController extends Controller
         if ($resutl) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Thêm mới nhân viên thành công',
+                'error' => 'Thêm mới nhân viên thành công',
                 'data' => null
             ]);
         }
 
         return response()->json([
             'code' => 400,
-            'message' => 'Thêm mới nhân viên không thành công',
+            'error' => 'Thêm mới nhân viên không thành công',
             'data' => null
         ]);
     }
@@ -108,13 +108,13 @@ class DepartmentController extends Controller
             $this->department_repo->attachPositions($departmentId, $positions);
             return response()->json([
                 'code' => 200,
-                'message' => 'Gán quyền cho nhóm quyền thành công',
+                'error' => 'Gán quyền cho nhóm quyền thành công',
                 'data' => null
             ]);
         } else {
             return response()->json([
                 'code' => 200,
-                'message' => 'Đã có lỗi xảy ra',
+                'error' => 'Đã có lỗi xảy ra',
                 'data' => null
             ]);
         }

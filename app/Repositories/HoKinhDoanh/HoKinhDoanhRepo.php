@@ -17,7 +17,7 @@ class HoKinhDoanhRepository extends BaseRepo
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
         $created_by = $params['created_by'] ?? 0;
-        
+
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
 
         $query = HoKinhDoanh::select();
@@ -108,20 +108,20 @@ class HoKinhDoanhRepository extends BaseRepo
             if ($hoKinhDoanh->save()) {
                 return [
                     'code' => 200,
-                    'message' => 'Xóa hộ kinh doanh thành công',
+                    'error' => 'Xóa hộ kinh doanh thành công',
                     'data' => null
                 ];
             } else {
                 return [
                     'code' => 400,
-                    'message' => 'Xóa hộ kinh doanh không thành công',
+                    'error' => 'Xóa hộ kinh doanh không thành công',
                     'data' => null
                 ];
             }
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy hộ kinh doanh',
+                'error' => 'Không tìm thấy hộ kinh doanh',
                 'data' => null
             ];
         }

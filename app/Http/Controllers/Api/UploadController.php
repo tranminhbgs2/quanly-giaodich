@@ -38,7 +38,7 @@ class UploadController extends Controller
 
         return response()->json([
             'code' => 200,
-            'message' => 'Đường dẫn ảnh vừa tải lên',
+            'error' => 'Đường dẫn ảnh vừa tải lên',
             'data' => [
                 'path' => $path
             ]

@@ -90,13 +90,13 @@ class AnnouncementRepo extends BaseRepo
 
                 return [
                     'code' => 200,
-                    'message' => 'Thông tin chi tiết thông báo',
+                    'error' => 'Thông tin chi tiết thông báo',
                     'data' => $notice
                 ];
             } else {
                 return [
                     'code' => 404,
-                    'message' => 'Không tìm thấy thông tin chi tiết thông báo',
+                    'error' => 'Không tìm thấy thông tin chi tiết thông báo',
                     'data' => $notice
                 ];
             }
@@ -104,7 +104,7 @@ class AnnouncementRepo extends BaseRepo
 
         return [
             'code' => 400,
-            'message' => 'Đã có lỗi xảy ra. Bạn vui lòng, thử lại sau.',
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng, thử lại sau.',
             'data' => null
         ];
     }

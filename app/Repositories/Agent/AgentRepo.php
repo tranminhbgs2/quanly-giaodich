@@ -128,13 +128,13 @@ class AgentRepo extends BaseRepo
         if ($agent) {
             return [
                 'code' => 200,
-                'message' => 'Thông tin chi tiết',
+                'error' => 'Thông tin chi tiết',
                 'data' => $agent
             ];
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin chi tiết',
+                'error' => 'Không tìm thấy thông tin chi tiết',
                 'data' => null
             ];
         }
@@ -149,7 +149,7 @@ class AgentRepo extends BaseRepo
             if ($agent->status == Constants::USER_STATUS_DELETED) {
                 return [
                     'code' => 200,
-                    'message' => 'Đại lý đã bị xóa',
+                    'error' => 'Đại lý đã bị xóa',
                     'data' => null
                 ];
             } else {
@@ -159,13 +159,13 @@ class AgentRepo extends BaseRepo
                 if ($agent->save()) {
                     return [
                         'code' => 200,
-                        'message' => 'Xóa đại lý thành công',
+                        'error' => 'Xóa đại lý thành công',
                         'data' => null
                     ];
                 } else {
                     return [
                         'code' => 400,
-                        'message' => 'Xóa đại lý không thành công',
+                        'error' => 'Xóa đại lý không thành công',
                         'data' => null
                     ];
                 }
@@ -173,7 +173,7 @@ class AgentRepo extends BaseRepo
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin đại lý',
+                'error' => 'Không tìm thấy thông tin đại lý',
                 'data' => null
             ];
         }

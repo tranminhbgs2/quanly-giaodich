@@ -276,13 +276,13 @@ class TransactionRepo extends BaseRepo
 
             return [
                 'code' => 200,
-                'message' => 'Thông tin chi tiết',
+                'error' => 'Thông tin chi tiết',
                 'data' => $data
             ];
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin chi tiết ',
+                'error' => 'Không tìm thấy thông tin chi tiết ',
                 'data' => null
             ];
         }
@@ -305,7 +305,7 @@ class TransactionRepo extends BaseRepo
             if ($tran->status == Constants::USER_STATUS_DELETED) {
                 return [
                     'code' => 200,
-                    'message' => 'Giao dịch đã bị xóa',
+                    'error' => 'Giao dịch đã bị xóa',
                     'data' => null
                 ];
             } else {
@@ -315,13 +315,13 @@ class TransactionRepo extends BaseRepo
                 if ($tran->save()) {
                     return [
                         'code' => 200,
-                        'message' => 'Xóa giao dịch thành công',
+                        'error' => 'Xóa giao dịch thành công',
                         'data' => null
                     ];
                 } else {
                     return [
                         'code' => 400,
-                        'message' => 'Xóa giao dịch không thành công',
+                        'error' => 'Xóa giao dịch không thành công',
                         'data' => null
                     ];
                 }
@@ -329,7 +329,7 @@ class TransactionRepo extends BaseRepo
         } else {
             return [
                 'code' => 404,
-                'message' => 'Không tìm thấy thông tin giao dịch',
+                'error' => 'Không tìm thấy thông tin giao dịch',
                 'data' => null
             ];
         }

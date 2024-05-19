@@ -36,7 +36,7 @@ class LogController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Danh sách lịch sử phiên làm việc',
+                'error' => 'Danh sách lịch sử phiên làm việc',
                 'data' => $data,
                 'meta' => [
                     'page_index' => intval($params['page_index']),
@@ -49,7 +49,7 @@ class LogController extends Controller
 
         return response()->json([
             'code' => 404,
-            'message' => 'Không tìm thấy thông tin',
+            'error' => 'Không tìm thấy thông tin',
             'data' => null
         ]);
     }

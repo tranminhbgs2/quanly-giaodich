@@ -34,7 +34,7 @@ class BankController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Danh sách ngân hàng',
+                'error' => 'Danh sách ngân hàng',
                 'data' => $data,
                 'meta' => [
                     'page_index' => intval($params['page_index']),
@@ -47,7 +47,7 @@ class BankController extends Controller
 
         return response()->json([
             'code' => 404,
-            'message' => 'Không tìm thấy thông tin ngân hàng',
+            'error' => 'Không tìm thấy thông tin ngân hàng',
             'data' => null
         ]);
     }
@@ -71,7 +71,7 @@ class BankController extends Controller
         if ($data) {
             return response()->json([
                 'code' => 200,
-                'message' => 'Danh sách ngân hàng',
+                'error' => 'Danh sách ngân hàng',
                 'data' => $data,
                 'meta' => [
                     'page_index' => intval($params['page_index']),
@@ -84,7 +84,7 @@ class BankController extends Controller
 
         return response()->json([
             'code' => 404,
-            'message' => 'Không tìm thấy thông tin ngân hàng',
+            'error' => 'Không tìm thấy thông tin ngân hàng',
             'data' => null
         ]);
     }

@@ -30,13 +30,13 @@ class SettingController extends Controller
             $result = $this->versionRepository->version($platform);
             return response()->json([
                 'code' => ($result) ? 200 : 400,
-                'message' => ($result) ? 'Thông tin phiên bản hiện tại' : 'Đã có lỗi xảy ra, Bạn vui lòng thử lại sau',
+                'error' => ($result) ? 'Thông tin phiên bản hiện tại' : 'Đã có lỗi xảy ra, Bạn vui lòng thử lại sau',
                 'data' => $result
             ]);
         } else {
             return response()->json([
                 'code' => 422,
-                'message' => 'Truyền thiếu hoặc sai tham số platform (android/ios)',
+                'error' => 'Truyền thiếu hoặc sai tham số platform (android/ios)',
                 'data' => null
             ]);
         }
