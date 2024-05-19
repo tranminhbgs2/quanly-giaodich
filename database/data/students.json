@@ -1,0 +1,44 @@
+[
+    {
+        "name": "API lấy thông tin học phí của học sinh theo mã SSC",
+        "url": "{{url}}/api/v1/students/bills/search-by-sscid",
+        "request": {
+            "sscid":"1202112217000306",
+            "platform":"iOS"
+        },
+        "response": {
+            "code": 200,
+            "message": "Thông tin thanh toán của học sinh",
+            "data": {
+                "account_type": "STUDENT",
+                "sscid": "1202112217000306",
+                "fullname": "Ho Dac Quan",
+                "address": "115/7 Nguyen Van Nghi, P.7, Quan GV",
+                "school_code": "15FA01",
+                "school_name": "THPT Phu Nhuan",
+                "class_code": "10A01",
+                "class_name": "10A01",
+                "bills": [
+                    {
+                        "month": "06/2021",
+                        "amount": 1860400,
+                        "hash": "ec13bf97c19af58a44ce7585e00f7348"
+                    },
+                    {
+                        "month": "07/2021",
+                        "amount": 2000000,
+                        "hash": "c519c76892aec89c3057462163248488"
+                    },
+                    {
+                        "month": "08/2021",
+                        "amount": 12000,
+                        "hash": "dae953fc884f41686e464ef6faf5e343"
+                    }
+                ],
+                "total_amount": 3872400,
+                "avatar": "http://ssc.dcv.vn/storage/common/graduated.png"
+            }
+        }
+    }
+]
+

@@ -1,0 +1,1389 @@
+
+27/05/2021 16:13:09
+const TABLE_DCV_ASSETS = 'dcv_assets';
+const TABLE_DCV_COMPANIES = 'dcv_companies';
+const TABLE_DCV_DEPARTMENTS = 'dcv_departments';
+const TABLE_DCV_EMPLOYEES = 'dcv_employees';
+const TABLE_DCV_MEDIA = 'dcv_media';
+const TABLE_DCV_NOTICES = 'dcv_notices';
+const TABLE_DCV_SURVEYS = 'dcv_surveys';
+
+const TABLE_FAILED_JOBS = 'failed_jobs';
+
+const TABLE_INV_ACCOUNT_BANKS = 'inv_account_banks';
+const TABLE_INV_ADMIN = 'inv_admin';
+const TABLE_INV_CRONTJOBS = 'inv_crontjobs';
+const TABLE_INV_DEPOSIT = 'inv_deposit';
+const TABLE_INV_DEVICES = 'inv_devices';
+const TABLE_INV_EMAIL_SMS_GATEWAY = 'inv_email_sms_gateway';
+const TABLE_INV_FEE_PACKAGES = 'inv_fee_packages';
+const TABLE_INV_FEEDBACKS = 'inv_feedbacks';
+const TABLE_INV_LANGUAGE = 'inv_language';
+const TABLE_INV_NOTIFICATION_LOGS = 'inv_notification_logs';
+const TABLE_INV_NOTIFICATION_WAITS = 'inv_notification_waits';
+const TABLE_INV_ORDER_DETAIL_PACKAGES = 'inv_order_detail_packages';
+const TABLE_INV_ORDER_PACKAGES = 'inv_order_packages';
+const TABLE_INV_OTPS = 'inv_otps';
+const TABLE_INV_PAYMENT_GATEWAY = 'inv_payment_gateway';
+const TABLE_INV_PAYMENT_METOD_SETTING = 'inv_payment_metod_setting';
+const TABLE_INV_PRICE_PACKAGES = 'inv_price_packages';
+const TABLE_INV_REGISTRATION_PACKAGE = 'inv_registration_package';
+const TABLE_INV_REQUESTS = 'inv_requests';
+const TABLE_INV_SETTING = 'inv_setting';
+const TABLE_INV_TRANSECTIONS = 'inv_transections';
+const TABLE_INV_USER_REGISTRATION = 'inv_user_registration';
+const TABLE_INV_VERSIONS = 'inv_versions';
+const TABLE_INV_WITHDRAW = 'inv_withdraw';
+
+const TABLE_JOBS = 'jobs';
+
+const TABLE_MXV_AGENCIES = 'mxv_agencies';
+const TABLE_MXV_BROKERS = 'mxv_brokers';
+const TABLE_MXV_COMMODITIES = 'mxv_commodities';
+const TABLE_MXV_COMMODITY_SESSION = 'mxv_commodity_session';
+const TABLE_MXV_CONVERSION_UNITS = 'mxv_conversion_units';
+const TABLE_MXV_EXCHANGES = 'mxv_exchanges';
+const TABLE_MXV_MATURITIES = 'mxv_maturities';
+const TABLE_MXV_TRANS_SESSIONS = 'mxv_trans_sessions';
+const TABLE_MXV_UNITS = 'mxv_units';
+const TABLE_MXVNEWS_AUTHEN_LOGS = 'mxvnews_authen_logs';
+const TABLE_MXVNEWS_CALENDAR = 'mxvnews_calendar';
+const TABLE_MXVNEWS_CATEGORIES = 'mxvnews_categories';
+const TABLE_MXVNEWS_CATEGORY_POST = 'mxvnews_category_post';
+const TABLE_MXVNEWS_EVENT_TYPES = 'mxvnews_event_types';
+const TABLE_MXVNEWS_FILES = 'mxvnews_files';
+const TABLE_MXVNEWS_MEDIA = 'mxvnews_media';
+const TABLE_MXVNEWS_MEDIA_TOPIC = 'mxvnews_media_topic';
+const TABLE_MXVNEWS_POST_TAG = 'mxvnews_post_tag';
+const TABLE_MXVNEWS_POSTS = 'mxvnews_posts';
+const TABLE_MXVNEWS_SUBCATEGORIES = 'mxvnews_subcategories';
+const TABLE_MXVNEWS_TAGS = 'mxvnews_tags';
+const TABLE_MXVNEWS_TOPICS = 'mxvnews_topics';
+
+const TABLE_TBLACTIVITY_LOG = 'tblactivity_log';
+const TABLE_TBLALLOWANCE_TYPE = 'tblallowance_type';
+const TABLE_TBLANNOUNCEMENTS = 'tblannouncements';
+const TABLE_TBLAPPLICABLE_STAFF = 'tblapplicable_staff';
+const TABLE_TBLBONUS_DISCIPLINE = 'tblbonus_discipline';
+const TABLE_TBLBONUS_DISCIPLINE_DETAIL = 'tblbonus_discipline_detail';
+const TABLE_TBLCALL_LOG_TYPES = 'tblcall_log_types';
+const TABLE_TBLCALL_LOGS = 'tblcall_logs';
+const TABLE_TBLCD_CARE = 'tblcd_care';
+const TABLE_TBLCD_FAMILY_INFOR = 'tblcd_family_infor';
+const TABLE_TBLCD_INTERVIEW = 'tblcd_interview';
+const TABLE_TBLCD_LITERACY = 'tblcd_literacy';
+const TABLE_TBLCD_WORK_EXPERIENCE = 'tblcd_work_experience';
+const TABLE_TBLCHATCLIENTMESSAGES = 'tblchatclientmessages';
+const TABLE_TBLCHATGROUPMEMBERS = 'tblchatgroupmembers';
+const TABLE_TBLCHATGROUPMESSAGES = 'tblchatgroupmessages';
+const TABLE_TBLCHATGROUPS = 'tblchatgroups';
+const TABLE_TBLCHATGROUPSHAREDFILES = 'tblchatgroupsharedfiles';
+const TABLE_TBLCHATMESSAGES = 'tblchatmessages';
+const TABLE_TBLCHATSETTINGS = 'tblchatsettings';
+const TABLE_TBLCHATSHAREDFILES = 'tblchatsharedfiles';
+const TABLE_TBLCHECK_IN_OUT = 'tblcheck_in_out';
+const TABLE_TBLCHECKLIST = 'tblchecklist';
+const TABLE_TBLCHECKLIST_ALLOCATION = 'tblchecklist_allocation';
+const TABLE_TBLCLIENTS = 'tblclients';
+const TABLE_TBLCOMMISSION = 'tblcommission';
+const TABLE_TBLCOMMISSION_HIERARCHY = 'tblcommission_hierarchy';
+const TABLE_TBLCOMMISSION_POLICY = 'tblcommission_policy';
+const TABLE_TBLCOMMISSION_RECEIPT = 'tblcommission_receipt';
+const TABLE_TBLCOMMISSION_RECEIPT_DETAIL = 'tblcommission_receipt_detail';
+const TABLE_TBLCOMMISSION_SALESADMIN_GROUP = 'tblcommission_salesadmin_group';
+const TABLE_TBLCONSENT_PURPOSES = 'tblconsent_purposes';
+const TABLE_TBLCONSENTS = 'tblconsents';
+const TABLE_TBLCONTACT_PERMISSIONS = 'tblcontact_permissions';
+const TABLE_TBLCONTACTS = 'tblcontacts';
+const TABLE_TBLCONTRACT_COMMENTS = 'tblcontract_comments';
+const TABLE_TBLCONTRACT_RENEWALS = 'tblcontract_renewals';
+const TABLE_TBLCONTRACTS = 'tblcontracts';
+const TABLE_TBLCONTRACTS_TYPES = 'tblcontracts_types';
+const TABLE_TBLCOUNTRIES = 'tblcountries';
+const TABLE_TBLCREDITNOTE_REFUNDS = 'tblcreditnote_refunds';
+const TABLE_TBLCREDITNOTES = 'tblcreditnotes';
+const TABLE_TBLCREDITS = 'tblcredits';
+const TABLE_TBLCURRENCIES = 'tblcurrencies';
+const TABLE_TBLCUSTOMER_ADMINS = 'tblcustomer_admins';
+const TABLE_TBLCUSTOMER_GROUPS = 'tblcustomer_groups';
+const TABLE_TBLCUSTOMERS_GROUPS = 'tblcustomers_groups';
+const TABLE_TBLCUSTOMFIELDS = 'tblcustomfields';
+const TABLE_TBLCUSTOMFIELDSVALUES = 'tblcustomfieldsvalues';
+const TABLE_TBLDAY_OFF = 'tblday_off';
+const TABLE_TBLDEPARTMENTS = 'tbldepartments';
+const TABLE_TBLDISMISSED_ANNOUNCEMENTS = 'tbldismissed_announcements';
+const TABLE_TBLEMAILTEMPLATES = 'tblemailtemplates';
+const TABLE_TBLESTIMATE_REQUEST_FORMS = 'tblestimate_request_forms';
+const TABLE_TBLESTIMATE_REQUEST_STATUS = 'tblestimate_request_status';
+const TABLE_TBLESTIMATE_REQUESTS = 'tblestimate_requests';
+const TABLE_TBLESTIMATES = 'tblestimates';
+const TABLE_TBLEVENTS = 'tblevents';
+const TABLE_TBLEXPENSES = 'tblexpenses';
+const TABLE_TBLEXPENSES_CATEGORIES = 'tblexpenses_categories';
+const TABLE_TBLFILES = 'tblfiles';
+const TABLE_TBLFORM_QUESTION_BOX = 'tblform_question_box';
+const TABLE_TBLFORM_QUESTION_BOX_DESCRIPTION = 'tblform_question_box_description';
+const TABLE_TBLFORM_QUESTIONS = 'tblform_questions';
+const TABLE_TBLFORM_RESULTS = 'tblform_results';
+const TABLE_TBLGDPR_REQUESTS = 'tblgdpr_requests';
+const TABLE_TBLGOALS = 'tblgoals';
+const TABLE_TBLGROUP_CHECKLIST = 'tblgroup_checklist';
+const TABLE_TBLGROUP_CHECKLIST_ALLOCATION = 'tblgroup_checklist_allocation';
+const TABLE_TBLHR_ALLOCATION_ASSET = 'tblhr_allocation_asset';
+const TABLE_TBLHR_ALLOWANCE_TYPE = 'tblhr_allowance_type';
+const TABLE_TBLHR_CHECKLIST_ALLOCATION = 'tblhr_checklist_allocation';
+const TABLE_TBLHR_DEPENDENT_PERSON = 'tblhr_dependent_person';
+const TABLE_TBLHR_EDUCATION = 'tblhr_education';
+const TABLE_TBLHR_GROUP_CHECKLIST_ALLOCATION = 'tblhr_group_checklist_allocation';
+const TABLE_TBLHR_JOB_P = 'tblhr_job_p';
+const TABLE_TBLHR_JOB_POSITION = 'tblhr_job_position';
+const TABLE_TBLHR_JP_INTERVIEW_TRAINING = 'tblhr_jp_interview_training';
+const TABLE_TBLHR_JP_SALARY_SCALE = 'tblhr_jp_salary_scale';
+const TABLE_TBLHR_KNOWEDGE_BASE_ARTICLE_FEEDBACK = 'tblhr_knowedge_base_article_feedback';
+const TABLE_TBLHR_KNOWLEDGE_BASE = 'tblhr_knowledge_base';
+const TABLE_TBLHR_KNOWLEDGE_BASE_GROUPS = 'tblhr_knowledge_base_groups';
+const TABLE_TBLHR_LIST_STAFF_QUITTING_WORK = 'tblhr_list_staff_quitting_work';
+const TABLE_TBLHR_P_T_FORM_QUESTION_BOX = 'tblhr_p_t_form_question_box';
+const TABLE_TBLHR_P_T_FORM_QUESTION_BOX_DESCRIPTION = 'tblhr_p_t_form_question_box_description';
+const TABLE_TBLHR_P_T_FORM_RESULTS = 'tblhr_p_t_form_results';
+const TABLE_TBLHR_P_T_SURVEYRESULTSETS = 'tblhr_p_t_surveyresultsets';
+const TABLE_TBLHR_POSITION_TRAINING = 'tblhr_position_training';
+const TABLE_TBLHR_POSITION_TRAINING_QUESTION_FORM = 'tblhr_position_training_question_form';
+const TABLE_TBLHR_PROCEDURE_RETIRE = 'tblhr_procedure_retire';
+const TABLE_TBLHR_PROCEDURE_RETIRE_MANAGE = 'tblhr_procedure_retire_manage';
+const TABLE_TBLHR_PROCEDURE_RETIRE_OF_STAFF = 'tblhr_procedure_retire_of_staff';
+const TABLE_TBLHR_PROCEDURE_RETIRE_OF_STAFF_BY_ID = 'tblhr_procedure_retire_of_staff_by_id';
+const TABLE_TBLHR_PROFILE_OPTION = 'tblhr_profile_option';
+const TABLE_TBLHR_REC_TRANSFER_RECORDS = 'tblhr_rec_transfer_records';
+const TABLE_TBLHR_SALARY_FORM = 'tblhr_salary_form';
+const TABLE_TBLHR_STAFF_CONTRACT = 'tblhr_staff_contract';
+const TABLE_TBLHR_STAFF_CONTRACT_DETAIL = 'tblhr_staff_contract_detail';
+const TABLE_TBLHR_STAFF_CONTRACT_TYPE = 'tblhr_staff_contract_type';
+const TABLE_TBLHR_TRAINING_ALLOCATION = 'tblhr_training_allocation';
+const TABLE_TBLHR_VIEWS_TRACKING = 'tblhr_views_tracking';
+const TABLE_TBLHR_WORKPLACE = 'tblhr_workplace';
+const TABLE_TBLHRM_OPTION = 'tblhrm_option';
+const TABLE_TBLHRM_TIMESHEET = 'tblhrm_timesheet';
+const TABLE_TBLINSURANCE_TYPE = 'tblinsurance_type';
+const TABLE_TBLINVOICEPAYMENTRECORDS = 'tblinvoicepaymentrecords';
+const TABLE_TBLINVOICES = 'tblinvoices';
+const TABLE_TBLITEM_TAX = 'tblitem_tax';
+const TABLE_TBLITEMABLE = 'tblitemable';
+const TABLE_TBLITEMS = 'tblitems';
+const TABLE_TBLITEMS_GROUPS = 'tblitems_groups';
+const TABLE_TBLJOB_POSITION = 'tbljob_position';
+const TABLE_TBLKNOWEDGE_BASE_ARTICLE_FEEDBACK = 'tblknowedge_base_article_feedback';
+const TABLE_TBLKNOWLEDGE_BASE = 'tblknowledge_base';
+const TABLE_TBLKNOWLEDGE_BASE_GROUPS = 'tblknowledge_base_groups';
+const TABLE_TBLLEAD_ACTIVITY_LOG = 'tbllead_activity_log';
+const TABLE_TBLLEAD_INTEGRATION_EMAILS = 'tbllead_integration_emails';
+const TABLE_TBLLEADS = 'tblleads';
+const TABLE_TBLLEADS_EMAIL_INTEGRATION = 'tblleads_email_integration';
+const TABLE_TBLLEADS_SOURCES = 'tblleads_sources';
+const TABLE_TBLLEADS_STATUS = 'tblleads_status';
+const TABLE_TBLLEAVE_OF_THE_YEAR = 'tblleave_of_the_year';
+const TABLE_TBLLIST_WIDGET = 'tbllist_widget';
+const TABLE_TBLLOY_CARD = 'tblloy_card';
+const TABLE_TBLLOY_MBS_PROGRAM = 'tblloy_mbs_program';
+const TABLE_TBLLOY_MBS_RULE = 'tblloy_mbs_rule';
+const TABLE_TBLLOY_PROGRAM_DETAIL = 'tblloy_program_detail';
+const TABLE_TBLLOY_REDEEM_LOG = 'tblloy_redeem_log';
+const TABLE_TBLLOY_REDEMP_DETAIL = 'tblloy_redemp_detail';
+const TABLE_TBLLOY_RULE = 'tblloy_rule';
+const TABLE_TBLLOY_RULE_DETAIL = 'tblloy_rule_detail';
+const TABLE_TBLLOY_TRANSATION = 'tblloy_transation';
+const TABLE_TBLMAIL_QUEUE = 'tblmail_queue';
+const TABLE_TBLMANAGE_LEAVE = 'tblmanage_leave';
+const TABLE_TBLMIGRATIONS = 'tblmigrations';
+const TABLE_TBLMILESTONES = 'tblmilestones';
+const TABLE_TBLMODULES = 'tblmodules';
+const TABLE_TBLNEWSFEED_COMMENT_LIKES = 'tblnewsfeed_comment_likes';
+const TABLE_TBLNEWSFEED_POST_COMMENTS = 'tblnewsfeed_post_comments';
+const TABLE_TBLNEWSFEED_POST_LIKES = 'tblnewsfeed_post_likes';
+const TABLE_TBLNEWSFEED_POSTS = 'tblnewsfeed_posts';
+const TABLE_TBLNOTES = 'tblnotes';
+const TABLE_TBLNOTIFICATIONS = 'tblnotifications';
+const TABLE_TBLOKR_APPROVAL_DETAILS = 'tblokr_approval_details';
+const TABLE_TBLOKR_APPROVAL_SETTING = 'tblokr_approval_setting';
+const TABLE_TBLOKR_SETTING_CATEGORY = 'tblokr_setting_category';
+const TABLE_TBLOKR_SETTING_CIRCULATION = 'tblokr_setting_circulation';
+const TABLE_TBLOKR_SETTING_EVALUATION_CRITERIA = 'tblokr_setting_evaluation_criteria';
+const TABLE_TBLOKR_SETTING_QUESTION = 'tblokr_setting_question';
+const TABLE_TBLOKR_SETTING_UNIT = 'tblokr_setting_unit';
+const TABLE_TBLOKRS = 'tblokrs';
+const TABLE_TBLOKRS_CHECKIN = 'tblokrs_checkin';
+const TABLE_TBLOKRS_CHECKIN_LOG = 'tblokrs_checkin_log';
+const TABLE_TBLOKRS_KEY_RESULT = 'tblokrs_key_result';
+const TABLE_TBLOKRS_KEY_RESULT_LOG = 'tblokrs_key_result_log';
+const TABLE_TBLOKRS_LOG = 'tblokrs_log';
+const TABLE_TBLOPTIONS = 'tbloptions';
+const TABLE_TBLP_T_FORM_QUESTION_BOX_DESCRIPTION = 'tblp_t_form_question_box_description';
+const TABLE_TBLPAYMENT_MODES = 'tblpayment_modes';
+const TABLE_TBLPAYROLL_TABLE = 'tblpayroll_table';
+const TABLE_TBLPAYROLL_TYPE = 'tblpayroll_type';
+const TABLE_TBLPINNED_PROJECTS = 'tblpinned_projects';
+const TABLE_TBLPOSITION_TRAINING_QUESTION_FORM = 'tblposition_training_question_form';
+const TABLE_TBLPROJECT_ACTIVITY = 'tblproject_activity';
+const TABLE_TBLPROJECT_FILES = 'tblproject_files';
+const TABLE_TBLPROJECT_MEMBERS = 'tblproject_members';
+const TABLE_TBLPROJECT_NOTES = 'tblproject_notes';
+const TABLE_TBLPROJECT_SETTINGS = 'tblproject_settings';
+const TABLE_TBLPROJECTDISCUSSIONCOMMENTS = 'tblprojectdiscussioncomments';
+const TABLE_TBLPROJECTDISCUSSIONS = 'tblprojectdiscussions';
+const TABLE_TBLPROJECTS = 'tblprojects';
+const TABLE_TBLPROPOSAL_COMMENTS = 'tblproposal_comments';
+const TABLE_TBLPROPOSALS = 'tblproposals';
+const TABLE_TBLPROVINCE_CITY = 'tblprovince_city';
+const TABLE_TBLREC_CAMPAIGN = 'tblrec_campaign';
+const TABLE_TBLREC_CAMPAIGN_FORM_WEB = 'tblrec_campaign_form_web';
+const TABLE_TBLREC_CANDIDATE = 'tblrec_candidate';
+const TABLE_TBLREC_CD_EVALUATION = 'tblrec_cd_evaluation';
+const TABLE_TBLREC_CRITERIA = 'tblrec_criteria';
+const TABLE_TBLREC_EVALUATION_FORM = 'tblrec_evaluation_form';
+const TABLE_TBLREC_INTERVIEW = 'tblrec_interview';
+const TABLE_TBLREC_JOB_POSITION = 'tblrec_job_position';
+const TABLE_TBLREC_LIST_CRITERIA = 'tblrec_list_criteria';
+const TABLE_TBLREC_PROPOSAL = 'tblrec_proposal';
+const TABLE_TBLREC_SET_TRANSFER_RECORD = 'tblrec_set_transfer_record';
+const TABLE_TBLREC_TRANSFER_RECORDS = 'tblrec_transfer_records';
+const TABLE_TBLRECORDS_META = 'tblrecords_meta';
+const TABLE_TBLRELATED_ITEMS = 'tblrelated_items';
+const TABLE_TBLREMINDERS = 'tblreminders';
+const TABLE_TBLREQUEST = 'tblrequest';
+const TABLE_TBLREQUEST_APPROVAL_DETAILS = 'tblrequest_approval_details';
+const TABLE_TBLREQUEST_FILES = 'tblrequest_files';
+const TABLE_TBLREQUEST_FOLLOW = 'tblrequest_follow';
+const TABLE_TBLREQUEST_FORM = 'tblrequest_form';
+const TABLE_TBLREQUEST_LOG = 'tblrequest_log';
+const TABLE_TBLREQUEST_RELATED = 'tblrequest_related';
+const TABLE_TBLREQUEST_TYPE = 'tblrequest_type';
+const TABLE_TBLREQUEST_TYPE_FORM = 'tblrequest_type_form';
+const TABLE_TBLREQUEST_TYPE_WORKFLOW = 'tblrequest_type_workflow';
+const TABLE_TBLROLES = 'tblroles';
+const TABLE_TBLSALARY_FORM = 'tblsalary_form';
+const TABLE_TBLSALES_ACTIVITY = 'tblsales_activity';
+const TABLE_TBLSCHEDULED_EMAILS = 'tblscheduled_emails';
+const TABLE_TBLSERVICES = 'tblservices';
+const TABLE_TBLSESSIONS = 'tblsessions';
+const TABLE_TBLSETTING_ASSET_ALLOCATION = 'tblsetting_asset_allocation';
+const TABLE_TBLSETTING_TRAINING = 'tblsetting_training';
+const TABLE_TBLSETTING_TRANSFER_RECORDS = 'tblsetting_transfer_records';
+const TABLE_TBLSHARED_CUSTOMER_FILES = 'tblshared_customer_files';
+const TABLE_TBLSHIFT_TYPE = 'tblshift_type';
+const TABLE_TBLSPAM_FILTERS = 'tblspam_filters';
+const TABLE_TBLSTAFF = 'tblstaff';
+const TABLE_TBLSTAFF_CONTRACT = 'tblstaff_contract';
+const TABLE_TBLSTAFF_CONTRACT_DETAIL = 'tblstaff_contract_detail';
+const TABLE_TBLSTAFF_CONTRACTTYPE = 'tblstaff_contracttype';
+const TABLE_TBLSTAFF_DEPARTMENTS = 'tblstaff_departments';
+const TABLE_TBLSTAFF_INSURANCE = 'tblstaff_insurance';
+const TABLE_TBLSTAFF_INSURANCE_HISTORY = 'tblstaff_insurance_history';
+const TABLE_TBLSTAFF_PERMISSIONS = 'tblstaff_permissions';
+const TABLE_TBLSUBSCRIPTIONS = 'tblsubscriptions';
+const TABLE_TBLTAGGABLES = 'tbltaggables';
+const TABLE_TBLTAGS = 'tbltags';
+const TABLE_TBLTASK_ASSIGNED = 'tbltask_assigned';
+const TABLE_TBLTASK_CHECKLIST_ITEMS = 'tbltask_checklist_items';
+const TABLE_TBLTASK_COMMENTS = 'tbltask_comments';
+const TABLE_TBLTASK_FOLLOWERS = 'tbltask_followers';
+const TABLE_TBLTASKS = 'tbltasks';
+const TABLE_TBLTASKS_CHECKLIST_TEMPLATES = 'tbltasks_checklist_templates';
+const TABLE_TBLTASKSTIMERS = 'tbltaskstimers';
+const TABLE_TBLTAXES = 'tbltaxes';
+const TABLE_TBLTEMPLATES = 'tbltemplates';
+const TABLE_TBLTICKET_ATTACHMENTS = 'tblticket_attachments';
+const TABLE_TBLTICKET_REPLIES = 'tblticket_replies';
+const TABLE_TBLTICKETS = 'tbltickets';
+const TABLE_TBLTICKETS_PIPE_LOG = 'tbltickets_pipe_log';
+const TABLE_TBLTICKETS_PREDEFINED_REPLIES = 'tbltickets_predefined_replies';
+const TABLE_TBLTICKETS_PRIORITIES = 'tbltickets_priorities';
+const TABLE_TBLTICKETS_STATUS = 'tbltickets_status';
+const TABLE_TBLTIMESHEETS_ADDITIONAL_TIMESHEET = 'tbltimesheets_additional_timesheet';
+const TABLE_TBLTIMESHEETS_APPROVAL_DETAILS = 'tbltimesheets_approval_details';
+const TABLE_TBLTIMESHEETS_APPROVAL_SETTING = 'tbltimesheets_approval_setting';
+const TABLE_TBLTIMESHEETS_DAY_OFF = 'tbltimesheets_day_off';
+const TABLE_TBLTIMESHEETS_GO_BUSSINESS_ADVANCE_PAYMENT = 'tbltimesheets_go_bussiness_advance_payment';
+const TABLE_TBLTIMESHEETS_LATCH_TIMESHEET = 'tbltimesheets_latch_timesheet';
+const TABLE_TBLTIMESHEETS_LEAVE = 'tbltimesheets_leave';
+const TABLE_TBLTIMESHEETS_LOG_SEND_NOTIFY = 'tbltimesheets_log_send_notify';
+const TABLE_TBLTIMESHEETS_OPTION = 'tbltimesheets_option';
+const TABLE_TBLTIMESHEETS_REQUISITION_LEAVE = 'tbltimesheets_requisition_leave';
+const TABLE_TBLTIMESHEETS_ROUTE = 'tbltimesheets_route';
+const TABLE_TBLTIMESHEETS_ROUTE_POINT = 'tbltimesheets_route_point';
+const TABLE_TBLTIMESHEETS_SHIFT_SC = 'tbltimesheets_shift_sc';
+const TABLE_TBLTIMESHEETS_SHIFTWORK_SC = 'tbltimesheets_shiftwork_sc';
+const TABLE_TBLTIMESHEETS_TIMEKEEPER_DATA = 'tbltimesheets_timekeeper_data';
+const TABLE_TBLTIMESHEETS_TIMESHEET = 'tbltimesheets_timesheet';
+const TABLE_TBLTIMESHEETS_WORKPLACE = 'tbltimesheets_workplace';
+const TABLE_TBLTIMESHEETS_WORKPLACE_ASSIGN = 'tbltimesheets_workplace_assign';
+const TABLE_TBLTODOS = 'tbltodos';
+const TABLE_TBLTRACKED_MAILS = 'tbltracked_mails';
+const TABLE_TBLTRAINING_ALLOCATION = 'tbltraining_allocation';
+const TABLE_TBLTRANSFER_RECORDS_RECEPTION = 'tbltransfer_records_reception';
+const TABLE_TBLTWOCHECKOUT_LOG = 'tbltwocheckout_log';
+const TABLE_TBLUSER_AUTO_LOGIN = 'tbluser_auto_login';
+const TABLE_TBLUSER_META = 'tbluser_meta';
+const TABLE_TBLVAULT = 'tblvault';
+const TABLE_TBLVIEWS_TRACKING = 'tblviews_tracking';
+const TABLE_TBLWEB_TO_LEAD = 'tblweb_to_lead';
+const TABLE_TBLWEB_TO_RECRUITMENT = 'tblweb_to_recruitment';
+const TABLE_TBLWORK_SHIFT = 'tblwork_shift';
+const TABLE_TBLWORK_SHIFT_DETAIL = 'tblwork_shift_detail';
+const TABLE_TBLWORK_SHIFT_DETAIL_DAY_NAME = 'tblwork_shift_detail_day_name';
+const TABLE_TBLWORK_SHIFT_DETAIL_NUMBER_DAY = 'tblwork_shift_detail_number_day';
+const TABLE_TBLWORKPLACE = 'tblworkplace';
+
+const TABLE_USERS = 'users';
+
+const TABLE_VA_ACCOUNTS = 'va_accounts';
+const TABLE_VA_NOTIFICATIONS = 'va_notifications';
+const TABLE_VNPAY_BANKS = 'vnpay_banks';
+const TABLE_VNPAY_IPN_HISTORIES = 'vnpay_ipn_histories';
+const TABLE_VNPAY_TRANSACTION_HISTORIES = 'vnpay_transaction_histories';
+
+
+06/07/2021 17:07:08
+1. activity_log
+2. allowance_type
+3. announcements
+4. applicable_staff
+5. bonus_discipline
+6. dcv_assets
+7. dcv_companies
+8. dcv_departments
+9. dcv_employees
+10. dcv_media
+11. dcv_notices
+12. dcv_surveys
+13. failed_jobs
+14. inv_account_banks
+15. inv_admin
+16. inv_crontjobs
+17. inv_deposit
+18. inv_devices
+19. inv_email_sms_gateway
+20. inv_fee_packages
+21. inv_feedbacks
+22. inv_language
+23. inv_notification_logs
+24. inv_notification_waits
+25. inv_order_detail_packages
+26. inv_order_packages
+27. inv_otps
+28. inv_payment_gateway
+29. inv_payment_metod_setting
+30. inv_price_packages
+31. inv_registration_package
+32. inv_requests
+33. inv_setting
+34. inv_transections
+35. inv_user_registration
+36. inv_versions
+37. inv_withdraw
+38. jobs
+39. mxv_agencies
+40. mxv_brokers
+41. mxv_commodities
+42. mxv_commodity_session
+43. mxv_conversion_units
+44. mxv_exchanges
+45. mxv_maturities
+46. mxv_traders
+47. mxv_trans_sessions
+48. mxv_transaction_imports
+49. mxv_transaction_logs
+50. mxv_transaction_reports
+51. mxv_units
+52. mxvnews_authen_logs
+53. mxvnews_calendar
+54. mxvnews_categories
+55. mxvnews_category_post
+56. mxvnews_event_types
+57. mxvnews_files
+58. mxvnews_media
+59. mxvnews_media_topic
+60. mxvnews_post_tag
+61. mxvnews_posts
+62. mxvnews_subcategories
+63. mxvnews_tags
+64. mxvnews_topics
+65. tblbonus_discipline_detail
+66. tblcall_log_types
+67. tblcall_logs
+68. tblcd_care
+69. tblcd_family_infor
+70. tblcd_interview
+71. tblcd_literacy
+72. tblcd_work_experience
+73. tblchange_status_histories
+74. tblchatclientmessages
+75. tblchatgroupmembers
+76. tblchatgroupmessages
+77. tblchatgroups
+78. tblchatgroupsharedfiles
+79. tblchatmessages
+80. tblchatsettings
+81. tblchatsharedfiles
+82. tblcheck_in_out
+83. tblchecklist
+84. tblchecklist_allocation
+85. tblclients
+86. tblcommission
+87. tblcommission_hierarchy
+88. tblcommission_policy
+89. tblcommission_receipt
+90. tblcommission_receipt_detail
+91. tblcommission_salesadmin_group
+92. tblconsent_purposes
+93. tblconsents
+94. tblcontact_permissions
+95. tblcontacts
+96. tblcontract_comments
+97. tblcontract_renewals
+98. tblcontracts
+99. tblcontracts_types
+100. tblcountries
+101. tblcreditnote_refunds
+102. tblcreditnotes
+103. tblcredits
+104. tblcurrencies
+105. tblcustomer_admins
+106. tblcustomer_groups
+107. tblcustomers_groups
+108. tblcustomfields
+109. tblcustomfieldsvalues
+110. tblday_off
+111. tbldepartments
+112. tbldismissed_announcements
+113. tblemailtemplates
+114. tblestimate_request_forms
+115. tblestimate_request_status
+116. tblestimate_requests
+117. tblestimates
+118. tblevents
+119. tblexpenses
+120. tblexpenses_categories
+121. tblfiles
+122. tblform_question_box
+123. tblform_question_box_description
+124. tblform_questions
+125. tblform_results
+126. tblgdpr_requests
+127. tblgoals
+128. tblgroup_checklist
+129. tblgroup_checklist_allocation
+130. tblhr_allocation_asset
+131. tblhr_allowance_type
+132. tblhr_checklist_allocation
+133. tblhr_dependent_person
+134. tblhr_education
+135. tblhr_group_checklist_allocation
+136. tblhr_job_p
+137. tblhr_job_position
+138. tblhr_jp_interview_training
+139. tblhr_jp_salary_scale
+140. tblhr_knowedge_base_article_feedback
+141. tblhr_knowledge_base
+142. tblhr_knowledge_base_groups
+143. tblhr_list_staff_quitting_work
+144. tblhr_p_t_form_question_box
+145. tblhr_p_t_form_question_box_description
+146. tblhr_p_t_form_results
+147. tblhr_p_t_surveyresultsets
+148. tblhr_position_training
+149. tblhr_position_training_question_form
+150. tblhr_procedure_retire
+151. tblhr_procedure_retire_manage
+152. tblhr_procedure_retire_of_staff
+153. tblhr_procedure_retire_of_staff_by_id
+154. tblhr_profile_option
+155. tblhr_rec_transfer_records
+156. tblhr_salary_form
+157. tblhr_staff_contract
+158. tblhr_staff_contract_detail
+159. tblhr_staff_contract_type
+160. tblhr_training_allocation
+161. tblhr_views_tracking
+162. tblhr_workplace
+163. tblhrm_option
+164. tblhrm_timesheet
+165. tblinsurance_type
+166. tblinvoice_products
+167. tblinvoicepaymentrecords
+168. tblinvoices
+169. tblitem_tax
+170. tblitemable
+171. tblitems
+172. tblitems_groups
+173. tbljob_position
+174. tblknowedge_base_article_feedback
+175. tblknowledge_base
+176. tblknowledge_base_groups
+177. tbllead_activity_log
+178. tbllead_integration_emails
+179. tblleads
+180. tblleads_email_integration
+181. tblleads_sources
+182. tblleads_status
+183. tblleave_of_the_year
+184. tbllist_widget
+185. tblloy_card
+186. tblloy_mbs_program
+187. tblloy_mbs_rule
+188. tblloy_program_detail
+189. tblloy_redeem_log
+190. tblloy_redemp_detail
+191. tblloy_rule
+192. tblloy_rule_detail
+193. tblloy_transation
+194. tblmail_queue
+195. tblmanage_leave
+196. tblmigrations
+197. tblmilestones
+198. tblmodules
+199. tblnewsfeed_comment_likes
+200. tblnewsfeed_post_comments
+201. tblnewsfeed_post_likes
+202. tblnewsfeed_posts
+203. tblnotes
+204. tblnotifications
+205. tblokr_approval_details
+206. tblokr_approval_setting
+207. tblokr_setting_category
+208. tblokr_setting_circulation
+209. tblokr_setting_evaluation_criteria
+210. tblokr_setting_question
+211. tblokr_setting_unit
+212. tblokrs
+213. tblokrs_checkin
+214. tblokrs_checkin_log
+215. tblokrs_key_result
+216. tblokrs_key_result_log
+217. tblokrs_log
+218. tbloptions
+219. tblp_t_form_question_box_description
+220. tblpayment_modes
+221. tblpayroll_table
+222. tblpayroll_type
+223. tblpinned_projects
+224. tblposition_training_question_form
+225. tblproduct_purchase_log
+226. tblproducts_groups
+227. tblproject_activity
+228. tblproject_files
+229. tblproject_members
+230. tblproject_notes
+231. tblproject_settings
+232. tblprojectdiscussioncomments
+233. tblprojectdiscussions
+234. tblprojects
+235. tblproposal_comments
+236. tblproposals
+237. tblprovince_city
+238. tblrec_campaign
+239. tblrec_campaign_form_web
+240. tblrec_candidate
+241. tblrec_cd_evaluation
+242. tblrec_criteria
+243. tblrec_evaluation_form
+244. tblrec_interview
+245. tblrec_job_position
+246. tblrec_list_criteria
+247. tblrec_proposal
+248. tblrec_set_transfer_record
+249. tblrec_transfer_records
+250. tblrecords_meta
+251. tblrelated_items
+252. tblreminders
+253. tblrequest
+254. tblrequest_approval_details
+255. tblrequest_files
+256. tblrequest_follow
+257. tblrequest_form
+258. tblrequest_log
+259. tblrequest_related
+260. tblrequest_type
+261. tblrequest_type_form
+262. tblrequest_type_workflow
+263. tblroles
+264. tblsalary_form
+265. tblsales_activity
+266. tblscheduled_emails
+267. tblservices
+268. tblsessions
+269. tblsetting_asset_allocation
+270. tblsetting_training
+271. tblsetting_transfer_records
+272. tblshared_customer_files
+273. tblshift_type
+274. tblspam_filters
+275. tblstaff
+276. tblstaff_contract
+277. tblstaff_contract_detail
+278. tblstaff_contracttype
+279. tblstaff_departments
+280. tblstaff_insurance
+281. tblstaff_insurance_history
+282. tblstaff_permissions
+283. tblsubscription_products
+284. tblsubscriptions
+285. tbltaggables
+286. tbltags
+287. tbltask_assigned
+288. tbltask_checklist_items
+289. tbltask_comments
+290. tbltask_followers
+291. tbltasks
+292. tbltasks_checklist_templates
+293. tbltaskstimers
+294. tbltaxes
+295. tbltemplates
+296. tblticket_attachments
+297. tblticket_replies
+298. tbltickets
+299. tbltickets_pipe_log
+300. tbltickets_predefined_replies
+301. tbltickets_priorities
+302. tbltickets_status
+303. tbltimesheets_additional_timesheet
+304. tbltimesheets_approval_details
+305. tbltimesheets_approval_setting
+306. tbltimesheets_day_off
+307. tbltimesheets_go_bussiness_advance_payment
+308. tbltimesheets_latch_timesheet
+309. tbltimesheets_leave
+310. tbltimesheets_log_send_notify
+311. tbltimesheets_option
+312. tbltimesheets_requisition_leave
+313. tbltimesheets_route
+314. tbltimesheets_route_point
+315. tbltimesheets_shift_sc
+316. tbltimesheets_shiftwork_sc
+317. tbltimesheets_timekeeper_data
+318. tbltimesheets_timesheet
+319. tbltimesheets_workplace
+320. tbltimesheets_workplace_assign
+321. tbltodos
+322. tbltracked_mails
+323. tbltraining_allocation
+324. tbltransfer_records_reception
+325. tbltwocheckout_log
+326. tbluser_api
+327. tbluser_auto_login
+328. tbluser_meta
+329. tblvault
+330. tblviews_tracking
+331. tblweb_to_lead
+332. tblweb_to_recruitment
+333. tblwork_shift
+334. tblwork_shift_detail
+335. tblwork_shift_detail_day_name
+336. tblwork_shift_detail_number_day
+337. tblworkplace
+338. temps
+339. temps_copy
+340. users
+341. va_accounts
+342. va_notifications
+343. vn9pay_ipn_histories
+344. vn9pay_transaction_histories
+345. vnpay_banks
+346. vnpay_ipn_histories
+347. vnpay_transaction_histories
+
+
+07/07/2021 08:44:17
+1. dcv_assets
+2. dcv_companies
+3. dcv_departments
+4. dcv_employees
+5. dcv_media
+6. dcv_notices
+7. dcv_surveys
+8. failed_jobs
+9. inv_account_banks
+10. inv_admin
+11. inv_crontjobs
+12. inv_deposit
+13. inv_devices
+14. inv_email_sms_gateway
+15. inv_fee_packages
+16. inv_feedbacks
+17. inv_language
+18. inv_notification_logs
+19. inv_notification_waits
+20. inv_order_detail_packages
+21. inv_order_packages
+22. inv_otps
+23. inv_payment_gateway
+24. inv_payment_metod_setting
+25. inv_price_packages
+26. inv_registration_package
+27. inv_requests
+28. inv_setting
+29. inv_transections
+30. inv_user_registration
+31. inv_versions
+32. inv_withdraw
+33. jobs
+34. mxv_agencies
+35. mxv_brokers
+36. mxv_commodities
+37. mxv_commodity_session
+38. mxv_conversion_units
+39. mxv_exchanges
+40. mxv_maturities
+41. mxv_traders
+42. mxv_trans_sessions
+43. mxv_transaction_imports
+44. mxv_transaction_logs
+45. mxv_transaction_reports
+46. mxv_units
+47. mxvnews_authen_logs
+48. mxvnews_calendar
+49. mxvnews_categories
+50. mxvnews_category_post
+51. mxvnews_event_types
+52. mxvnews_files
+53. mxvnews_media
+54. mxvnews_media_topic
+55. mxvnews_post_tag
+56. mxvnews_posts
+57. mxvnews_subcategories
+58. mxvnews_tags
+59. mxvnews_topics
+60. tblactivity_log
+61. tblallowance_type
+62. tblannouncements
+63. tblapplicable_staff
+64. tblbonus_discipline
+65. tblbonus_discipline_detail
+66. tblcall_log_types
+67. tblcall_logs
+68. tblcd_care
+69. tblcd_family_infor
+70. tblcd_interview
+71. tblcd_literacy
+72. tblcd_work_experience
+73. tblchange_status_histories
+74. tblchatclientmessages
+75. tblchatgroupmembers
+76. tblchatgroupmessages
+77. tblchatgroups
+78. tblchatgroupsharedfiles
+79. tblchatmessages
+80. tblchatsettings
+81. tblchatsharedfiles
+82. tblcheck_in_out
+83. tblchecklist
+84. tblchecklist_allocation
+85. tblclients
+86. tblcommission
+87. tblcommission_hierarchy
+88. tblcommission_policy
+89. tblcommission_receipt
+90. tblcommission_receipt_detail
+91. tblcommission_salesadmin_group
+92. tblconsent_purposes
+93. tblconsents
+94. tblcontact_permissions
+95. tblcontacts
+96. tblcontract_comments
+97. tblcontract_renewals
+98. tblcontracts
+99. tblcontracts_types
+100. tblcountries
+101. tblcreditnote_refunds
+102. tblcreditnotes
+103. tblcredits
+104. tblcurrencies
+105. tblcustomer_admins
+106. tblcustomer_groups
+107. tblcustomers_groups
+108. tblcustomfields
+109. tblcustomfieldsvalues
+110. tblday_off
+111. tbldepartments
+112. tbldismissed_announcements
+113. tblemailtemplates
+114. tblestimate_request_forms
+115. tblestimate_request_status
+116. tblestimate_requests
+117. tblestimates
+118. tblevents
+119. tblexpenses
+120. tblexpenses_categories
+121. tblfiles
+122. tblform_question_box
+123. tblform_question_box_description
+124. tblform_questions
+125. tblform_results
+126. tblgdpr_requests
+127. tblgoals
+128. tblgroup_checklist
+129. tblgroup_checklist_allocation
+130. tblhr_allocation_asset
+131. tblhr_allowance_type
+132. tblhr_checklist_allocation
+133. tblhr_dependent_person
+134. tblhr_education
+135. tblhr_group_checklist_allocation
+136. tblhr_job_p
+137. tblhr_job_position
+138. tblhr_jp_interview_training
+139. tblhr_jp_salary_scale
+140. tblhr_knowedge_base_article_feedback
+141. tblhr_knowledge_base
+142. tblhr_knowledge_base_groups
+143. tblhr_list_staff_quitting_work
+144. tblhr_p_t_form_question_box
+145. tblhr_p_t_form_question_box_description
+146. tblhr_p_t_form_results
+147. tblhr_p_t_surveyresultsets
+148. tblhr_position_training
+149. tblhr_position_training_question_form
+150. tblhr_procedure_retire
+151. tblhr_procedure_retire_manage
+152. tblhr_procedure_retire_of_staff
+153. tblhr_procedure_retire_of_staff_by_id
+154. tblhr_profile_option
+155. tblhr_rec_transfer_records
+156. tblhr_salary_form
+157. tblhr_staff_contract
+158. tblhr_staff_contract_detail
+159. tblhr_staff_contract_type
+160. tblhr_training_allocation
+161. tblhr_views_tracking
+162. tblhr_workplace
+163. tblhrm_option
+164. tblhrm_timesheet
+165. tblinsurance_type
+166. tblinvoice_products
+167. tblinvoicepaymentrecords
+168. tblinvoices
+169. tblitem_tax
+170. tblitemable
+171. tblitems
+172. tblitems_groups
+173. tbljob_position
+174. tblknowedge_base_article_feedback
+175. tblknowledge_base
+176. tblknowledge_base_groups
+177. tbllead_activity_log
+178. tbllead_integration_emails
+179. tblleads
+180. tblleads_email_integration
+181. tblleads_sources
+182. tblleads_status
+183. tblleave_of_the_year
+184. tbllist_widget
+185. tblloy_card
+186. tblloy_mbs_program
+187. tblloy_mbs_rule
+188. tblloy_program_detail
+189. tblloy_redeem_log
+190. tblloy_redemp_detail
+191. tblloy_rule
+192. tblloy_rule_detail
+193. tblloy_transation
+194. tblmail_queue
+195. tblmanage_leave
+196. tblmigrations
+197. tblmilestones
+198. tblmodules
+199. tblnewsfeed_comment_likes
+200. tblnewsfeed_post_comments
+201. tblnewsfeed_post_likes
+202. tblnewsfeed_posts
+203. tblnotes
+204. tblnotifications
+205. tblokr_approval_details
+206. tblokr_approval_setting
+207. tblokr_setting_category
+208. tblokr_setting_circulation
+209. tblokr_setting_evaluation_criteria
+210. tblokr_setting_question
+211. tblokr_setting_unit
+212. tblokrs
+213. tblokrs_checkin
+214. tblokrs_checkin_log
+215. tblokrs_key_result
+216. tblokrs_key_result_log
+217. tblokrs_log
+218. tbloptions
+219. tblp_t_form_question_box_description
+220. tblpayment_modes
+221. tblpayroll_table
+222. tblpayroll_type
+223. tblpinned_projects
+224. tblposition_training_question_form
+225. tblproduct_purchase_log
+226. tblproducts_groups
+227. tblproject_activity
+228. tblproject_files
+229. tblproject_members
+230. tblproject_notes
+231. tblproject_settings
+232. tblprojectdiscussioncomments
+233. tblprojectdiscussions
+234. tblprojects
+235. tblproposal_comments
+236. tblproposals
+237. tblprovince_city
+238. tblrec_campaign
+239. tblrec_campaign_form_web
+240. tblrec_candidate
+241. tblrec_cd_evaluation
+242. tblrec_criteria
+243. tblrec_evaluation_form
+244. tblrec_interview
+245. tblrec_job_position
+246. tblrec_list_criteria
+247. tblrec_proposal
+248. tblrec_set_transfer_record
+249. tblrec_transfer_records
+250. tblrecords_meta
+251. tblrelated_items
+252. tblreminders
+253. tblrequest
+254. tblrequest_approval_details
+255. tblrequest_files
+256. tblrequest_follow
+257. tblrequest_form
+258. tblrequest_log
+259. tblrequest_related
+260. tblrequest_type
+261. tblrequest_type_form
+262. tblrequest_type_workflow
+263. tblroles
+264. tblsalary_form
+265. tblsales_activity
+266. tblscheduled_emails
+267. tblservices
+268. tblsessions
+269. tblsetting_asset_allocation
+270. tblsetting_training
+271. tblsetting_transfer_records
+272. tblshared_customer_files
+273. tblshift_type
+274. tblspam_filters
+275. tblstaff
+276. tblstaff_contract
+277. tblstaff_contract_detail
+278. tblstaff_contracttype
+279. tblstaff_departments
+280. tblstaff_insurance
+281. tblstaff_insurance_history
+282. tblstaff_permissions
+283. tblsubscription_products
+284. tblsubscriptions
+285. tbltaggables
+286. tbltags
+287. tbltask_assigned
+288. tbltask_checklist_items
+289. tbltask_comments
+290. tbltask_followers
+291. tbltasks
+292. tbltasks_checklist_templates
+293. tbltaskstimers
+294. tbltaxes
+295. tbltemplates
+296. tblticket_attachments
+297. tblticket_replies
+298. tbltickets
+299. tbltickets_pipe_log
+300. tbltickets_predefined_replies
+301. tbltickets_priorities
+302. tbltickets_status
+303. tbltimesheets_additional_timesheet
+304. tbltimesheets_approval_details
+305. tbltimesheets_approval_setting
+306. tbltimesheets_day_off
+307. tbltimesheets_go_bussiness_advance_payment
+308. tbltimesheets_latch_timesheet
+309. tbltimesheets_leave
+310. tbltimesheets_log_send_notify
+311. tbltimesheets_option
+312. tbltimesheets_requisition_leave
+313. tbltimesheets_route
+314. tbltimesheets_route_point
+315. tbltimesheets_shift_sc
+316. tbltimesheets_shiftwork_sc
+317. tbltimesheets_timekeeper_data
+318. tbltimesheets_timesheet
+319. tbltimesheets_workplace
+320. tbltimesheets_workplace_assign
+321. tbltodos
+322. tbltracked_mails
+323. tbltraining_allocation
+324. tbltransfer_records_reception
+325. tbltwocheckout_log
+326. tbluser_api
+327. tbluser_auto_login
+328. tbluser_meta
+329. tblvault
+330. tblviews_tracking
+331. tblweb_to_lead
+332. tblweb_to_recruitment
+333. tblwork_shift
+334. tblwork_shift_detail
+335. tblwork_shift_detail_day_name
+336. tblwork_shift_detail_number_day
+337. tblworkplace
+338. users
+339. va_accounts
+340. va_notifications
+341. vn9pay_ipn_histories
+342. vn9pay_transaction_histories
+343. vnpay_banks
+344. vnpay_ipn_histories
+345. vnpay_transaction_histories
+
+
+07/07/2021 09:29:49
+define('TABLE_FAILED_JOBS', 'failed_jobs');
+define('TABLE_JOBS', 'jobs');
+define('TABLE_TBLACTIVITY_LOG', 'tblactivity_log');
+define('TABLE_TBLALLOWANCE_TYPE', 'tblallowance_type');
+define('TABLE_TBLANNOUNCEMENTS', 'tblannouncements');
+define('TABLE_TBLAPPLICABLE_STAFF', 'tblapplicable_staff');
+define('TABLE_TBLBONUS_DISCIPLINE', 'tblbonus_discipline');
+define('TABLE_TBLBONUS_DISCIPLINE_DETAIL', 'tblbonus_discipline_detail');
+define('TABLE_TBLCALL_LOG_TYPES', 'tblcall_log_types');
+define('TABLE_TBLCALL_LOGS', 'tblcall_logs');
+define('TABLE_TBLCD_CARE', 'tblcd_care');
+define('TABLE_TBLCD_FAMILY_INFOR', 'tblcd_family_infor');
+define('TABLE_TBLCD_INTERVIEW', 'tblcd_interview');
+define('TABLE_TBLCD_LITERACY', 'tblcd_literacy');
+define('TABLE_TBLCD_WORK_EXPERIENCE', 'tblcd_work_experience');
+define('TABLE_TBLCHANGE_STATUS_HISTORIES', 'tblchange_status_histories');
+define('TABLE_TBLCHATCLIENTMESSAGES', 'tblchatclientmessages');
+define('TABLE_TBLCHATGROUPMEMBERS', 'tblchatgroupmembers');
+define('TABLE_TBLCHATGROUPMESSAGES', 'tblchatgroupmessages');
+define('TABLE_TBLCHATGROUPS', 'tblchatgroups');
+define('TABLE_TBLCHATGROUPSHAREDFILES', 'tblchatgroupsharedfiles');
+define('TABLE_TBLCHATMESSAGES', 'tblchatmessages');
+define('TABLE_TBLCHATSETTINGS', 'tblchatsettings');
+define('TABLE_TBLCHATSHAREDFILES', 'tblchatsharedfiles');
+define('TABLE_TBLCHECK_IN_OUT', 'tblcheck_in_out');
+define('TABLE_TBLCHECKLIST', 'tblchecklist');
+define('TABLE_TBLCHECKLIST_ALLOCATION', 'tblchecklist_allocation');
+define('TABLE_TBLCLIENTS', 'tblclients');
+define('TABLE_TBLCOMMISSION', 'tblcommission');
+define('TABLE_TBLCOMMISSION_HIERARCHY', 'tblcommission_hierarchy');
+define('TABLE_TBLCOMMISSION_POLICY', 'tblcommission_policy');
+define('TABLE_TBLCOMMISSION_RECEIPT', 'tblcommission_receipt');
+define('TABLE_TBLCOMMISSION_RECEIPT_DETAIL', 'tblcommission_receipt_detail');
+define('TABLE_TBLCOMMISSION_SALESADMIN_GROUP', 'tblcommission_salesadmin_group');
+define('TABLE_TBLCONSENT_PURPOSES', 'tblconsent_purposes');
+define('TABLE_TBLCONSENTS', 'tblconsents');
+define('TABLE_TBLCONTACT_PERMISSIONS', 'tblcontact_permissions');
+define('TABLE_TBLCONTACTS', 'tblcontacts');
+define('TABLE_TBLCONTRACT_COMMENTS', 'tblcontract_comments');
+define('TABLE_TBLCONTRACT_RENEWALS', 'tblcontract_renewals');
+define('TABLE_TBLCONTRACTS', 'tblcontracts');
+define('TABLE_TBLCONTRACTS_TYPES', 'tblcontracts_types');
+define('TABLE_TBLCOUNTRIES', 'tblcountries');
+define('TABLE_TBLCREDITNOTE_REFUNDS', 'tblcreditnote_refunds');
+define('TABLE_TBLCREDITNOTES', 'tblcreditnotes');
+define('TABLE_TBLCREDITS', 'tblcredits');
+define('TABLE_TBLCURRENCIES', 'tblcurrencies');
+define('TABLE_TBLCUSTOMER_ADMINS', 'tblcustomer_admins');
+define('TABLE_TBLCUSTOMER_GROUPS', 'tblcustomer_groups');
+define('TABLE_TBLCUSTOMERS_GROUPS', 'tblcustomers_groups');
+define('TABLE_TBLCUSTOMFIELDS', 'tblcustomfields');
+define('TABLE_TBLCUSTOMFIELDSVALUES', 'tblcustomfieldsvalues');
+define('TABLE_TBLDAY_OFF', 'tblday_off');
+define('TABLE_TBLDCV_ASSETS', 'tbldcv_assets');
+define('TABLE_TBLDCV_COMPANIES', 'tbldcv_companies');
+define('TABLE_TBLDCV_DEPARTMENTS', 'tbldcv_departments');
+define('TABLE_TBLDCV_EMPLOYEES', 'tbldcv_employees');
+define('TABLE_TBLDCV_MEDIA', 'tbldcv_media');
+define('TABLE_TBLDCV_NOTICES', 'tbldcv_notices');
+define('TABLE_TBLDCV_SURVEYS', 'tbldcv_surveys');
+define('TABLE_TBLDEPARTMENTS', 'tbldepartments');
+define('TABLE_TBLDISMISSED_ANNOUNCEMENTS', 'tbldismissed_announcements');
+define('TABLE_TBLEMAILTEMPLATES', 'tblemailtemplates');
+define('TABLE_TBLESTIMATE_REQUEST_FORMS', 'tblestimate_request_forms');
+define('TABLE_TBLESTIMATE_REQUEST_STATUS', 'tblestimate_request_status');
+define('TABLE_TBLESTIMATE_REQUESTS', 'tblestimate_requests');
+define('TABLE_TBLESTIMATES', 'tblestimates');
+define('TABLE_TBLEVENTS', 'tblevents');
+define('TABLE_TBLEXPENSES', 'tblexpenses');
+define('TABLE_TBLEXPENSES_CATEGORIES', 'tblexpenses_categories');
+define('TABLE_TBLFILES', 'tblfiles');
+define('TABLE_TBLFORM_QUESTION_BOX', 'tblform_question_box');
+define('TABLE_TBLFORM_QUESTION_BOX_DESCRIPTION', 'tblform_question_box_description');
+define('TABLE_TBLFORM_QUESTIONS', 'tblform_questions');
+define('TABLE_TBLFORM_RESULTS', 'tblform_results');
+define('TABLE_TBLGDPR_REQUESTS', 'tblgdpr_requests');
+define('TABLE_TBLGOALS', 'tblgoals');
+define('TABLE_TBLGROUP_CHECKLIST', 'tblgroup_checklist');
+define('TABLE_TBLGROUP_CHECKLIST_ALLOCATION', 'tblgroup_checklist_allocation');
+define('TABLE_TBLHR_ALLOCATION_ASSET', 'tblhr_allocation_asset');
+define('TABLE_TBLHR_ALLOWANCE_TYPE', 'tblhr_allowance_type');
+define('TABLE_TBLHR_CHECKLIST_ALLOCATION', 'tblhr_checklist_allocation');
+define('TABLE_TBLHR_DEPENDENT_PERSON', 'tblhr_dependent_person');
+define('TABLE_TBLHR_EDUCATION', 'tblhr_education');
+define('TABLE_TBLHR_GROUP_CHECKLIST_ALLOCATION', 'tblhr_group_checklist_allocation');
+define('TABLE_TBLHR_JOB_P', 'tblhr_job_p');
+define('TABLE_TBLHR_JOB_POSITION', 'tblhr_job_position');
+define('TABLE_TBLHR_JP_INTERVIEW_TRAINING', 'tblhr_jp_interview_training');
+define('TABLE_TBLHR_JP_SALARY_SCALE', 'tblhr_jp_salary_scale');
+define('TABLE_TBLHR_KNOWEDGE_BASE_ARTICLE_FEEDBACK', 'tblhr_knowedge_base_article_feedback');
+define('TABLE_TBLHR_KNOWLEDGE_BASE', 'tblhr_knowledge_base');
+define('TABLE_TBLHR_KNOWLEDGE_BASE_GROUPS', 'tblhr_knowledge_base_groups');
+define('TABLE_TBLHR_LIST_STAFF_QUITTING_WORK', 'tblhr_list_staff_quitting_work');
+define('TABLE_TBLHR_P_T_FORM_QUESTION_BOX', 'tblhr_p_t_form_question_box');
+define('TABLE_TBLHR_P_T_FORM_QUESTION_BOX_DESCRIPTION', 'tblhr_p_t_form_question_box_description');
+define('TABLE_TBLHR_P_T_FORM_RESULTS', 'tblhr_p_t_form_results');
+define('TABLE_TBLHR_P_T_SURVEYRESULTSETS', 'tblhr_p_t_surveyresultsets');
+define('TABLE_TBLHR_POSITION_TRAINING', 'tblhr_position_training');
+define('TABLE_TBLHR_POSITION_TRAINING_QUESTION_FORM', 'tblhr_position_training_question_form');
+define('TABLE_TBLHR_PROCEDURE_RETIRE', 'tblhr_procedure_retire');
+define('TABLE_TBLHR_PROCEDURE_RETIRE_MANAGE', 'tblhr_procedure_retire_manage');
+define('TABLE_TBLHR_PROCEDURE_RETIRE_OF_STAFF', 'tblhr_procedure_retire_of_staff');
+define('TABLE_TBLHR_PROCEDURE_RETIRE_OF_STAFF_BY_ID', 'tblhr_procedure_retire_of_staff_by_id');
+define('TABLE_TBLHR_PROFILE_OPTION', 'tblhr_profile_option');
+define('TABLE_TBLHR_REC_TRANSFER_RECORDS', 'tblhr_rec_transfer_records');
+define('TABLE_TBLHR_SALARY_FORM', 'tblhr_salary_form');
+define('TABLE_TBLHR_STAFF_CONTRACT', 'tblhr_staff_contract');
+define('TABLE_TBLHR_STAFF_CONTRACT_DETAIL', 'tblhr_staff_contract_detail');
+define('TABLE_TBLHR_STAFF_CONTRACT_TYPE', 'tblhr_staff_contract_type');
+define('TABLE_TBLHR_TRAINING_ALLOCATION', 'tblhr_training_allocation');
+define('TABLE_TBLHR_VIEWS_TRACKING', 'tblhr_views_tracking');
+define('TABLE_TBLHR_WORKPLACE', 'tblhr_workplace');
+define('TABLE_TBLHRM_OPTION', 'tblhrm_option');
+define('TABLE_TBLHRM_TIMESHEET', 'tblhrm_timesheet');
+define('TABLE_TBLINSURANCE_TYPE', 'tblinsurance_type');
+define('TABLE_TBLINV_ACCOUNT_BANKS', 'tblinv_account_banks');
+define('TABLE_TBLINV_ADMIN', 'tblinv_admin');
+define('TABLE_TBLINV_CRONTJOBS', 'tblinv_crontjobs');
+define('TABLE_TBLINV_DEPOSIT', 'tblinv_deposit');
+define('TABLE_TBLINV_DEVICES', 'tblinv_devices');
+define('TABLE_TBLINV_EMAIL_SMS_GATEWAY', 'tblinv_email_sms_gateway');
+define('TABLE_TBLINV_FEE_PACKAGES', 'tblinv_fee_packages');
+define('TABLE_TBLINV_FEEDBACKS', 'tblinv_feedbacks');
+define('TABLE_TBLINV_LANGUAGE', 'tblinv_language');
+define('TABLE_TBLINV_NOTIFICATION_LOGS', 'tblinv_notification_logs');
+define('TABLE_TBLINV_NOTIFICATION_WAITS', 'tblinv_notification_waits');
+define('TABLE_TBLINV_ORDER_DETAIL_PACKAGES', 'tblinv_order_detail_packages');
+define('TABLE_TBLINV_ORDER_PACKAGES', 'tblinv_order_packages');
+define('TABLE_TBLINV_OTPS', 'tblinv_otps');
+define('TABLE_TBLINV_PAYMENT_GATEWAY', 'tblinv_payment_gateway');
+define('TABLE_TBLINV_PAYMENT_METOD_SETTING', 'tblinv_payment_metod_setting');
+define('TABLE_TBLINV_PRICE_PACKAGES', 'tblinv_price_packages');
+define('TABLE_TBLINV_REGISTRATION_PACKAGE', 'tblinv_registration_package');
+define('TABLE_TBLINV_REQUESTS', 'tblinv_requests');
+define('TABLE_TBLINV_SETTING', 'tblinv_setting');
+define('TABLE_TBLINV_TRANSECTIONS', 'tblinv_transections');
+define('TABLE_TBLINV_USER_REGISTRATION', 'tblinv_user_registration');
+define('TABLE_TBLINV_VERSIONS', 'tblinv_versions');
+define('TABLE_TBLINV_WITHDRAW', 'tblinv_withdraw');
+define('TABLE_TBLINVOICE_PRODUCTS', 'tblinvoice_products');
+define('TABLE_TBLINVOICEPAYMENTRECORDS', 'tblinvoicepaymentrecords');
+define('TABLE_TBLINVOICES', 'tblinvoices');
+define('TABLE_TBLITEM_TAX', 'tblitem_tax');
+define('TABLE_TBLITEMABLE', 'tblitemable');
+define('TABLE_TBLITEMS', 'tblitems');
+define('TABLE_TBLITEMS_GROUPS', 'tblitems_groups');
+define('TABLE_TBLJOB_POSITION', 'tbljob_position');
+define('TABLE_TBLKNOWEDGE_BASE_ARTICLE_FEEDBACK', 'tblknowedge_base_article_feedback');
+define('TABLE_TBLKNOWLEDGE_BASE', 'tblknowledge_base');
+define('TABLE_TBLKNOWLEDGE_BASE_GROUPS', 'tblknowledge_base_groups');
+define('TABLE_TBLLEAD_ACTIVITY_LOG', 'tbllead_activity_log');
+define('TABLE_TBLLEAD_INTEGRATION_EMAILS', 'tbllead_integration_emails');
+define('TABLE_TBLLEADS', 'tblleads');
+define('TABLE_TBLLEADS_EMAIL_INTEGRATION', 'tblleads_email_integration');
+define('TABLE_TBLLEADS_SOURCES', 'tblleads_sources');
+define('TABLE_TBLLEADS_STATUS', 'tblleads_status');
+define('TABLE_TBLLEAVE_OF_THE_YEAR', 'tblleave_of_the_year');
+define('TABLE_TBLLIST_WIDGET', 'tbllist_widget');
+define('TABLE_TBLLOY_CARD', 'tblloy_card');
+define('TABLE_TBLLOY_MBS_PROGRAM', 'tblloy_mbs_program');
+define('TABLE_TBLLOY_MBS_RULE', 'tblloy_mbs_rule');
+define('TABLE_TBLLOY_PROGRAM_DETAIL', 'tblloy_program_detail');
+define('TABLE_TBLLOY_REDEEM_LOG', 'tblloy_redeem_log');
+define('TABLE_TBLLOY_REDEMP_DETAIL', 'tblloy_redemp_detail');
+define('TABLE_TBLLOY_RULE', 'tblloy_rule');
+define('TABLE_TBLLOY_RULE_DETAIL', 'tblloy_rule_detail');
+define('TABLE_TBLLOY_TRANSATION', 'tblloy_transation');
+define('TABLE_TBLMAIL_QUEUE', 'tblmail_queue');
+define('TABLE_TBLMANAGE_LEAVE', 'tblmanage_leave');
+define('TABLE_TBLMIGRATIONS', 'tblmigrations');
+define('TABLE_TBLMILESTONES', 'tblmilestones');
+define('TABLE_TBLMODULES', 'tblmodules');
+define('TABLE_TBLMXV_AGENCIES', 'tblmxv_agencies');
+define('TABLE_TBLMXV_BROKERS', 'tblmxv_brokers');
+define('TABLE_TBLMXV_COMMODITIES', 'tblmxv_commodities');
+define('TABLE_TBLMXV_COMMODITY_SESSION', 'tblmxv_commodity_session');
+define('TABLE_TBLMXV_CONVERSION_UNITS', 'tblmxv_conversion_units');
+define('TABLE_TBLMXV_EXCHANGES', 'tblmxv_exchanges');
+define('TABLE_TBLMXV_MATURITIES', 'tblmxv_maturities');
+define('TABLE_TBLMXV_TRADERS', 'tblmxv_traders');
+define('TABLE_TBLMXV_TRANS_SESSIONS', 'tblmxv_trans_sessions');
+define('TABLE_TBLMXV_TRANSACTION_IMPORTS', 'tblmxv_transaction_imports');
+define('TABLE_TBLMXV_TRANSACTION_LOGS', 'tblmxv_transaction_logs');
+define('TABLE_TBLMXV_TRANSACTION_REPORTS', 'tblmxv_transaction_reports');
+define('TABLE_TBLMXV_UNITS', 'tblmxv_units');
+define('TABLE_TBLMXVNEWS_AUTHEN_LOGS', 'tblmxvnews_authen_logs');
+define('TABLE_TBLMXVNEWS_CALENDAR', 'tblmxvnews_calendar');
+define('TABLE_TBLMXVNEWS_CATEGORIES', 'tblmxvnews_categories');
+define('TABLE_TBLMXVNEWS_CATEGORY_POST', 'tblmxvnews_category_post');
+define('TABLE_TBLMXVNEWS_EVENT_TYPES', 'tblmxvnews_event_types');
+define('TABLE_TBLMXVNEWS_FILES', 'tblmxvnews_files');
+define('TABLE_TBLMXVNEWS_MEDIA', 'tblmxvnews_media');
+define('TABLE_TBLMXVNEWS_MEDIA_TOPIC', 'tblmxvnews_media_topic');
+define('TABLE_TBLMXVNEWS_POST_TAG', 'tblmxvnews_post_tag');
+define('TABLE_TBLMXVNEWS_POSTS', 'tblmxvnews_posts');
+define('TABLE_TBLMXVNEWS_SUBCATEGORIES', 'tblmxvnews_subcategories');
+define('TABLE_TBLMXVNEWS_TAGS', 'tblmxvnews_tags');
+define('TABLE_TBLMXVNEWS_TOPICS', 'tblmxvnews_topics');
+define('TABLE_TBLNEWSFEED_COMMENT_LIKES', 'tblnewsfeed_comment_likes');
+define('TABLE_TBLNEWSFEED_POST_COMMENTS', 'tblnewsfeed_post_comments');
+define('TABLE_TBLNEWSFEED_POST_LIKES', 'tblnewsfeed_post_likes');
+define('TABLE_TBLNEWSFEED_POSTS', 'tblnewsfeed_posts');
+define('TABLE_TBLNOTES', 'tblnotes');
+define('TABLE_TBLNOTIFICATIONS', 'tblnotifications');
+define('TABLE_TBLOKR_APPROVAL_DETAILS', 'tblokr_approval_details');
+define('TABLE_TBLOKR_APPROVAL_SETTING', 'tblokr_approval_setting');
+define('TABLE_TBLOKR_SETTING_CATEGORY', 'tblokr_setting_category');
+define('TABLE_TBLOKR_SETTING_CIRCULATION', 'tblokr_setting_circulation');
+define('TABLE_TBLOKR_SETTING_EVALUATION_CRITERIA', 'tblokr_setting_evaluation_criteria');
+define('TABLE_TBLOKR_SETTING_QUESTION', 'tblokr_setting_question');
+define('TABLE_TBLOKR_SETTING_UNIT', 'tblokr_setting_unit');
+define('TABLE_TBLOKRS', 'tblokrs');
+define('TABLE_TBLOKRS_CHECKIN', 'tblokrs_checkin');
+define('TABLE_TBLOKRS_CHECKIN_LOG', 'tblokrs_checkin_log');
+define('TABLE_TBLOKRS_KEY_RESULT', 'tblokrs_key_result');
+define('TABLE_TBLOKRS_KEY_RESULT_LOG', 'tblokrs_key_result_log');
+define('TABLE_TBLOKRS_LOG', 'tblokrs_log');
+define('TABLE_TBLOPTIONS', 'tbloptions');
+define('TABLE_TBLP_T_FORM_QUESTION_BOX_DESCRIPTION', 'tblp_t_form_question_box_description');
+define('TABLE_TBLPAYMENT_MODES', 'tblpayment_modes');
+define('TABLE_TBLPAYROLL_TABLE', 'tblpayroll_table');
+define('TABLE_TBLPAYROLL_TYPE', 'tblpayroll_type');
+define('TABLE_TBLPINNED_PROJECTS', 'tblpinned_projects');
+define('TABLE_TBLPOSITION_TRAINING_QUESTION_FORM', 'tblposition_training_question_form');
+define('TABLE_TBLPRODUCT_PURCHASE_LOG', 'tblproduct_purchase_log');
+define('TABLE_TBLPRODUCTS_GROUPS', 'tblproducts_groups');
+define('TABLE_TBLPROJECT_ACTIVITY', 'tblproject_activity');
+define('TABLE_TBLPROJECT_FILES', 'tblproject_files');
+define('TABLE_TBLPROJECT_MEMBERS', 'tblproject_members');
+define('TABLE_TBLPROJECT_NOTES', 'tblproject_notes');
+define('TABLE_TBLPROJECT_SETTINGS', 'tblproject_settings');
+define('TABLE_TBLPROJECTDISCUSSIONCOMMENTS', 'tblprojectdiscussioncomments');
+define('TABLE_TBLPROJECTDISCUSSIONS', 'tblprojectdiscussions');
+define('TABLE_TBLPROJECTS', 'tblprojects');
+define('TABLE_TBLPROPOSAL_COMMENTS', 'tblproposal_comments');
+define('TABLE_TBLPROPOSALS', 'tblproposals');
+define('TABLE_TBLPROVINCE_CITY', 'tblprovince_city');
+define('TABLE_TBLREC_CAMPAIGN', 'tblrec_campaign');
+define('TABLE_TBLREC_CAMPAIGN_FORM_WEB', 'tblrec_campaign_form_web');
+define('TABLE_TBLREC_CANDIDATE', 'tblrec_candidate');
+define('TABLE_TBLREC_CD_EVALUATION', 'tblrec_cd_evaluation');
+define('TABLE_TBLREC_CRITERIA', 'tblrec_criteria');
+define('TABLE_TBLREC_EVALUATION_FORM', 'tblrec_evaluation_form');
+define('TABLE_TBLREC_INTERVIEW', 'tblrec_interview');
+define('TABLE_TBLREC_JOB_POSITION', 'tblrec_job_position');
+define('TABLE_TBLREC_LIST_CRITERIA', 'tblrec_list_criteria');
+define('TABLE_TBLREC_PROPOSAL', 'tblrec_proposal');
+define('TABLE_TBLREC_SET_TRANSFER_RECORD', 'tblrec_set_transfer_record');
+define('TABLE_TBLREC_TRANSFER_RECORDS', 'tblrec_transfer_records');
+define('TABLE_TBLRECORDS_META', 'tblrecords_meta');
+define('TABLE_TBLRELATED_ITEMS', 'tblrelated_items');
+define('TABLE_TBLREMINDERS', 'tblreminders');
+define('TABLE_TBLREQUEST', 'tblrequest');
+define('TABLE_TBLREQUEST_APPROVAL_DETAILS', 'tblrequest_approval_details');
+define('TABLE_TBLREQUEST_FILES', 'tblrequest_files');
+define('TABLE_TBLREQUEST_FOLLOW', 'tblrequest_follow');
+define('TABLE_TBLREQUEST_FORM', 'tblrequest_form');
+define('TABLE_TBLREQUEST_LOG', 'tblrequest_log');
+define('TABLE_TBLREQUEST_RELATED', 'tblrequest_related');
+define('TABLE_TBLREQUEST_TYPE', 'tblrequest_type');
+define('TABLE_TBLREQUEST_TYPE_FORM', 'tblrequest_type_form');
+define('TABLE_TBLREQUEST_TYPE_WORKFLOW', 'tblrequest_type_workflow');
+define('TABLE_TBLROLES', 'tblroles');
+define('TABLE_TBLSALARY_FORM', 'tblsalary_form');
+define('TABLE_TBLSALES_ACTIVITY', 'tblsales_activity');
+define('TABLE_TBLSCHEDULED_EMAILS', 'tblscheduled_emails');
+define('TABLE_TBLSERVICES', 'tblservices');
+define('TABLE_TBLSESSIONS', 'tblsessions');
+define('TABLE_TBLSETTING_ASSET_ALLOCATION', 'tblsetting_asset_allocation');
+define('TABLE_TBLSETTING_TRAINING', 'tblsetting_training');
+define('TABLE_TBLSETTING_TRANSFER_RECORDS', 'tblsetting_transfer_records');
+define('TABLE_TBLSHARED_CUSTOMER_FILES', 'tblshared_customer_files');
+define('TABLE_TBLSHIFT_TYPE', 'tblshift_type');
+define('TABLE_TBLSPAM_FILTERS', 'tblspam_filters');
+define('TABLE_TBLSTAFF', 'tblstaff');
+define('TABLE_TBLSTAFF_CONTRACT', 'tblstaff_contract');
+define('TABLE_TBLSTAFF_CONTRACT_DETAIL', 'tblstaff_contract_detail');
+define('TABLE_TBLSTAFF_CONTRACTTYPE', 'tblstaff_contracttype');
+define('TABLE_TBLSTAFF_DEPARTMENTS', 'tblstaff_departments');
+define('TABLE_TBLSTAFF_INSURANCE', 'tblstaff_insurance');
+define('TABLE_TBLSTAFF_INSURANCE_HISTORY', 'tblstaff_insurance_history');
+define('TABLE_TBLSTAFF_PERMISSIONS', 'tblstaff_permissions');
+define('TABLE_TBLSUBSCRIPTION_PRODUCTS', 'tblsubscription_products');
+define('TABLE_TBLSUBSCRIPTIONS', 'tblsubscriptions');
+define('TABLE_TBLTAGGABLES', 'tbltaggables');
+define('TABLE_TBLTAGS', 'tbltags');
+define('TABLE_TBLTASK_ASSIGNED', 'tbltask_assigned');
+define('TABLE_TBLTASK_CHECKLIST_ITEMS', 'tbltask_checklist_items');
+define('TABLE_TBLTASK_COMMENTS', 'tbltask_comments');
+define('TABLE_TBLTASK_FOLLOWERS', 'tbltask_followers');
+define('TABLE_TBLTASKS', 'tbltasks');
+define('TABLE_TBLTASKS_CHECKLIST_TEMPLATES', 'tbltasks_checklist_templates');
+define('TABLE_TBLTASKSTIMERS', 'tbltaskstimers');
+define('TABLE_TBLTAXES', 'tbltaxes');
+define('TABLE_TBLTEMPLATES', 'tbltemplates');
+define('TABLE_TBLTICKET_ATTACHMENTS', 'tblticket_attachments');
+define('TABLE_TBLTICKET_REPLIES', 'tblticket_replies');
+define('TABLE_TBLTICKETS', 'tbltickets');
+define('TABLE_TBLTICKETS_PIPE_LOG', 'tbltickets_pipe_log');
+define('TABLE_TBLTICKETS_PREDEFINED_REPLIES', 'tbltickets_predefined_replies');
+define('TABLE_TBLTICKETS_PRIORITIES', 'tbltickets_priorities');
+define('TABLE_TBLTICKETS_STATUS', 'tbltickets_status');
+define('TABLE_TBLTIMESHEETS_ADDITIONAL_TIMESHEET', 'tbltimesheets_additional_timesheet');
+define('TABLE_TBLTIMESHEETS_APPROVAL_DETAILS', 'tbltimesheets_approval_details');
+define('TABLE_TBLTIMESHEETS_APPROVAL_SETTING', 'tbltimesheets_approval_setting');
+define('TABLE_TBLTIMESHEETS_DAY_OFF', 'tbltimesheets_day_off');
+define('TABLE_TBLTIMESHEETS_GO_BUSSINESS_ADVANCE_PAYMENT', 'tbltimesheets_go_bussiness_advance_payment');
+define('TABLE_TBLTIMESHEETS_LATCH_TIMESHEET', 'tbltimesheets_latch_timesheet');
+define('TABLE_TBLTIMESHEETS_LEAVE', 'tbltimesheets_leave');
+define('TABLE_TBLTIMESHEETS_LOG_SEND_NOTIFY', 'tbltimesheets_log_send_notify');
+define('TABLE_TBLTIMESHEETS_OPTION', 'tbltimesheets_option');
+define('TABLE_TBLTIMESHEETS_REQUISITION_LEAVE', 'tbltimesheets_requisition_leave');
+define('TABLE_TBLTIMESHEETS_ROUTE', 'tbltimesheets_route');
+define('TABLE_TBLTIMESHEETS_ROUTE_POINT', 'tbltimesheets_route_point');
+define('TABLE_TBLTIMESHEETS_SHIFT_SC', 'tbltimesheets_shift_sc');
+define('TABLE_TBLTIMESHEETS_SHIFTWORK_SC', 'tbltimesheets_shiftwork_sc');
+define('TABLE_TBLTIMESHEETS_TIMEKEEPER_DATA', 'tbltimesheets_timekeeper_data');
+define('TABLE_TBLTIMESHEETS_TIMESHEET', 'tbltimesheets_timesheet');
+define('TABLE_TBLTIMESHEETS_WORKPLACE', 'tbltimesheets_workplace');
+define('TABLE_TBLTIMESHEETS_WORKPLACE_ASSIGN', 'tbltimesheets_workplace_assign');
+define('TABLE_TBLTODOS', 'tbltodos');
+define('TABLE_TBLTRACKED_MAILS', 'tbltracked_mails');
+define('TABLE_TBLTRAINING_ALLOCATION', 'tbltraining_allocation');
+define('TABLE_TBLTRANSFER_RECORDS_RECEPTION', 'tbltransfer_records_reception');
+define('TABLE_TBLTWOCHECKOUT_LOG', 'tbltwocheckout_log');
+define('TABLE_TBLUSER_API', 'tbluser_api');
+define('TABLE_TBLUSER_AUTO_LOGIN', 'tbluser_auto_login');
+define('TABLE_TBLUSER_META', 'tbluser_meta');
+define('TABLE_TBLVAULT', 'tblvault');
+define('TABLE_TBLVIEWS_TRACKING', 'tblviews_tracking');
+define('TABLE_TBLWEB_TO_LEAD', 'tblweb_to_lead');
+define('TABLE_TBLWEB_TO_RECRUITMENT', 'tblweb_to_recruitment');
+define('TABLE_TBLWORK_SHIFT', 'tblwork_shift');
+define('TABLE_TBLWORK_SHIFT_DETAIL', 'tblwork_shift_detail');
+define('TABLE_TBLWORK_SHIFT_DETAIL_DAY_NAME', 'tblwork_shift_detail_day_name');
+define('TABLE_TBLWORK_SHIFT_DETAIL_NUMBER_DAY', 'tblwork_shift_detail_number_day');
+define('TABLE_TBLWORKPLACE', 'tblworkplace');
+define('TABLE_USERS', 'users');
+define('TABLE_VA_ACCOUNTS', 'va_accounts');
+define('TABLE_VA_NOTIFICATIONS', 'va_notifications');
+define('TABLE_VN9PAY_IPN_HISTORIES', 'vn9pay_ipn_histories');
+define('TABLE_VN9PAY_TRANSACTION_HISTORIES', 'vn9pay_transaction_histories');
+define('TABLE_VNPAY_BANKS', 'vnpay_banks');
+define('TABLE_VNPAY_IPN_HISTORIES', 'vnpay_ipn_histories');
+define('TABLE_VNPAY_TRANSACTION_HISTORIES', 'vnpay_transaction_histories');
+
