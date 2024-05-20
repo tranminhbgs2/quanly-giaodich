@@ -9,6 +9,7 @@ use App\Http\Requests\Transaction\GetDetailRequest;
 use App\Http\Requests\Transaction\ListingRequest;
 use App\Http\Requests\Transaction\StoreRequest;
 use App\Http\Requests\Transaction\UpdateRequest;
+use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
 use App\Repositories\Transaction\TransactionRepo;
 use App\Repositories\Upload\UploadRepo;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +17,12 @@ use Illuminate\Support\Facades\Auth;
 class TransactionController extends Controller
 {
     protected $tran_repo;
-    protected $upload_repo;
+    protected $money_comes_back_repo;
 
-    public function __construct(TransactionRepo $tranRepo, UploadRepo $uploadRepo)
+    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo)
     {
         $this->tran_repo = $tranRepo;
-        $this->upload_repo = $uploadRepo;
+        $this->money_comes_back_repo = $moneyComesBackRepo;
     }
 
     /**
@@ -50,7 +51,7 @@ class TransactionController extends Controller
         $export = $this->tran_repo->getTotal($params); //số liệu báo cáo
         return response()->json([
             'code' => 200,
-            'error' => 'Danh sách khách hàng',
+            'error' => 'Danh sách Giao dịch Khách lẻ',
             'data' => [
                 "total_elements" => $total,
                 "total_page" => ceil($total / $params['page_size']),
@@ -121,6 +122,43 @@ class TransactionController extends Controller
         $resutl = $this->tran_repo->store($params);
 
         if ($resutl) {
+            if ($params['lo_number'] > 0) {
+                if ($params['time_payment']) {
+                    $time_process = date('Y-m-d', strtotime($params['time_payment']));
+                } else {
+                    $time_process = date('Y-m-d');
+                }
+                $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+                if ($money_come) {
+                    $total_price = $money_come->total_price + $params['price_rut'];
+                    $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
+                    $money_comes_back = [
+                        'pos_id' => $params['pos_id'],
+                        'lo_number' => $params['lo_number'],
+                        'time_end' => $params['time_payment'],
+                        'time_process' => $time_process,
+                        'fee' => $params['original_fee'],
+                        'total_price' => $total_price,
+                        'payment' => $payment,
+                        'created_by' => auth()->user()->id,
+                        'status' => Constants::USER_STATUS_ACTIVE,
+                    ];
+                    $this->money_comes_back_repo->update($money_comes_back, $money_come->id);
+                } else {
+                    $money_comes_back = [
+                        'pos_id' => $params['pos_id'],
+                        'lo_number' => $params['lo_number'],
+                        'time_end' => $params['time_payment'],
+                        'time_process' => $time_process,
+                        'fee' => $params['original_fee'],
+                        'total_price' => $params['price_rut'],
+                        'payment' => ($params['price_rut'] - $params['price_fee']),
+                        'created_by' => auth()->user()->id,
+                        'status' => Constants::USER_STATUS_ACTIVE,
+                    ];
+                    $this->money_comes_back_repo->store($money_comes_back);
+                }
+            }
             return response()->json([
                 'code' => 200,
                 'error' => 'Thêm mới thành công',
@@ -145,51 +183,96 @@ class TransactionController extends Controller
      */
     public function update(UpdateRequest $request)
     {
-            $params['id'] = request('id', null);
-            if ($params['id']) {
-                $params['bank_card'] = request('bank_card', null);
-                $params['method'] = request('method', null);
-                $params['category_id'] = request('category_id', 0);
-                $params['pos_id'] = request('pos_id', 0);
-                $params['fee'] = floatval(request('fee', 0));
-                $params['original_fee'] = floatval(request('original_fee', 0));
-                $params['time_payment'] = request('time_payment', null);
-                $params['customer_name'] = request('customer_name', null);
-                $params['account_type'] = request('account_type', null);
-                $params['price_nop'] = floatval(request('price_nop', 0));
-                $params['price_rut'] = floatval(request('price_rut', 0));
-                $params['price_transfer'] = floatval(request('price_transfer', 0));
-                $params['price_repair'] = floatval(request('price_repair', 0));
-                $params['created_by'] = auth()->user()->id;
-                $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
-                $params['customer_id'] = request('customer_id', 0);
-                $params['lo_number'] = request('lo_number', 0);
-                $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
-                $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
+        $params['id'] = request('id', null);
+        if ($params['id']) {
+            $tran = $this->tran_repo->getById($params['id'], false);
 
-                $resutl = $this->tran_repo->update($params);
+            $params['bank_card'] = request('bank_card', null);
+            $params['method'] = request('method', null);
+            $params['category_id'] = request('category_id', 0);
+            $params['pos_id'] = request('pos_id', 0);
+            $params['fee'] = floatval(request('fee', 0));
+            $params['original_fee'] = floatval(request('original_fee', 0));
+            $params['time_payment'] = request('time_payment', null);
+            $params['customer_name'] = request('customer_name', null);
+            $params['account_type'] = request('account_type', null);
+            $params['price_nop'] = floatval(request('price_nop', 0));
+            $params['price_rut'] = floatval(request('price_rut', 0));
+            $params['price_transfer'] = floatval(request('price_transfer', 0));
+            $params['price_repair'] = floatval(request('price_repair', 0));
+            $params['created_by'] = auth()->user()->id;
+            $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
+            $params['customer_id'] = request('customer_id', 0);
+            $params['lo_number'] = request('lo_number', 0);
+            $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
+            $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
 
-                if ($resutl) {
-                    return response()->json([
-                        'code' => 200,
-                        'error' => 'Cập nhật thông tin thành công',
-                        'data' => null
-                    ]);
+            $resutl = $this->tran_repo->update($params);
+
+            if ($resutl) {
+                if ($params['lo_number'] > 0) {
+                    if ($params['time_payment']) {
+                        $time_process = date('Y-m-d', strtotime($params['time_payment']));
+                    } else {
+                        $time_process = date('Y-m-d');
+                    }
+                    $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+                    if ($money_come) {
+                        if ($tran->lo_number > 0) {
+                            // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
+                            $total_price = $money_come->total_price + $params['price_rut'] - $tran->price_rut;
+                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran->price_rut - $tran->price_fee);
+                        } else {
+                            // Chưa có lần nào cộng
+                            $total_price = $money_come->total_price + $params['price_rut'];
+                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
+                        }
+                        $money_comes_back = [
+                            'pos_id' => $params['pos_id'],
+                            'lo_number' => $params['lo_number'],
+                            'time_end' => $params['time_payment'],
+                            'time_process' => $time_process,
+                            'fee' => $params['original_fee'],
+                            'total_price' => $total_price,
+                            'payment' => $payment,
+                            'created_by' => auth()->user()->id,
+                            'status' => Constants::USER_STATUS_ACTIVE,
+                        ];
+                        $this->money_comes_back_repo->update($money_comes_back, $money_come->id);
+                    } else {
+                        $money_comes_back = [
+                            'pos_id' => $params['pos_id'],
+                            'lo_number' => $params['lo_number'],
+                            'time_end' => $params['time_payment'],
+                            'time_process' => $time_process,
+                            'fee' => $params['original_fee'],
+                            'total_price' => $params['price_rut'],
+                            'payment' => ($params['price_rut'] - $params['price_fee']),
+                            'created_by' => auth()->user()->id,
+                            'status' => Constants::USER_STATUS_ACTIVE,
+                        ];
+                        $this->money_comes_back_repo->store($money_comes_back);
+                    }
                 }
-
                 return response()->json([
-                    'code' => 400,
-                    'error' => 'Cập nhật thông tin không thành công',
-                    'data' => null
-                ]);
-            } else {
-                return response()->json([
-                    'code' => 422,
-                    'error' => 'ID không hợp lệ',
+                    'code' => 200,
+                    'error' => 'Cập nhật thông tin thành công',
                     'data' => null
                 ]);
             }
 
+            return response()->json([
+                'code' => 400,
+                'error' => 'Cập nhật thông tin không thành công',
+                'data' => null
+            ]);
+        } else {
+            return response()->json([
+                'code' => 422,
+                'error' => 'ID không hợp lệ',
+                'data' => null
+            ]);
+        }
     }
 
     /**

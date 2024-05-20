@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class HoKinhDoanh extends Model
 {
     use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
-    protected $table = Constants::TABLE_POS;
+    protected $table = Constants::TABLE_HO_KINH_DOANH;
     public $timestamps = true;
 
     protected $fillable = [

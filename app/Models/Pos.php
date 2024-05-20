@@ -15,6 +15,7 @@ class Pos extends Model
 
     protected $fillable = [
         'name',
+        'code',
         'bank_code',
         'method',
         'hkd_id',
@@ -38,7 +39,9 @@ class Pos extends Model
      */
     public function agents()
     {
-        return $this->belongsToMany(Agent::class, 'agent_pos')->withPivot('status', 'fee')->withTimestamps();
+        return $this->belongsToMany(Agent::class, 'agent_pos')
+        ->wherePivot('status', Constants::USER_STATUS_ACTIVE)
+        ->withPivot('status', 'fee')->withTimestamps();
     }
 
      /**
@@ -75,6 +78,19 @@ class Pos extends Model
         return $this->belongsToMany(Agent::class, 'agent_pos')
             ->wherePivot('status', Constants::USER_STATUS_ACTIVE)
             ->withPivot('status', 'fee')
-            ->withTimestamps();
+            ->select('agency.id', 'agent_pos.pos_id', 'agent_pos.agent_id', 'agent_pos.status', 'agent_pos.fee', 'agent_pos.created_at', 'agent_pos.updated_at');
+    }
+
+    /**
+     * Lấy các agents đang active
+     */
+    public function activeByAgents($agent_id)
+    {
+        return $this->belongsToMany(Agent::class, 'agent_pos')
+            ->wherePivot('status', Constants::USER_STATUS_ACTIVE)
+            ->wherePivot('agent_id', $agent_id)
+            ->withPivot('status', 'fee')
+            ->select('agency.id', 'agent_pos.pos_id', 'agent_pos.agent_id', 'agent_pos.status', 'agent_pos.fee', 'agent_pos.created_at', 'agent_pos.updated_at')
+            ->first();
     }
 }

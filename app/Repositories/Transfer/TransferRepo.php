@@ -213,4 +213,30 @@ class TransferRepo extends BaseRepo
             ];
         }
     }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getById($id, $with_trashed = false)
+    {
+        $tran = Transfer::where('id', $id)->with([
+            'bankFrom' => function ($sql) {
+                $sql->select(['id', 'account_number', 'bank_name']);
+            },
+            'bankTo' => function ($sql) {
+                $sql->select(['id', 'account_number', 'bank_name']);
+            },
+            'createdBy' => function ($sql) {
+                $sql->select(['id', 'username', 'email']);
+            },
+        ]);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
+    }
 }

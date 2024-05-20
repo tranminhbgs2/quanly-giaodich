@@ -291,6 +291,30 @@ class TransactionRepo extends BaseRepo
     }
 
     /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getById($id, $with_trashed = false)
+    {
+        $tran = Transaction::select()->where('id', $id);
+        $tran->with([
+            'category' => function ($sql) {
+                $sql->select(['id', 'name', 'code']);
+            },
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
+            },
+        ]);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
+    }
+
+    /**
      * Hàm khóa thông tin khách hàng vĩnh viễn, khóa trạng thái, ko xóa vật lý
      *
      * @param $params

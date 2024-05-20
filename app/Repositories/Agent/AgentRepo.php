@@ -178,4 +178,20 @@ class AgentRepo extends BaseRepo
             ];
         }
     }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getById($id, $with_trashed = false)
+    {
+        $tran = Agent::where('id', $id);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
+    }
 }

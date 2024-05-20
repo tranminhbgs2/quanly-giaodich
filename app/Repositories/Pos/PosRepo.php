@@ -30,7 +30,9 @@ class PosRepo extends BaseRepo
             'hokinhdoanh' => function ($sql) {
                 $sql->select(['id', 'name']);
             },
-            'activeAgents',
+            'activeAgents' => function ($sql) {
+                $sql->select(['agency.id', 'agency.name', 'agency.phone', 'agent_pos.pos_id', 'agent_pos.fee']);
+            },
         ]);
 
         if (!empty($keyword)) {
@@ -40,9 +42,9 @@ class PosRepo extends BaseRepo
             });
         }
 
-        if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
-            $query->where('created_by', $created_by);
-        }
+        // if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
+        //     $query->where('created_by', $created_by);
+        // }
 
         if ($date_from && $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
@@ -75,6 +77,7 @@ class PosRepo extends BaseRepo
         $fillable = [
             'name',
             'bank_code',
+            'code',
             'method',
             'hkd_id',
             'fee',
@@ -82,18 +85,19 @@ class PosRepo extends BaseRepo
             'fee_cashback',
             'price_pos',
             'created_by',
+            'updated_by',
             'status',
         ];
 
         $insert = [];
 
         foreach ($fillable as $field) {
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $insert[$field] = $params[$field];
             }
         }
 
-        if (!empty($insert['name']) && !empty($insert['hkd_id'])) {
+        if (!empty($insert['name']) && !empty($insert['code'])) {
             return Pos::create($insert) ? true : false;
         }
 
@@ -105,6 +109,7 @@ class PosRepo extends BaseRepo
         $fillable = [
             'name',
             'bank_code',
+            'code',
             'method',
             'hkd_id',
             'fee',
@@ -112,13 +117,14 @@ class PosRepo extends BaseRepo
             'fee_cashback',
             'price_pos',
             'created_by',
+            'updated_by',
             'status',
         ];
 
         $update = [];
 
         foreach ($fillable as $field) {
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $update[$field] = $params[$field];
             }
         }
@@ -132,6 +138,9 @@ class PosRepo extends BaseRepo
         $pos = Pos::select()->where('id', $id)->with([
             'hokinhdoanh' => function ($sql) {
                 $sql->select(['id', 'name']);
+            },
+            'activeAgents' => function ($sql) {
+                $sql->select(['agency.id', 'agency.name', 'agency.phone', 'agent_pos.pos_id', 'agent_pos.fee']);
             },
         ])->first();
 
@@ -220,7 +229,7 @@ class PosRepo extends BaseRepo
 
         $pos = Pos::find($pos_id);
 
-        if ($pos) {
+        if ($pos && $fee > 0) {
             $pos->addAgentWithDeactivation($agent_id, $fee);
 
             return [
@@ -235,5 +244,28 @@ class PosRepo extends BaseRepo
                 'data' => null
             ];
         }
+    }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getById($id, $with_trashed = false)
+    {
+        $tran = Pos::where('id', $id)->with([
+            'hokinhdoanh' => function ($sql) {
+                $sql->select(['id', 'name']);
+            },
+            'activeAgents' => function ($sql) {
+                $sql->select(['agency.id', 'agency.name', 'agency.phone', 'agent_pos.pos_id', 'agent_pos.fee']);
+            },
+        ]);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
     }
 }

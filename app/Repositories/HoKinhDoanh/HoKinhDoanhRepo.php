@@ -26,9 +26,9 @@ class HoKinhDoanhRepo extends BaseRepo
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
 
-        if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
-            $query->where('created_by', $created_by);
-        }
+        // if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
+        //     $query->where('created_by', $created_by);
+        // }
 
         if ($status >= 0) {
             $query->where('status', $status);
@@ -125,5 +125,53 @@ class HoKinhDoanhRepo extends BaseRepo
                 'data' => null
             ];
         }
+    }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getDetail($params, $with_trashed = false)
+    {
+        $id = isset($params['id']) ? $params['id'] : 0;
+        $tran = HoKinhDoanh::where('id', $id);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        $data = $tran->first();
+
+        if ($data) {
+
+            return [
+                'code' => 200,
+                'error' => 'Thông tin chi tiết',
+                'data' => $data
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'error' => 'Không tìm thấy thông tin chi tiết ',
+                'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getById($id, $with_trashed = false)
+    {
+        $tran = HoKinhDoanh::where('id', $id);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
     }
 }

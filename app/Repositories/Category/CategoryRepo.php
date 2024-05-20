@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Repositories\Categories;
+namespace App\Repositories\Category;
 
 use App\Models\Categories;
 use App\Helpers\Constants;
 use App\Repositories\BaseRepo;
 use Carbon\Carbon;
 
-class CategoriesRepo extends BaseRepo
+class CategoryRepo extends BaseRepo
 {
     public function getListing($params, $is_counting = false)
     {
@@ -119,4 +119,53 @@ class CategoriesRepo extends BaseRepo
             ];
         }
     }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getDetail($params, $with_trashed = false)
+    {
+        $id = isset($params['id']) ? $params['id'] : 0;
+        $tran = Categories::select()->where('id', $id);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        $data = $tran->first();
+
+        if ($data) {
+
+            return [
+                'code' => 200,
+                'error' => 'Thông tin chi tiết',
+                'data' => $data
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'error' => 'Không tìm thấy thông tin chi tiết ',
+                'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getById($id, $with_trashed = false)
+    {
+        $tran = Categories::select()->where('id', $id);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
+    }
+
 }

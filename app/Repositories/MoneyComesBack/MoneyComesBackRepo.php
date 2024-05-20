@@ -79,6 +79,7 @@ class MoneyComesBackRepo extends BaseRepo
             'pos_id',
             'lo_number',
             'time_end',
+            'time_process',
             'created_by',
             'fee',
             'total_price',
@@ -90,12 +91,12 @@ class MoneyComesBackRepo extends BaseRepo
         $insert = [];
 
         foreach ($fillable as $field) {
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $insert[$field] = $params[$field];
             }
         }
 
-        if (!empty($insert['agency_id']) && !empty($insert['pos_id']) && !empty($insert['total_price'])) {
+        if (!empty($insert['pos_id']) && !empty($insert['total_price'])) {
             return MoneyComesBack::create($insert) ? true : false;
         }
 
@@ -109,6 +110,7 @@ class MoneyComesBackRepo extends BaseRepo
             'pos_id',
             'lo_number',
             'time_end',
+            'time_process', // 'time_process' => 'date_format:Y-m-d'
             'created_by',
             'fee',
             'total_price',
@@ -120,7 +122,7 @@ class MoneyComesBackRepo extends BaseRepo
         $update = [];
 
         foreach ($fillable as $field) {
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $update[$field] = $params[$field];
             }
         }
@@ -166,4 +168,93 @@ class MoneyComesBackRepo extends BaseRepo
             ];
         }
     }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getDetail($params, $with_trashed = false)
+    {
+        $id = isset($params['id']) ? $params['id'] : 0;
+        $tran = MoneyComesBack::select()->where('id', $id);
+        $tran->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name']);
+            },
+            'agency' => function ($sql) {
+                $sql->select(['id', 'name']);
+            },
+            'user' => function ($sql) {
+                $sql->select(['id', 'username', 'email', 'fullname']);
+            }
+        ]);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        $data = $tran->first();
+
+        if ($data) {
+
+            return [
+                'code' => 200,
+                'error' => 'Thông tin chi tiết',
+                'data' => $data
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'error' => 'Không tìm thấy thông tin chi tiết ',
+                'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getByLoTime($params, $with_trashed = false)
+    {
+        $lo_number = isset($params['lo_number']) ? $params['lo_number'] : 0;
+        $time_process = isset($params['time_process']) ? $params['time_process'] : 0;
+        $tran = MoneyComesBack::where('lo_number', $lo_number, 'time_process', $time_process);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
+    }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getById($id, $with_trashed = false)
+    {
+        $tran = MoneyComesBack::where('id', $id);
+        $tran->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name']);
+            },
+            'agency' => function ($sql) {
+                $sql->select(['id', 'name']);
+            },
+            'user' => function ($sql) {
+                $sql->select(['id', 'username', 'email', 'fullname']);
+            }
+        ]);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
+    }
+
 }

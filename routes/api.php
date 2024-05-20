@@ -38,6 +38,9 @@ Route::group(['namespace' => 'Api'], function () {
         includeRouteFiles(__DIR__ . '/Api/Student/');
         includeRouteFiles(__DIR__ . '/Api/Upload/');
         includeRouteFiles(__DIR__ . '/Api/Transaction/');
+        includeRouteFiles(__DIR__ . '/Api/Category/');
+        includeRouteFiles(__DIR__ . '/Api/Pos/');
+        includeRouteFiles(__DIR__ . '/Api/HoKinhDoanh/');
     });
 });
 

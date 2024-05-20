@@ -17,6 +17,7 @@ class MoneyComesBack extends Model
         'pos_id',
         'lo_number',
         'time_end',
+        'time_process',
         'created_by',
         'fee',
         'total_price',

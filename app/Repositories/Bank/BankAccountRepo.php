@@ -121,4 +121,52 @@ class BankAccountsRepo extends BaseRepo
             ];
         }
     }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getDetail($params, $with_trashed = false)
+    {
+        $id = isset($params['id']) ? $params['id'] : 0;
+        $tran = BankAccounts::where('id', $id);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        $data = $tran->first();
+
+        if ($data) {
+
+            return [
+                'code' => 200,
+                'error' => 'Thông tin chi tiết',
+                'data' => $data
+            ];
+        } else {
+            return [
+                'code' => 404,
+                'error' => 'Không tìm thấy thông tin chi tiết ',
+                'data' => null
+            ];
+        }
+    }
+
+    /**
+     * Hàm lấy chi tiết thông tin GD
+     *
+     * @param $params
+     */
+    public function getById($id, $with_trashed = false)
+    {
+        $tran = BankAccounts::where('id', $id);
+
+        if ($with_trashed) {
+            $tran->withTrashed();
+        }
+
+        return $tran->first();
+    }
 }
