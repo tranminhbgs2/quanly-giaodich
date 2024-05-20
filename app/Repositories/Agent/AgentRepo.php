@@ -26,7 +26,7 @@ class AgentRepo extends BaseRepo
 
         $query = Agent::select()->with([
             'managerBy' => function ($sql) {
-                $sql->select(['id', 'name']);
+                $sql->select(['id', 'fullname', 'status']);
             },
         ]);
 
@@ -121,7 +121,7 @@ class AgentRepo extends BaseRepo
         $id = isset($params['id']) ? $params['id'] : 0;
         $agent = Agent::select()->where('id', $id)->with([
             'managerBy' => function ($sql) {
-                $sql->select(['id', 'name']);
+                $sql->select(['id', 'fullname', 'status']);
             },
         ])->first();
 

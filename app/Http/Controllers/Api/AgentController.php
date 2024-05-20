@@ -4,25 +4,25 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\HoKinhDoanh\DeleteRequest;
-use App\Http\Requests\HoKinhDoanh\GetDetailRequest;
-use App\Http\Requests\HoKinhDoanh\ListingRequest;
-use App\Http\Requests\HoKinhDoanh\StoreRequest;
-use App\Http\Requests\HoKinhDoanh\UpdateRequest;
-use App\Repositories\HoKinhDoanh\HoKinhDoanhRepo;
+use App\Http\Requests\Agent\DeleteRequest;
+use App\Http\Requests\Agent\GetDetailRequest;
+use App\Http\Requests\Agent\ListingRequest;
+use App\Http\Requests\Agent\StoreRequest;
+use App\Http\Requests\Agent\UpdateRequest;
+use App\Repositories\Agent\AgentRepo;
 
-class HoKinhDoanhController extends Controller
+class AgentController extends Controller
 {
-    protected $hkd_repo;
+    protected $agent_repo;
 
-    public function __construct(HoKinhDoanhRepo $hkdRepo)
+    public function __construct(AgentRepo $agentRepo)
     {
-        $this->hkd_repo = $hkdRepo;
+        $this->agent_repo = $agentRepo;
     }
 
     /**
-     * API lấy ds khách hàng
-     * URL: {{url}}/api/v1/ho-kinh-doanh
+     * API lấy ds đại lý
+     * URL: {{url}}/api/v1/agent
      *
      * @param ListingRequest $request
      * @return \Illuminate\Http\JsonResponse
@@ -35,11 +35,11 @@ class HoKinhDoanhController extends Controller
         $params['page_size'] = request('page_size', 10);
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
 
-        $data = $this->hkd_repo->getListing($params, false);
-        $total = $this->hkd_repo->getListing($params, true);
+        $data = $this->agent_repo->getListing($params, false);
+        $total = $this->agent_repo->getListing($params, true);
         return response()->json([
             'code' => 200,
-            'error' => 'Danh sách Hộ kinh doanh',
+            'error' => 'Danh sách Đại lý',
             'data' => [
                 "total_elements" => $total,
                 "total_page" => ceil($total / $params['page_size']),
@@ -51,8 +51,8 @@ class HoKinhDoanhController extends Controller
     }
 
     /**
-     * API lấy thông tin chi tiết khách hàng
-     * URL: {{url}}/api/v1/ho-kinh-doanh/detail/8
+     * API lấy thông tin chi tiết đại lý
+     * URL: {{url}}/api/v1/agent/detail/8
      *
      * @param GetDetailRequest $request
      * @param $id
@@ -62,7 +62,7 @@ class HoKinhDoanhController extends Controller
     {
         if ($id) {
             $params['id'] = request('id', null);
-            $data = $this->hkd_repo->getDetail($params);
+            $data = $this->agent_repo->getDetail($params);
         } else {
             $data = [
                 'code' => 422,
@@ -75,8 +75,8 @@ class HoKinhDoanhController extends Controller
     }
 
     /**
-     * API thêm mới KH từ CMS
-     * URL: {{url}}/api/v1/ho-kinh-doanh/store
+     * API thêm mới đại lý
+     * URL: {{url}}/api/v1/agent/store
      *
      * @param StoreRequest $request
      * @return \Illuminate\Http\JsonResponse
@@ -88,9 +88,10 @@ class HoKinhDoanhController extends Controller
         $params['phone'] = request('phone', 0); // máy pos
         $params['address'] = floatval(request('address', null)); // phí
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
+        $params['manager_id'] = auth()->user()->id; // người tạo
 
 
-        $resutl = $this->hkd_repo->store($params);
+        $resutl = $this->agent_repo->store($params);
 
         if ($resutl) {
             return response()->json([
@@ -108,8 +109,8 @@ class HoKinhDoanhController extends Controller
     }
 
     /**
-     * API cập nhật thông tin HKD
-     * URL: {{url}}/api/v1/ho-kinh-doanh/update/id
+     * API cập nhật thông tin KH theo id
+     * URL: {{url}}/api/v1/agent/update/id
      *
      * @param UpdateRequest $request
      * @param $id
@@ -124,9 +125,10 @@ class HoKinhDoanhController extends Controller
             $params['surrogate'] = strtoupper(request('surrogate', null)); // hình thức
             $params['phone'] = request('phone', 0); // máy pos
             $params['address'] = floatval(request('address', null)); // phí
-            $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
+            $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
+            $params['manager_id'] = auth()->user()->id; // người tạo
 
-            $resutl = $this->hkd_repo->update($params, $params['id']);
+            $resutl = $this->agent_repo->update($params, $params['id']);
 
             if ($resutl) {
                 return response()->json([
@@ -152,7 +154,7 @@ class HoKinhDoanhController extends Controller
 
     /**
      * API xóa thông tin khách hàng, xóa trạng thái, ko xóa vật lý
-     * URL: {{url}}/api/v1/ho-kinh-doanh/delete/1202112817000308
+     * URL: {{url}}/api/v1/agent/delete/1202112817000308
      *
      * @param DeleteRequest $request
      * @param $id
@@ -163,7 +165,7 @@ class HoKinhDoanhController extends Controller
         if ($id) {
             $params['id'] = request('id', null);
             if ($id == $params['id']) {
-                $data = $this->hkd_repo->delete($params);
+                $data = $this->agent_repo->delete($params);
             } else {
                 return response()->json([
                     'code' => 422,

@@ -33,6 +33,7 @@ class PosController extends Controller
     {
         $params['keyword'] = request('keyword', null);
         $params['status'] = request('status', -1);
+        $params['hkd_id'] = request('hkd_id', 0);
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);

@@ -41,6 +41,7 @@ Route::group(['namespace' => 'Api'], function () {
         includeRouteFiles(__DIR__ . '/Api/Category/');
         includeRouteFiles(__DIR__ . '/Api/Pos/');
         includeRouteFiles(__DIR__ . '/Api/HoKinhDoanh/');
+        includeRouteFiles(__DIR__ . '/Api/Agent/');
     });
 });
 

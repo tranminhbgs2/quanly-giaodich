@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Pos;
+namespace App\Http\Requests\Agent;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,7 +27,6 @@ class ListingRequest extends FormRequest
     {
         return [
             'keyword' => [],
-            'hkd_id' => 'integer|min:1',
             'status' => 'integer|min:0',
             'page_index' => 'integer|min:1|required_with:page_size',
             'page_size' => 'integer|min:1|required_with:page_index'
@@ -57,7 +56,6 @@ class ListingRequest extends FormRequest
             'page_size.required_with' => 'Truyền thiếu tham số page_size',
             'status.integer' => 'Tham số status phải là số nguyên',
             'status.min' => "Tham số status tối thiểu phải là :min",
-            'hkd_id.integer' => 'Tham số hkd_id phải là số nguyên',
         ];
     }
 
