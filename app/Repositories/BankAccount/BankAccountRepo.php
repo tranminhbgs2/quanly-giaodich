@@ -28,7 +28,7 @@ class BankAccountRepo extends BaseRepo
         if ($status >= 0) {
             $query->where('status', $status);
         } else {
-            $query->where('status', Constants::USER_STATUS_ACTIVE);
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
         if ($bank_code) {
@@ -38,7 +38,7 @@ class BankAccountRepo extends BaseRepo
         if ($agent_id) {
             $query->where('agent_id', $agent_id);
         }
-        
+
         if ($is_counting) {
             return $query->count();
         } else {
