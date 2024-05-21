@@ -9,6 +9,7 @@ use App\Http\Requests\HoKinhDoanh\GetDetailRequest;
 use App\Http\Requests\HoKinhDoanh\ListingRequest;
 use App\Http\Requests\HoKinhDoanh\StoreRequest;
 use App\Http\Requests\HoKinhDoanh\UpdateRequest;
+use App\Http\Requests\HoKinhDoanh\ChangeStatusRequest;
 use App\Repositories\HoKinhDoanh\HoKinhDoanhRepo;
 
 class HoKinhDoanhController extends Controller
@@ -180,5 +181,26 @@ class HoKinhDoanhController extends Controller
         }
 
         return response()->json($data);
+    }
+
+    public function changeStatus(ChangeStatusRequest $request) {
+        $params['id'] = request('id', null);
+        $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
+
+        $resutl = $this->hkd_repo->changeStatus($params['status'], $params['id']);
+
+        if ($resutl) {
+            return response()->json([
+                'code' => 200,
+                'error' => 'Cập nhật trạng thái thành công',
+                'data' => null
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'error' => 'Cập nhật trạng thái không thành công',
+            'data' => null
+        ]);
     }
 }

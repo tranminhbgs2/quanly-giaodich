@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Pos\AssignAgentRequest;
+use App\Http\Requests\Pos\ChangeStatusRequest;
 use App\Http\Requests\Pos\DeleteRequest;
 use App\Http\Requests\Pos\GetDetailRequest;
 use App\Http\Requests\Pos\ListingRequest;
@@ -237,5 +238,28 @@ class PosController extends Controller
                 'data' => null
             ]);
         }
+    }
+
+    public function changeStatus(ChangeStatusRequest $request)
+    {
+        $params['id'] = request('id', null);
+        $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
+        $params['updated_by'] = auth()->user()->id; // người cập nhật
+
+        $resutl = $this->pos_repo->changeStatus($params['status'], $params['id']);
+
+        if ($resutl) {
+            return response()->json([
+                'code' => 200,
+                'error' => 'Cập nhật thông tin thành công',
+                'data' => null
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'error' => 'Cập nhật thông tin không thành công',
+            'data' => null
+        ]);
     }
 }

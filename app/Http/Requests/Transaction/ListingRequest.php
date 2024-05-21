@@ -28,8 +28,6 @@ class ListingRequest extends FormRequest
         return [
             'keyword' => [],
             'status' => 'integer|min:0',
-            'date_from' => 'date_format:Y-m-d',
-            'date_to' => 'date_format:Y-m-d',
             'pos_id' => 'integer|min:0',
             'category_id' => 'integer|min:0',
             'lo_number' => 'integer|min:0',
@@ -62,8 +60,6 @@ class ListingRequest extends FormRequest
             'page_size.required_with' => 'Truyền thiếu tham số page_size',
             'status.integer' => 'Tham số status phải là số nguyên',
             'status.min' => "Tham số status tối thiểu phải là :min",
-            'date_from.date_format' => 'Tham số date_from không đúng định dạng Y-m-d',
-            'date_to.date_format' => 'Tham số date_to không đúng định dạng Y-m-d',
             'pos_id.integer' => 'Tham số pos_id phải là số nguyên',
             'pos_id.min' => "Tham số pos_id tối thiểu phải là :min",
             'category_id.integer' => 'Tham số category_id phải là số nguyên',
@@ -81,6 +77,22 @@ class ListingRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+            //check date_from date_format
+            if ($this->request->has('date_from')&& !empty($this->request->get('date_from')) && !strtotime($this->request->get('date_from'))) {
+                $validator->errors()->add('check_date', 'Tham số date_from không đúng định dạng Y-m-d');
+            }
+
+            if ($this->request->has('date_to') && !empty($this->request->get('date_to')) && !strtotime($this->request->get('date_to'))) {
+                $validator->errors()->add('check_date', 'Tham số date_to không đúng định dạng Y-m-d');
+            }
+            //check date_from and date_to
+            if ($this->request->has('date_from') && $this->request->has('date_to')) {
+                $dateFrom = strtotime($this->request->get('date_from'));
+                $dateTo = strtotime($this->request->get('date_to'));
+                if ($dateFrom > $dateTo) {
+                    $validator->errors()->add('check_date', 'Tham số date_from phải nhỏ hơn hoặc bằng date_to');
+                }
+            }
             // Check key keyword
             // if (!$this->request->has('keyword')) {
             //     $validator->errors()->add('check_exist', 'Truyền thiếu tham số keyword');

@@ -53,7 +53,7 @@ class WithdrawPosRepo extends BaseRepo
             $query->where('created_by', $created_by);
         }
 
-        if ($date_from && $date_to) {
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
             $query->whereBetween('time_withdraw', [$date_from, $date_to]);
         }
 
@@ -65,10 +65,10 @@ class WithdrawPosRepo extends BaseRepo
             $query->where('hkd_id', $hkd_id);
         }
 
-        if ($status >= 0) {
+        if ($status > 0) {
             $query->where('status', $status);
         } else {
-            $query->where('status', Constants::USER_STATUS_ACTIVE);
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
         if ($is_counting) {
@@ -194,7 +194,7 @@ class WithdrawPosRepo extends BaseRepo
         $update = [];
 
         foreach ($fillable as $field) {
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $update[$field] = $params[$field];
             }
         }

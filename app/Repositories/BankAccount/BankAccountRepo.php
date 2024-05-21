@@ -27,14 +27,14 @@ class BankAccountRepo extends BaseRepo
             $keyword = translateKeyWord($keyword);
             $query->where(function ($sub_sql) use ($keyword) {
                 $sub_sql->where('account_name', 'LIKE', "%" . $keyword . "%")
-                        ->orWhere('account_name', 'LIKE', "%" . $keyword . "%");
+                    ->orWhere('account_name', 'LIKE', "%" . $keyword . "%");
             });
         }
-        if ($date_from && $date_to) {
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
 
-        if ($status >= 0) {
+        if ($status > 0) {
             $query->where('status', $status);
         } else {
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
@@ -81,7 +81,7 @@ class BankAccountRepo extends BaseRepo
             }
         }
 
-        if (!empty($insert['account_number']) && !empty($insert['bank_code']) && !empty($insert['account_name'])){
+        if (!empty($insert['account_number']) && !empty($insert['bank_code']) && !empty($insert['account_name'])) {
             return BankAccounts::create($insert) ? true : false;
         }
 

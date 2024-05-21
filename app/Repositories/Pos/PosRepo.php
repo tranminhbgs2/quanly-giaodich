@@ -38,7 +38,8 @@ class PosRepo extends BaseRepo
         if (!empty($keyword)) {
             $keyword = translateKeyWord($keyword);
             $query->where(function ($sub_sql) use ($keyword) {
-                $sub_sql->where('name', 'LIKE', "%" . $keyword . "%");
+                $sub_sql->where('name', 'LIKE', "%" . $keyword . "%")
+                    ->orWhere('code', 'LIKE', "%" . $keyword . "%");
             });
         }
 
@@ -46,7 +47,7 @@ class PosRepo extends BaseRepo
         //     $query->where('created_by', $created_by);
         // }
 
-        if ($date_from && $date_to) {
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
 
@@ -54,8 +55,10 @@ class PosRepo extends BaseRepo
             $query->where('hkd_id', $hkd_id);
         }
 
-        if ($status >= 0) {
+        if ($status > 0) {
             $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
         if ($is_counting) {

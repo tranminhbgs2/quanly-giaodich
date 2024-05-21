@@ -9,6 +9,7 @@ use App\Http\Requests\Category\GetDetailRequest;
 use App\Http\Requests\Category\ListingRequest;
 use App\Http\Requests\Category\StoreRequest;
 use App\Http\Requests\Category\UpdateRequest;
+use App\Http\Requests\User\ChangeStatusRequest;
 use App\Repositories\User\UserRepo;
 use Illuminate\Support\Facades\Auth;
 
@@ -225,7 +226,7 @@ class UserController extends Controller
         return response()->json($data);
     }
 
-    public function changeStatus()
+    public function changeStatus(ChangeStatusRequest $request)
     {
         $params['id'] = request('id', null);
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);

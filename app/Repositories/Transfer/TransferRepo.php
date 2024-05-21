@@ -43,7 +43,9 @@ class TransferRepo extends BaseRepo
             $keyword = translateKeyWord($keyword);
             $query->where(function ($sub_sql) use ($keyword) {
                 $sub_sql->where('acc_name_from', 'LIKE', "%" . $keyword . "%")
-                        ->orWhere('acc_name_to', 'LIKE', "%" . $keyword . "%");
+                        ->orWhere('acc_name_to', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('acc_number_from', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('acc_number_to', 'LIKE', "%" . $keyword . "%");
             });
         }
 
@@ -51,7 +53,7 @@ class TransferRepo extends BaseRepo
             $query->where('created_by', $created_by);
         }
 
-        if ($date_from && $date_to) {
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
             $query->whereBetween('time_payment', [$date_from, $date_to]);
         }
 
@@ -63,10 +65,10 @@ class TransferRepo extends BaseRepo
             $query->where('acc_bank_to_id', $acc_bank_to_id);
         }
 
-        if ($status >= 0) {
+        if ($status > 0) {
             $query->where('status', $status);
         } else {
-            $query->where('status', Constants::USER_STATUS_ACTIVE);
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
         if ($is_counting) {
@@ -137,7 +139,7 @@ class TransferRepo extends BaseRepo
         $update = [];
 
         foreach ($fillable as $field) {
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $update[$field] = $params[$field];
             }
         }

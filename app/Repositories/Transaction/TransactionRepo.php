@@ -56,7 +56,7 @@ class TransactionRepo extends BaseRepo
             });
         }
 
-        if ($date_from && $date_to) {
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
             $query->whereBetween('time_payment', [$date_from, $date_to]);
         }
 
@@ -72,10 +72,10 @@ class TransactionRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
-        if ($status >= 0) {
+        if ($status > 0) {
             $query->where('status', $status);
         } else {
-            $query->where('status', Constants::USER_STATUS_ACTIVE);
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
         if ($is_counting) {
@@ -123,7 +123,7 @@ class TransactionRepo extends BaseRepo
             });
         }
 
-        if ($date_from && $date_to) {
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)){
             $query->whereBetween('time_payment', [$date_from, $date_to]);
         }
 
@@ -139,7 +139,7 @@ class TransactionRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
-        if ($status >= 0) {
+        if ($status > 0) {
             $query->where('status', $status);
         } else {
             $query->where('status', Constants::USER_STATUS_ACTIVE);

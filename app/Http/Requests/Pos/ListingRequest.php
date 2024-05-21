@@ -27,7 +27,7 @@ class ListingRequest extends FormRequest
     {
         return [
             'keyword' => [],
-            'hkd_id' => 'integer|min:1',
+            'hkd_id' => 'integer|min:0',
             'status' => 'integer|min:0',
             'page_index' => 'integer|min:1|required_with:page_size',
             'page_size' => 'integer|min:1|required_with:page_index'

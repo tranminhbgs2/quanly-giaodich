@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Pos;
+namespace App\Http\Requests\BankAccount;
 
 use App\Helpers\Constants;
-use App\Models\Pos;
+use App\Models\BankAccounts;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -61,13 +61,13 @@ class ChangeStatusRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
-            $dep = Pos::where('id', $this->request->get('id'))->withTrashed()->first();
+            $dep = BankAccounts::where('id', $this->request->get('id'))->withTrashed()->first();
             if ($dep) {
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
-                    $validator->errors()->add('check_exist', 'Máy Pos đã bị xóa');
+                    $validator->errors()->add('check_exist', 'Tài khoản hưởng thụ đã bị xóa');
                 }
             } else {
-                $validator->errors()->add('check_exist', 'Không tìm thấy máy Pos');
+                $validator->errors()->add('check_exist', 'Không tìm thấy tài khoản hưởng thụ');
             }
         });
     }

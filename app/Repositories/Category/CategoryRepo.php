@@ -26,11 +26,11 @@ class CategoryRepo extends BaseRepo
                         ->orWhere('code', 'LIKE', "%" . $keyword . "%");
             });
         }
-        if ($date_from && $date_to) {
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
 
-        if ($status >= 0) {
+        if ($status > 0) {
             $query->where('status', $status);
         } else {
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
@@ -88,7 +88,7 @@ class CategoryRepo extends BaseRepo
         $update = [];
 
         foreach ($fillable as $field) {
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $update[$field] = $params[$field];
             }
         }
