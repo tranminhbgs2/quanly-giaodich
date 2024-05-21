@@ -11,6 +11,7 @@ class HoKinhDoanhRepo extends BaseRepo
 {
     public function getListing($params, $is_counting = false)
     {
+        $keyword = $params['keyword'] ?? null;
         $status = $params['status'] ?? -1;
         $page_index = $params['page_index'] ?? 1;
         $page_size = $params['page_size'] ?? 10;
