@@ -17,7 +17,7 @@ class MoneyComesBackRepo extends BaseRepo
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
         $pos_id = $params['pos_id'] ?? 0;
-        $agency_id = $params['agency_id'] ?? 0;
+        $agent_id = $params['agent_id'] ?? 0;
         $created_by = $params['created_by'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
 
@@ -45,8 +45,8 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('pos_id', $pos_id);
         }
 
-        if ($agency_id > 0) {
-            $query->where('agency_id', $agency_id);
+        if ($agent_id > 0) {
+            $query->where('agent_id', $agent_id);
         }
 
         if ($status >= 0) {
@@ -75,7 +75,7 @@ class MoneyComesBackRepo extends BaseRepo
     public function store($params)
     {
         $fillable = [
-            'agency_id',
+            'agent_id',
             'pos_id',
             'lo_number',
             'time_end',
@@ -106,7 +106,7 @@ class MoneyComesBackRepo extends BaseRepo
     public function update($params, $id)
     {
         $fillable = [
-            'agency_id',
+            'agent_id',
             'pos_id',
             'lo_number',
             'time_end',

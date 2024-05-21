@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Repositories\BankAccounts;
+namespace App\Repositories\BankAccount;
 
 use App\Models\BankAccounts;
 use App\Helpers\Constants;
 use App\Repositories\BaseRepo;
 use Carbon\Carbon;
 
-class BankAccountsRepo extends BaseRepo
+class BankAccountRepo extends BaseRepo
 {
     public function getListing($params, $is_counting = false)
     {
@@ -16,6 +16,8 @@ class BankAccountsRepo extends BaseRepo
         $page_size = $params['page_size'] ?? 10;
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
+        $bank_code = $params['bank_code'] ?? null;
+        $agent_id = $params['agent_id'] ?? null;
 
         $query = BankAccounts::select()->with('agency');
 
@@ -29,6 +31,14 @@ class BankAccountsRepo extends BaseRepo
             $query->where('status', Constants::USER_STATUS_ACTIVE);
         }
 
+        if ($bank_code) {
+            $query->where('bank_code', $bank_code);
+        }
+
+        if ($agent_id) {
+            $query->where('agent_id', $agent_id);
+        }
+        
         if ($is_counting) {
             return $query->count();
         } else {
@@ -46,7 +56,7 @@ class BankAccountsRepo extends BaseRepo
     public function store($params)
     {
         $fillable = [
-            'agency_id',
+            'agent_id',
             'bank_code',
             'account_number',
             'account_name',
@@ -62,7 +72,7 @@ class BankAccountsRepo extends BaseRepo
             }
         }
 
-        if (!empty($insert['agency_id']) && !empty($insert['account_number'])) {
+        if (!empty($insert['account_number']) && !empty($insert['bank_code']) && !empty($insert['account_name'])){
             return BankAccounts::create($insert) ? true : false;
         }
 
@@ -72,7 +82,7 @@ class BankAccountsRepo extends BaseRepo
     public function update($params, $id)
     {
         $fillable = [
-            'agency_id',
+            'agent_id',
             'bank_code',
             'account_number',
             'account_name',
@@ -83,7 +93,7 @@ class BankAccountsRepo extends BaseRepo
         $update = [];
 
         foreach ($fillable as $field) {
-            if (isset($params[$field]) && !empty($params[$field])) {
+            if (isset($params[$field])) {
                 $update[$field] = $params[$field];
             }
         }

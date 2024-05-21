@@ -13,7 +13,7 @@ class MoneyComesBack extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'agency_id',
+        'agent_id',
         'pos_id',
         'lo_number',
         'time_end',
@@ -31,7 +31,7 @@ class MoneyComesBack extends Model
      */
     public function agency()
     {
-        return $this->belongsTo(Agent::class, 'agency_id', 'id');
+        return $this->belongsTo(Agent::class, 'agent_id', 'id');
     }
 
     public function pos()

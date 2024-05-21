@@ -12,7 +12,7 @@ class BankAccounts extends Model
     protected $table = Constants::TABLE_BANK_ACCOUNTS;
     public $timestamps = true;
     protected $fillable = [
-        'agency_id',
+        'agent_id',
         'bank_code',
         'account_number',
         'account_name',
@@ -22,6 +22,6 @@ class BankAccounts extends Model
 
     public function agency()
     {
-        return $this->belongsTo(Agent::class, 'agency_id', 'id');
+        return $this->belongsTo(Agent::class, 'agent_id', 'id');
     }
 }

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\BankAccount;
 
 use App\Helpers\Constants;
-use App\Models\Categories;
+use App\Models\BankAccounts;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -29,9 +29,10 @@ class UpdateRequest extends FormRequest
     {
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
-            'name' => ['required'],
-            'code' => ['required'],
-            'fee' => ['required', 'numeric', 'min:0'],
+            'account_name' => ['required'],
+            'account_number' => ['required'],
+            'bank_code' => ['required', 'string'],
+            'agent_id' => ['integer', 'min:0'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];
 
@@ -41,9 +42,11 @@ class UpdateRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' => 'Tên danh mục',
-            'code' => 'Mã danh mục',
-            'fee' => 'Phí',
+            'id' => 'ID',
+            'account_name' => 'Tên tài khoản',
+            'account_number' => 'Số tài khoản',
+            'bank_code' => 'Mã ngân hàng',
+            'agent_id' => 'ID đại lý',
             'status' => 'Trạng thái',
         ];
     }
@@ -51,11 +54,15 @@ class UpdateRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'Truyền thiếu tham số name',
-            'code.required' => 'Truyền thiếu tham số code',
-            'fee.required' => 'Truyền thiếu tham số fee',
-            'fee.numeric' => 'Tham số fee phải là số',
-            'fee.min' => "Tham số fee tối thiểu phải là :min",
+            'id.required' => 'Truyền thiếu tham số id',
+            'id.integer' => 'Tham số id phải là số nguyên',
+            'id.min' => "Tham số id tối thiểu phải là :min",
+            'account_name.required' => 'Truyền thiếu tham số account_name',
+            'account_number.required' => 'Truyền thiếu tham số account_number',
+            'bank_code.required' => 'Truyền thiếu tham số bank_code',
+            'bank_code.string' => 'Tham số bank_code phải là chuỗi',
+            'agent_id.integer' => 'Tham số agent_id phải là số nguyên',
+            'agent_id.min' => "Tham số agent_id tối thiểu phải là :min",
             'status.integer' => 'Tham số status phải là số nguyên',
             'status.in' => 'Tham số status không hợp lệ',
         ];
@@ -68,36 +75,25 @@ class UpdateRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
-            $dep = Categories::where('id', $this->request->get('id'))->withTrashed()->first();
+            $dep = BankAccounts::where('id', $this->request->get('id'))->withTrashed()->first();
             if ($dep) {
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
-                    $validator->errors()->add('check_exist', 'Danh mục đã bị xóa');
+                    $validator->errors()->add('check_exist', 'Tài khoản hưởng thụ đã bị xóa');
                 }
             } else {
-                $validator->errors()->add('check_exist', 'Không tìm thấy danh mục');
+                $validator->errors()->add('check_exist', 'Không tìm thấy Tài khoản hưởng thụ');
             }
 
             // Check theo email
-            if ($this->request->get('name')) {
-                $user = Categories::where('name', $this->request->get('name'))
+            if ($this->request->get('account_name')) {
+                $user = BankAccounts::where('account_name', $this->request->get('account_name'))
+                    ->where('account_number', $this->request->get('account_number'))
                     ->whereNotIn('id', [$this->request->get('id')])
-                    ->whereNotNull('name')
+                    ->whereNotNull('account_name')
                     ->withTrashed()
                     ->first();
-                if ($user) {
-                    $validator->errors()->add('check_exist', 'Tên danh mục đã được đăng ký');
-                }
-            }
-
-            // Check theo identifier
-            if ($this->request->get('code')) {
-                $user = Categories::where('code', $this->request->get('code'))
-                    ->whereNotIn('id', [$this->request->get('id')])
-                    ->whereNotNull('code')
-                    ->withTrashed()
-                    ->first();
-                if ($user) {
-                    $validator->errors()->add('check_exist', 'Mã danh mục đã được đăng ký');
+                if ($user && $user->account_name) {
+                    $validator->errors()->add('check_exist', 'Tài khoản hưởng thụ đã được đăng ký');
                 }
             }
         });

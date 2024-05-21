@@ -77,8 +77,6 @@ class UpdateRequest extends FormRequest
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy thông tin');
             }
-        });
-
             // Check theo email
             if ($this->request->get('name')) {
                 $user = Pos::where('name', $this->request->get('name'))
@@ -102,6 +100,8 @@ class UpdateRequest extends FormRequest
                     $validator->errors()->add('check_exist', 'Mã máy pos đã được đăng ký');
                 }
             }
+        });
+
     }
 
     /**
