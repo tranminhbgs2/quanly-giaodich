@@ -268,4 +268,11 @@ class PosRepo extends BaseRepo
 
         return $tran->first();
     }
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return Pos::where('id', $id)->update($update);
+    }
 }

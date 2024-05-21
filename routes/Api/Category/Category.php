@@ -11,6 +11,7 @@ Route::group(['prefix' => 'category'], function (){
         Route::post('/store', 'CategoryController@store');
         Route::post('/update', 'CategoryController@update');
         Route::get('/delete/{id}', 'CategoryController@delete');
+        Route::post('/change-status', 'CategoryController@changeStatus');
     });
 
 });

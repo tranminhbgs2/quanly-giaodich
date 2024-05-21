@@ -12,6 +12,7 @@ Route::group(['prefix' => 'pos'], function (){
         Route::post('/update', 'PosController@update');
         Route::get('/delete/{id}', 'PosController@delete');
         Route::post('/assign-pos', 'PosController@assignPosToAgent');
+        Route::post('/change-status', 'PosController@changeStatus');
     });
 
 });

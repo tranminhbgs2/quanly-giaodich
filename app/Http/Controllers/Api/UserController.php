@@ -224,4 +224,26 @@ class UserController extends Controller
 
         return response()->json($data);
     }
+
+    public function changeStatus()
+    {
+        $params['id'] = request('id', null);
+        $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
+
+        $resutl = $this->user_repo->changeStatus($params['status'], $params['id']);
+
+        if ($resutl) {
+            return response()->json([
+                'code' => 200,
+                'error' => 'Cập nhật trạng thái thành công',
+                'data' => null
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'error' => 'Cập nhật trạng thái không thành công',
+            'data' => null
+        ]);
+    }
 }

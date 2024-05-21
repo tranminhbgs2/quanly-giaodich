@@ -12,6 +12,7 @@ Route::group(['prefix' => 'bank-account'], function (){
         Route::post('/store', 'BankAccountController@store');
         Route::post('/update', 'BankAccountController@update');
         Route::get('/delete/{id}', 'BankAccountController@delete');
+        Route::post('/change-status', 'BankAccountController@changeStatus');
     });
 
 });

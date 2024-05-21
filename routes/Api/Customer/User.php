@@ -11,6 +11,7 @@ Route::group(['prefix' => 'users'], function (){
         // Route::post('/store', 'UserController@store');
         // Route::post('/update/{id}', 'UserController@update');
         // Route::post('/delete/{id}', 'UserController@delete');
+        Route::post('/change-status', 'UserController@changeStatus');
     });
 
 });

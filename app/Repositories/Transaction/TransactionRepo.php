@@ -360,4 +360,11 @@ class TransactionRepo extends BaseRepo
             ];
         }
     }
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return Transaction::where('id', $id)->update($update);
+    }
 }

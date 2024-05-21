@@ -11,6 +11,7 @@ Route::group(['prefix' => 'transaction'], function (){
         Route::post('/store', 'TransactionController@store');
         Route::post('/update', 'TransactionController@update');
         Route::get('/delete/{id}', 'TransactionController@delete');
+        Route::post('/change-status', 'TransactionController@changeStatus');
     });
 
 });

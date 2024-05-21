@@ -11,6 +11,7 @@ class BankAccountRepo extends BaseRepo
 {
     public function getListing($params, $is_counting = false)
     {
+        $keyword = $params['keyword'] ?? null;
         $status = $params['status'] ?? -1;
         $page_index = $params['page_index'] ?? 1;
         $page_size = $params['page_size'] ?? 10;
@@ -21,6 +22,14 @@ class BankAccountRepo extends BaseRepo
 
         $query = BankAccounts::select()->with('agency');
 
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('account_name', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('account_name', 'LIKE', "%" . $keyword . "%");
+            });
+        }
         if ($date_from && $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
@@ -178,5 +187,13 @@ class BankAccountRepo extends BaseRepo
         }
 
         return $tran->first();
+    }
+
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return BankAccounts::where('id', $id)->update($update);
     }
 }

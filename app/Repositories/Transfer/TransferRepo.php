@@ -239,4 +239,12 @@ class TransferRepo extends BaseRepo
 
         return $tran->first();
     }
+
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return Transfer::where('id', $id)->update($update);
+    }
 }

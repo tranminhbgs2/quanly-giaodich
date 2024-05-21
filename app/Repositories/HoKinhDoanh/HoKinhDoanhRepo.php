@@ -22,6 +22,15 @@ class HoKinhDoanhRepo extends BaseRepo
 
         $query = HoKinhDoanh::select();
 
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('name', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('surrogate', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('phone', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('address', 'LIKE', "%" . $keyword . "%");
+            });
+        }
         if ($date_from && $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
@@ -67,7 +76,6 @@ class HoKinhDoanhRepo extends BaseRepo
                 $insert[$field] = $params[$field];
             }
         }
-
         if (!empty($insert['name']) && !empty($insert['phone'])) {
             return HoKinhDoanh::create($insert) ? true : false;
         }
@@ -173,5 +181,13 @@ class HoKinhDoanhRepo extends BaseRepo
         }
 
         return $tran->first();
+    }
+
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return HoKinhDoanh::where('id', $id)->update($update);
     }
 }

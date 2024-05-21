@@ -11,6 +11,7 @@ Route::group(['prefix' => 'ho-kinh-doanh'], function (){
         Route::post('/store', 'HoKinhDoanhController@store');
         Route::post('/update', 'HoKinhDoanhController@update');
         Route::get('/delete/{id}', 'HoKinhDoanhController@delete');
+        Route::post('/change-status', 'HoKinhDoanhController@changeStatus');
     });
 
 });

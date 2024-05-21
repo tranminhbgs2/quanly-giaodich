@@ -94,6 +94,12 @@ class AgentRepo extends BaseRepo
         return false;
     }
 
+    /**
+     * Hàm cập nhật thông tin
+     *
+     * @param $params
+     * @param $id
+     */
     public function update($params, $id)
     {
         $fillable = [
@@ -193,5 +199,13 @@ class AgentRepo extends BaseRepo
         }
 
         return $tran->first();
+    }
+
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return Agent::where('id', $id)->update($update);
     }
 }

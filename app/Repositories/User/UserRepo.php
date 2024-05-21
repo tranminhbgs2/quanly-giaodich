@@ -170,6 +170,14 @@ class UserRepo extends BaseRepo
         return $tran->first();
     }
 
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return User::where('id', $id)->update($update);
+    }
+
     public function getRoles($user_id = null)
     {
         $group_id = auth()->user()->group_id;

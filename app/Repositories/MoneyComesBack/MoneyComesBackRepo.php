@@ -257,4 +257,12 @@ class MoneyComesBackRepo extends BaseRepo
         return $tran->first();
     }
 
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return MoneyComesBack::where('id', $id)->update($update);
+    }
+
 }

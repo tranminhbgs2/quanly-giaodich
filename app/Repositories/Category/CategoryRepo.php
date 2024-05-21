@@ -19,6 +19,13 @@ class CategoryRepo extends BaseRepo
 
         $query = Categories::select();
 
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('name', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('code', 'LIKE', "%" . $keyword . "%");
+            });
+        }
         if ($date_from && $date_to) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
@@ -168,4 +175,11 @@ class CategoryRepo extends BaseRepo
         return $tran->first();
     }
 
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return Categories::where('id', $id)->update($update);
+    }
 }

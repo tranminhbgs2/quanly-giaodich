@@ -86,7 +86,7 @@ class HoKinhDoanhController extends Controller
         $params['name'] = request('name', null); // ngân hàng
         $params['surrogate'] = strtoupper(request('surrogate', null)); // hình thức
         $params['phone'] = request('phone', 0); // máy pos
-        $params['address'] = floatval(request('address', null)); // phí
+        $params['address'] = request('address', null); // phí
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
 
 
@@ -123,7 +123,7 @@ class HoKinhDoanhController extends Controller
             $params['name'] = request('name', null); // ngân hàng
             $params['surrogate'] = strtoupper(request('surrogate', null)); // hình thức
             $params['phone'] = request('phone', 0); // máy pos
-            $params['address'] = floatval(request('address', null)); // phí
+            $params['address'] = request('address', null); // phí
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
 
             $resutl = $this->hkd_repo->update($params, $params['id']);

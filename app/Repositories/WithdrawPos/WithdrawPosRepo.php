@@ -293,4 +293,12 @@ class WithdrawPosRepo extends BaseRepo
             ];
         }
     }
+
+    public function changeStatus($status, $id)
+    {
+
+        $update = ['status' => $status];
+
+        return WithdrawPos::where('id', $id)->update($update);
+    }
 }

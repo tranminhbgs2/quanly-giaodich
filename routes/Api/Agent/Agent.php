@@ -11,6 +11,7 @@ Route::group(['prefix' => 'agent'], function (){
         Route::post('/store', 'AgentController@store');
         Route::post('/update', 'AgentController@update');
         Route::get('/delete/{id}', 'AgentController@delete');
+        Route::post('/change-status', 'AgentController@changeStatus');
     });
 
 });
