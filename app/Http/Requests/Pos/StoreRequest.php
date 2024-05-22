@@ -30,11 +30,11 @@ class StoreRequest extends FormRequest
             'bank_code' => ['required'],
             'method' => ['required'],
             'name' => ['required'],
-            'fee' => ['required', 'numeric', 'min:0'],
+            'fee' => ['required', 'numeric', 'min:0', 'max:99'],
             'code' => ['required'],
             'hkd_id' => ['numeric', 'min:0'],
-            'fee_cashback' => ['numeric', 'min:0'],
-            'total_fee' => ['numeric', 'min:0'],
+            'fee_cashback' => ['numeric', 'min:0', 'max:99'],
+            'total_fee' => ['numeric', 'min:0', 'max:99'],
             'price_pos' => ['numeric', 'min:0'],
         ];
 
@@ -66,6 +66,7 @@ class StoreRequest extends FormRequest
             'fee.required' => 'Phí không được để trống',
             'fee.numeric' => 'Phí phải là số',
             'fee.min' => 'Phí phải lớn hơn hoặc bằng 0',
+            'fee.max' => 'Phí phải nhỏ hơn hoặc bằng 99',
             'code.required' => 'Mã máy Pos không được để trống',
             'hkd_id.numeric' => 'Hkd Id phải là số',
             'hkd_id.min' => 'Hkd Id phải lớn hơn hoặc bằng 0',
@@ -75,6 +76,8 @@ class StoreRequest extends FormRequest
             'total_fee.min' => 'Tổng phí phải lớn hơn hoặc bằng 0',
             'price_pos.numeric' => 'Tiền tồn Pos phải là số',
             'price_pos.min' => 'Tiền tồn Pos phải lớn hơn hoặc bằng 0',
+            'fee_cashback.max' => 'Phí cashback phải nhỏ hơn hoặc bằng 99',
+            'total_fee.max' => 'Tổng phí phải nhỏ hơn hoặc bằng 99',
         ];
     }
 

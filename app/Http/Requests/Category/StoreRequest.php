@@ -30,7 +30,7 @@ class StoreRequest extends FormRequest
         $rule = [
             'name' => ['required'],
             'code' => ['required'],
-            'fee' => ['required', 'numeric', 'min:0'],
+            'fee' => ['required', 'numeric', 'min:0', 'max:99'],
 
         ];
 
@@ -55,6 +55,7 @@ class StoreRequest extends FormRequest
             'fee.required' => 'Truyền thiếu tham số fee',
             'fee.numeric' => 'Tham số fee phải là số',
             'fee.min' => "Tham số fee tối thiểu phải là :min",
+            'fee.max' => "Tham số fee tối đa phải là :max",
 
         ];
     }

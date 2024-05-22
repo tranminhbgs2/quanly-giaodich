@@ -32,7 +32,7 @@ class UpdateRequest extends FormRequest
             'id' => ['required', 'integer', 'min:1'],
             'name' => ['required'],
             'code' => ['required'],
-            'fee' => ['required', 'numeric', 'min:0'],
+            'fee' => ['required', 'numeric', 'min:0', 'max:99'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];
 
@@ -59,6 +59,7 @@ class UpdateRequest extends FormRequest
             'fee.min' => "Tham số fee tối thiểu phải là :min",
             'status.integer' => 'Tham số status phải là số nguyên',
             'status.in' => 'Tham số status không hợp lệ',
+            'fee.max' => "Tham số fee tối đa phải là :max",
         ];
     }
 

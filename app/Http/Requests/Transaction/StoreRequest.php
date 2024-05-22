@@ -31,8 +31,8 @@ class StoreRequest extends FormRequest
             'method' => ['required'],
             'category_id' => ['required', 'integer', 'min:1'],
             'pos_id' => ['required', 'integer', 'min:1'],
-            'fee' => ['required', 'numeric', 'min:0'],
-            'original_fee' => ['numeric', 'min:0'],
+            'fee' => ['required', 'numeric', 'min:0', 'max:99'],
+            'original_fee' => ['numeric', 'min:0', 'max:99'],
             'time_payment' => ['date_format:Y-m-d H:i:s'],
             'customer_name' => ['required'],
             'account_type' => ['string', 'in:' . Constants::ACCOUNT_TYPE_STAFF . ',' . Constants::ACCOUNT_TYPE_SYSTEM],
@@ -66,7 +66,6 @@ class StoreRequest extends FormRequest
             'price_transfer' => 'Số tiền chuyển',
             'profit' => 'Lợi nhuận',
             'price_repair' => 'Số tiền bù',
-
         ];
     }
 
@@ -103,6 +102,8 @@ class StoreRequest extends FormRequest
             'profit.min' => "Tham số profit tối thiểu phải là :min",
             'price_repair.numeric' => 'Tham số price_repair phải là số',
             'price_repair.min' => "Tham số price_repair tối thiểu phải là :min",
+            'fee.max' => 'Tham số fee tối đa phải là :max',
+            'original_fee.max' => 'Tham số original_fee tối đa phải là :max',
 
         ];
     }

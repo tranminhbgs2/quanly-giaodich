@@ -281,6 +281,6 @@ class PosRepo extends BaseRepo
 
     public function getAll()
     {
-        return Pos::select('id', 'code', 'name')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+        return Pos::select('id', 'code', 'name', 'fee', 'fee_cashback', 'total_fee')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
     }
 }
