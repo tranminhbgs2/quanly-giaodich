@@ -10,15 +10,19 @@ use App\Http\Requests\MoneyComesBack\GetDetailRequest;
 use App\Http\Requests\MoneyComesBack\ListingRequest;
 use App\Http\Requests\MoneyComesBack\StoreRequest;
 use App\Http\Requests\MoneyComesBack\UpdateRequest;
+use App\Models\Pos;
 use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
+use App\Repositories\Pos\PosRepo;
 
 class MoneyComesBackController extends Controller
 {
     protected $money_repo;
+    protected $pos_repo;
 
-    public function __construct(MoneyComesBackRepo $moneyRepo)
+    public function __construct(MoneyComesBackRepo $moneyRepo, PosRepo $posRepo)
     {
         $this->money_repo = $moneyRepo;
+        $this->pos_repo = $posRepo;
     }
 
     /**
@@ -89,18 +93,40 @@ class MoneyComesBackController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $params['name'] = request('name', null); // ngân hàng
         $params['lo_number'] = strtoupper(request('lo_number', null)); // hình thức
         $params['pos_id'] = request('pos_id', 0); // máy pos
         $params['fee'] = floatval(request('fee', 0)); // phí
-        $params['total_price'] = floatval(request('total_price', 0)); // phí
-        $params['payment'] = floatval(request('payment', 0)); // phí
+        $params['total_price'] = floatval(request('total_price', 0)); // tổng tiền xử lý
+        $params['payment'] = floatval(request('payment', 0)); // thành tiền
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
         $params['created_by'] = auth()->user()->id;
-        if (request('time_process')) {
+        $params['balance'] = floatval(request('balance', 0)); // tiền  tổng
+        $params['agent_id'] = request('agent_id', 0); // id đại lý
+        $params['time_end'] = request('time_end', 0); // id đại lý
+        if (request('time_end')) {
             $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
         }
-
+        if ($params['agent_id'] > 0) {
+            $pos = $this->pos_repo->getById($params['pos_id']);
+            if ($pos && count($pos->activeAgents) > 0) {
+                if ($pos->activeAgents[0]->id != $params['agent_id']) {
+                    return response()->json([
+                        'code' => 400,
+                        'error' => 'Máy POS không thuộc đại lý này',
+                        'data' => null
+                    ]);
+                } else {
+                    $params['fee_agent'] = $pos->activeAgents[0]->fee;
+                    $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
+                }
+            } else {
+                return response()->json([
+                    'code' => 400,
+                    'error' => 'Máy POS không thuộc đại lý này',
+                    'data' => null
+                ]);
+            }
+        }
         $resutl = $this->money_repo->store($params);
 
         if ($resutl) {
@@ -131,7 +157,6 @@ class MoneyComesBackController extends Controller
         $params['id'] = request('id', null);
         if ($params['id']) {
 
-            $params['name'] = request('name', null); // ngân hàng
             $params['lo_number'] = strtoupper(request('lo_number', null)); // hình thức
             $params['pos_id'] = request('pos_id', 0); // máy pos
             $params['fee'] = floatval(request('fee', 0)); // phí
@@ -139,10 +164,34 @@ class MoneyComesBackController extends Controller
             $params['payment'] = floatval(request('payment', 0)); // phí
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
             $params['created_by'] = auth()->user()->id;
-            if (request('time_process')) {
+            $params['balance'] = floatval(request('balance', 0)); // tiền  tổng
+            $params['agent_id'] = request('agent_id', 0); // id đại lý
+            $params['time_end'] = request('time_end', 0); // id đại lý
+
+            if (request('time_end')) {
                 $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
             }
-
+            if ($params['agent_id'] > 0) {
+                $pos = $this->pos_repo->getById($params['pos_id']);
+                if ($pos && count($pos->activeAgents) > 0) {
+                    if ($pos->activeAgents[0]->id != $params['agent_id']) {
+                        return response()->json([
+                            'code' => 400,
+                            'error' => 'Máy POS không thuộc đại lý này',
+                            'data' => null
+                        ]);
+                    } else {
+                        $params['fee_agent'] = $pos->activeAgents[0]->fee;
+                        $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
+                    }
+                } else {
+                    return response()->json([
+                        'code' => 400,
+                        'error' => 'Máy POS không thuộc đại lý này',
+                        'data' => null
+                    ]);
+                }
+            }
             $resutl = $this->money_repo->update($params, $params['id']);
 
             if ($resutl) {

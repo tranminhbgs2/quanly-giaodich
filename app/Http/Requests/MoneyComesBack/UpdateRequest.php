@@ -45,7 +45,7 @@ class UpdateRequest extends FormRequest
         return [
             'pos_id' => 'Mã POS',
             'lo_number' => 'Số Lô',
-            'fee' => 'Phí',
+            'fee' => 'Phí gốc máy pos',
             'total_price' => 'Tổng tiền xử lý',
             'payment' => 'Thành tiền',
             'time_end' => 'Thời gian kết toán',

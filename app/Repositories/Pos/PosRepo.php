@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Pos;
 
+use App\Events\ActionLogEvent;
 use App\Helpers\Constants;
 use App\Models\Pos;
 use App\Repositories\BaseRepo;
@@ -47,7 +48,7 @@ class PosRepo extends BaseRepo
         //     $query->where('created_by', $created_by);
         // }
 
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
 
@@ -131,8 +132,24 @@ class PosRepo extends BaseRepo
                 $update[$field] = $params[$field];
             }
         }
+        $pos = Pos::where('id', $id);
+        if (isset($params['price_pos']) && $params['price_pos'] != $pos->price_pos) {
+            // Lưu log qua event
+            event(new ActionLogEvent([
+                'actor_id' => auth()->user()->id,
+                'username' => auth()->user()->username,
+                'action' => 'UPDATE_BANLANCE_POS',
+                'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $params['price_pos'],
+                'data_new' => $params['price_pos'],
+                'data_old' => $pos->price_pos,
+                'model' => 'Pos',
+                'table' => 'pos',
+                'record_id' => $pos->id,
+                'ip_address' => request()->ip()
+            ]));
+        }
 
-        return Pos::where('id', $id)->update($update);
+        return $pos->update($update);
     }
 
     public function getDetail($params)
@@ -143,7 +160,7 @@ class PosRepo extends BaseRepo
                 $sql->select(['id', 'name']);
             },
             'activeAgents' => function ($sql) {
-                $sql->select(['agency.id', 'agency.name', 'agency.phone', 'agent_pos.pos_id', 'agent_pos.fee']);
+                $sql->select(['agency.id', 'agency.name', 'agency.phone', 'agent_pos.pos_id', 'agent_pos.fee'])->first();
             },
         ])->first();
 
@@ -261,7 +278,7 @@ class PosRepo extends BaseRepo
                 $sql->select(['id', 'name']);
             },
             'activeAgents' => function ($sql) {
-                $sql->select(['agency.id', 'agency.name', 'agency.phone', 'agent_pos.pos_id', 'agent_pos.fee']);
+                $sql->select(['agency.id', 'agency.name', 'agency.phone', 'agent_pos.pos_id', 'agent_pos.fee'])->first();
             },
         ]);
 

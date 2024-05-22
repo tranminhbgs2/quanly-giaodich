@@ -32,13 +32,13 @@ class MoneyComesBackRepo extends BaseRepo
                 $sql->select(['id', 'name']);
             },
             'user' => function ($sql) {
-                $sql->select(['id', 'username', 'email', 'fullname']);
+                $sql->select(['id', 'status', 'username', 'email', 'fullname']);
             }
         ]);
 
-        if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
-            $query->where('created_by', $created_by);
-        }
+        // if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
+        //     $query->where('created_by', $created_by);
+        // }
 
         if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
             try {
@@ -99,7 +99,9 @@ class MoneyComesBackRepo extends BaseRepo
             'total_price',
             'payment',
             'balance',
-            'status'
+            'status',
+            'fee_agent',
+            'payment_agent',
         ];
 
         $insert = [];
@@ -114,24 +116,24 @@ class MoneyComesBackRepo extends BaseRepo
             $res = MoneyComesBack::create($insert) ? true : false;
             // Xử lý cộng tiền máy Pos
             if ($res) {
-                $pos = Pos::where('id', $insert['pos_id']);
+                $pos = Pos::where('id', $insert['pos_id'])->first();
                 if ($pos) {
-                    $pos_balance = $pos->balance + $insert['payment'];
+                    $pos_balance = $pos->price_pos + $insert['payment'];
                     // Lưu log qua event
                     event(new ActionLogEvent([
                         'actor_id' => auth()->user()->id,
                         'username' => auth()->user()->username,
                         'action' => 'UPDATE_BANLANCE_POS',
-                        'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->balance . ' thành ' . $pos_balance,
+                        'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $pos_balance,
                         'data_new' => $pos_balance,
-                        'data_old' => $pos->balance,
+                        'data_old' => $pos->price_pos,
                         'model' => 'Pos',
                         'table' => 'pos',
                         'record_id' => $pos->id,
                         'ip_address' => request()->ip()
                     ]));
 
-                    $pos->balance = $pos_balance;
+                    $pos->price_pos = $pos_balance;
                     $pos->save();
                 }
             }
@@ -154,7 +156,9 @@ class MoneyComesBackRepo extends BaseRepo
             'total_price',
             'payment',
             'balance',
-            'status'
+            'status',
+            'fee_agent',
+            'payment_agent',
         ];
 
         $update = [];
@@ -174,7 +178,7 @@ class MoneyComesBackRepo extends BaseRepo
             event(new ActionLogEvent([
                 'actor_id' => auth()->user()->id,
                 'username' => auth()->user()->username,
-                'action' => 'UPDATE_BANLANCE_POS',
+                'action' => 'UPDATE_BANLANCE_MONEY_COMES_BACK',
                 'description' => 'Cập nhật số tiền lô tiền về ' . $old_money->lo_number . ' từ ' . $old_money->payment . ' thành ' . $params['payment'],
                 'data_new' => $old_money->payment,
                 'data_old' => $params['payment'],
@@ -184,24 +188,24 @@ class MoneyComesBackRepo extends BaseRepo
                 'ip_address' => request()->ip()
             ]));
 
-            $pos = Pos::where('id', $params['pos_id']);
+            $pos = Pos::where('id', $params['pos_id'])->first();
             if ($pos) {
-                $pos_balance = $pos->balance + $balance_change;
+                $pos_balance = $pos->price_pos + $balance_change;
                 // Lưu log qua event
                 event(new ActionLogEvent([
                     'actor_id' => auth()->user()->id,
                     'username' => auth()->user()->username,
                     'action' => 'UPDATE_BANLANCE_POS',
-                    'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->balance . ' thành ' . $pos_balance,
+                    'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $pos_balance,
                     'data_new' => $pos_balance,
-                    'data_old' => $pos->balance,
+                    'data_old' => $pos->price_pos,
                     'model' => 'Pos',
                     'table' => 'pos',
                     'record_id' => $pos->id,
                     'ip_address' => request()->ip()
                 ]));
 
-                $pos->balance = $pos_balance;
+                $pos->price_pos = $pos_balance;
                 $pos->save();
             }
         }
@@ -212,7 +216,6 @@ class MoneyComesBackRepo extends BaseRepo
     {
         $id = isset($params['id']) ? $params['id'] : null;
         $moneyComesBack = MoneyComesBack::where('id', $id)->withTrashed()->first();
-        $balance_change = $moneyComesBack->payment;
 
         if ($moneyComesBack) {
             if ($moneyComesBack->status == Constants::USER_STATUS_DELETED) {
@@ -222,29 +225,30 @@ class MoneyComesBackRepo extends BaseRepo
                     'data' => null
                 ];
             } else {
+                $balance_change = $moneyComesBack->payment;
                 $moneyComesBack->status = Constants::USER_STATUS_DELETED;
                 $moneyComesBack->deleted_at = Carbon::now();
 
                 if ($moneyComesBack->save()) {
                     // Xóa lô tiền về thì trừ đi tiền pos tồn
-                    $pos = Pos::where('id', $params['pos_id']);
-                    if ($pos && $pos->balance >= $balance_change) {
-                        $pos_balance = $pos->balance - $balance_change;
+                    $pos = Pos::where('id', $moneyComesBack->pos_id)->first();
+                    if ($pos && $pos->price_pos >= $balance_change) {
+                        $pos_balance = $pos->price_pos - $balance_change;
                         // Lưu log qua event
                         event(new ActionLogEvent([
                             'actor_id' => auth()->user()->id,
                             'username' => auth()->user()->username,
                             'action' => 'UPDATE_BANLANCE_POS',
-                            'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->balance . ' thành ' . $pos_balance,
+                            'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $pos_balance,
                             'data_new' => $pos_balance,
-                            'data_old' => $pos->balance,
+                            'data_old' => $pos->price_pos,
                             'model' => 'Pos',
                             'table' => 'pos',
                             'record_id' => $pos->id,
                             'ip_address' => request()->ip()
                         ]));
 
-                        $pos->balance = $pos_balance;
+                        $pos->price_pos = $pos_balance;
                         $pos->save();
                     }
                     return [

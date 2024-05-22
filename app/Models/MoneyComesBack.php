@@ -24,6 +24,8 @@ class MoneyComesBack extends Model
         'payment',
         'balance',
         'status',
+        'fee_agent',
+        'payment_agent',
     ];
 
     /**

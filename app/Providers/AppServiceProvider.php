@@ -4,8 +4,8 @@ namespace App\Providers;
 
 use App\Repositories\Agent\AgentRepo;
 use App\Repositories\Bank\BankRepo;
-use App\Repositories\BankAccounts\BankAccountsRepo;
-use App\Repositories\Categories\CategoriesRepo;
+use App\Repositories\BankAccount\BankAccountRepo;
+use App\Repositories\Category\CategoryRepo;
 use App\Repositories\Category\DepartmentRepo;
 use App\Repositories\Customer\CustomerRepo;
 use App\Repositories\HoKinhDoanh\HoKinhDoanhRepo;
@@ -32,8 +32,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(CustomerRepo::class);
         $this->app->singleton(AgentRepo::class);
         $this->app->singleton(BankRepo::class);
-        $this->app->singleton(BankAccountsRepo::class);
-        $this->app->singleton(CategoriesRepo::class);
+        $this->app->singleton(BankAccountRepo::class);
+        $this->app->singleton(CategoryRepo::class);
         $this->app->singleton(DepartmentRepo::class);
         $this->app->singleton(HoKinhDoanhRepo::class);
         $this->app->singleton(LogRepo::class);

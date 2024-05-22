@@ -93,4 +93,14 @@ class Pos extends Model
             ->select('agency.id', 'agent_pos.pos_id', 'agent_pos.agent_id', 'agent_pos.status', 'agent_pos.fee', 'agent_pos.created_at', 'agent_pos.updated_at')
             ->first();
     }
+    /**
+     * Lấy các agents đang active
+     */
+    public function activeAgent()
+    {
+        return $this->belongsToMany(Agent::class, 'agent_pos')
+            ->wherePivot('status', Constants::USER_STATUS_ACTIVE)
+            ->withPivot('status', 'fee')
+            ->select('agency.id', 'agent_pos.pos_id', 'agent_pos.agent_id', 'agent_pos.status', 'agent_pos.fee', 'agent_pos.created_at', 'agent_pos.updated_at');
+    }
 }

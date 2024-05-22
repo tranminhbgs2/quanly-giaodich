@@ -33,6 +33,7 @@ class StoreRequest extends FormRequest
             'total_price' => ['required', 'numeric', 'min:0'],
             'payment' => ['required', 'numeric', 'min:0'],
             'time_end' => 'required|date_format:Y-m-d H:i:s',
+            'agent_id' => 'numeric|min:0',
         ];
 
         return $rule;
@@ -43,7 +44,7 @@ class StoreRequest extends FormRequest
         return [
             'pos_id' => 'Mã POS',
             'lo_number' => 'Số Lô',
-            'fee' => 'Phí',
+            'fee' => 'Phí gốc máy pos',
             'total_price' => 'Tổng tiền xử lý',
             'payment' => 'Thành tiền',
             'time_end' => 'Thời gian kết toán',
@@ -57,6 +58,8 @@ class StoreRequest extends FormRequest
             'numeric' => ':attribute phải là số',
             'min' => ':attribute phải lớn hơn :min',
             'date_format' => ':attribute không đúng định dạng Y-m-d H:i:s',
+            'agent_id.numeric' => 'ID đại lý phải là số',
+            'agent_id.min' => 'ID đại lý phải lớn hơn 0',
         ];
     }
 
