@@ -41,7 +41,13 @@ class AgentRepo extends BaseRepo
         }
 
         if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
-            $query->whereBetween('created_at', [$date_from, $date_to]);
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d', $date_to)->endOfDay();
+                $query->whereBetween('created_at', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
         }
 
         if ($manager_id > 0) {
@@ -205,5 +211,10 @@ class AgentRepo extends BaseRepo
     {
         $update = ['status' => $status];
         return Agent::where('id', $id)->update($update);
+    }
+
+    public function getAll()
+    {
+        return Agent::select('id', 'name')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
     }
 }

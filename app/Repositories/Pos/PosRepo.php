@@ -278,4 +278,9 @@ class PosRepo extends BaseRepo
 
         return Pos::where('id', $id)->update($update);
     }
+
+    public function getAll()
+    {
+        return Pos::select('id', 'code', 'name')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+    }
 }

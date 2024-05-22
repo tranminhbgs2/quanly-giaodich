@@ -19,6 +19,8 @@ class LogAction extends Model
         'table',
         'record_id',
         'ip_address',
+        'data_old',
+        'data_new',
     ];
 
     /**

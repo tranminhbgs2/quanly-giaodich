@@ -206,4 +206,14 @@ class AgentController extends Controller
             'data' => null
         ]);
     }
+
+    public function getAll()
+    {
+        $data = $this->agent_repo->getAll();
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách Đại lý',
+            'data' => $data
+        ]);
+    }
 }

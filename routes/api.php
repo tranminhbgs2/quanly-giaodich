@@ -30,6 +30,7 @@ Route::group(['namespace' => 'Api'], function () {
             includeRouteFiles(__DIR__ . '/Api/Auth/');
         });
 
+        includeRouteFiles(__DIR__ . '/Api/Setting/');
         includeRouteFiles(__DIR__ . '/Api/Announcement/');
         includeRouteFiles(__DIR__ . '/Api/Bank/');
         includeRouteFiles(__DIR__ . '/Api/Common/');

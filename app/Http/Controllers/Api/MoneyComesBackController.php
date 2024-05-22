@@ -4,26 +4,26 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\BankAccount\ChangeStatusRequest;
-use App\Http\Requests\BankAccount\DeleteRequest;
-use App\Http\Requests\BankAccount\GetDetailRequest;
-use App\Http\Requests\BankAccount\ListingRequest;
-use App\Http\Requests\BankAccount\StoreRequest;
-use App\Http\Requests\BankAccount\UpdateRequest;
-use App\Repositories\BankAccount\BankAccountRepo;
+use App\Http\Requests\MoneyComesBack\ChangeStatusRequest;
+use App\Http\Requests\MoneyComesBack\DeleteRequest;
+use App\Http\Requests\MoneyComesBack\GetDetailRequest;
+use App\Http\Requests\MoneyComesBack\ListingRequest;
+use App\Http\Requests\MoneyComesBack\StoreRequest;
+use App\Http\Requests\MoneyComesBack\UpdateRequest;
+use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
 
-class BankAccountController extends Controller
+class MoneyComesBackController extends Controller
 {
-    protected $bankacc_repo;
+    protected $money_repo;
 
-    public function __construct(BankAccountRepo $bankaccRepo)
+    public function __construct(MoneyComesBackRepo $moneyRepo)
     {
-        $this->bankacc_repo = $bankaccRepo;
+        $this->money_repo = $moneyRepo;
     }
 
     /**
      * API lấy ds khách hàng
-     * URL: {{url}}/api/v1/bank-account
+     * URL: {{url}}/api/v1/transaction
      *
      * @param ListingRequest $request
      * @return \Illuminate\Http\JsonResponse
@@ -32,17 +32,20 @@ class BankAccountController extends Controller
     {
         $params['keyword'] = request('keyword', null);
         $params['status'] = request('status', -1);
-        $params['agent_id'] = request('agent_id', null);
-        $params['bank_code'] = request('bank_code', null);
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['lo_number'] = request('lo_number', 0);
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
+        $params['pos_id'] = request('pos_id', 0);
 
-        $data = $this->bankacc_repo->getListing($params, false);
-        $total = $this->bankacc_repo->getListing($params, true);
+
+        $data = $this->money_repo->getListing($params, false);
+        $total = $this->money_repo->getListing($params, true);
         return response()->json([
             'code' => 200,
-            'error' => 'Danh sách Tài khoản hưởng thụ',
+            'error' => 'Danh sách Lô tiền về',
             'data' => [
                 "total_elements" => $total,
                 "total_page" => ceil($total / $params['page_size']),
@@ -54,8 +57,8 @@ class BankAccountController extends Controller
     }
 
     /**
-     * API lấy thông tin chi tiết
-     * URL: {{url}}/api/v1/bank-account/detail/8
+     * API lấy thông tin chi tiết khách hàng
+     * URL: {{url}}/api/v1/transaction/detail/8
      *
      * @param GetDetailRequest $request
      * @param $id
@@ -65,7 +68,7 @@ class BankAccountController extends Controller
     {
         if ($id) {
             $params['id'] = request('id', null);
-            $data = $this->bankacc_repo->getDetail($params);
+            $data = $this->money_repo->getDetail($params);
         } else {
             $data = [
                 'code' => 422,
@@ -79,23 +82,26 @@ class BankAccountController extends Controller
 
     /**
      * API thêm mới KH từ CMS
-     * URL: {{url}}/api/v1/bank-account/store
+     * URL: {{url}}/api/v1/transaction/store
      *
      * @param StoreRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(StoreRequest $request)
     {
-        $params['account_name'] = strtoupper(request('account_name', null));
-        $params['account_number'] = request('account_number', null);
-        $params['bank_code'] = request('bank_code', null);
-        $params['agent_id'] = request('agent_id', null);
-        $params['balance'] = request('balance', 0);
+        $params['name'] = request('name', null); // ngân hàng
+        $params['lo_number'] = strtoupper(request('lo_number', null)); // hình thức
+        $params['pos_id'] = request('pos_id', 0); // máy pos
+        $params['fee'] = floatval(request('fee', 0)); // phí
+        $params['total_price'] = floatval(request('total_price', 0)); // phí
+        $params['payment'] = floatval(request('payment', 0)); // phí
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
-        $params['account_name'] = unsigned($params['account_name']);
+        $params['created_by'] = auth()->user()->id;
+        if (request('time_process')) {
+            $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
+        }
 
-
-        $resutl = $this->bankacc_repo->store($params);
+        $resutl = $this->money_repo->store($params);
 
         if ($resutl) {
             return response()->json([
@@ -124,15 +130,20 @@ class BankAccountController extends Controller
     {
         $params['id'] = request('id', null);
         if ($params['id']) {
-            $params['account_name'] = request('account_name', null);
-            $params['account_number'] = request('account_number', null);
-            $params['bank_code'] = request('bank_code', null);
-            $params['agent_id'] = request('agent_id', null);
-            $params['balance'] = request('balance', 0);
-            $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
-            $params['account_name'] = unsigned($params['account_name']);
 
-            $resutl = $this->bankacc_repo->update($params, $params['id']);
+            $params['name'] = request('name', null); // ngân hàng
+            $params['lo_number'] = strtoupper(request('lo_number', null)); // hình thức
+            $params['pos_id'] = request('pos_id', 0); // máy pos
+            $params['fee'] = floatval(request('fee', 0)); // phí
+            $params['total_price'] = floatval(request('total_price', 0)); // phí
+            $params['payment'] = floatval(request('payment', 0)); // phí
+            $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
+            $params['created_by'] = auth()->user()->id;
+            if (request('time_process')) {
+                $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
+            }
+
+            $resutl = $this->money_repo->update($params, $params['id']);
 
             if ($resutl) {
                 return response()->json([
@@ -169,7 +180,7 @@ class BankAccountController extends Controller
         if ($id) {
             $params['id'] = request('id', null);
             if ($id == $params['id']) {
-                $data = $this->bankacc_repo->delete($params);
+                $data = $this->money_repo->delete($params);
             } else {
                 return response()->json([
                     'code' => 422,
@@ -191,9 +202,9 @@ class BankAccountController extends Controller
     public function changeStatus(ChangeStatusRequest $request)
     {
         $params['id'] = request('id', null);
-        $params['status'] = request('status', null);
+        $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
 
-        $resutl = $this->bankacc_repo->changeStatus($params['status'], $params['id']);
+        $resutl = $this->money_repo->changeStatus($params['status'], $params['id']);
 
         if ($resutl) {
             return response()->json([
@@ -207,16 +218,6 @@ class BankAccountController extends Controller
             'code' => 400,
             'error' => 'Cập nhật trạng thái không thành công',
             'data' => null
-        ]);
-    }
-
-    public function getAll()
-    {
-        $data = $this->bankacc_repo->getAll();
-        return response()->json([
-            'code' => 200,
-            'error' => 'Danh sách Tài khoản hưởng thụ',
-            'data' => $data
         ]);
     }
 }

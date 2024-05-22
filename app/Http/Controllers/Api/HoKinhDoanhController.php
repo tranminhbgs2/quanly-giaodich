@@ -203,4 +203,14 @@ class HoKinhDoanhController extends Controller
             'data' => null
         ]);
     }
+
+    public function getAll()
+    {
+        $data = $this->hkd_repo->getAll();
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách hộ kinh doanh',
+            'data' => $data
+        ]);
+    }
 }

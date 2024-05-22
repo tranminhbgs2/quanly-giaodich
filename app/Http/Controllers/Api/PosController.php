@@ -262,4 +262,14 @@ class PosController extends Controller
             'data' => null
         ]);
     }
+
+    public function getAll()
+    {
+        $data = $this->pos_repo->getAll();
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách máy Pos',
+            'data' => $data
+        ]);
+    }
 }

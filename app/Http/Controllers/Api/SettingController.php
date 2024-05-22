@@ -42,4 +42,63 @@ class SettingController extends Controller
         }
     }
 
+    /**
+     * API lấy danh sách hình thức thanh toán
+     * URL: {{url}}/api/v1/dropdown/hinh-thuc
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getHinhThuc()
+    {
+        $data = [
+            0 => [
+                'id' => 1,
+                'name' => 'Đáo hạn'
+            ],
+            1 => [
+                'id' => 2,
+                'name' => 'Rút tiền mặt'
+            ],
+            2 => [
+                'id' => 3,
+                'name' => 'Online'
+            ],
+        ];
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách hình thức thanh toán',
+            'data' => $data
+        ]);
+    }
+
+    /**
+     * API lấy danh sách phương thức thanh toán
+     * URL: {{url}}/api/v1/dropdown/phuong-thuc
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getPhuongThuc()
+    {
+
+        $data = [
+            0 => [
+                'id' => 1,
+                'name' => 'Máy Pos'
+            ],
+            1 => [
+                'id' => 2,
+                'name' => 'Thanh toán QR Code'
+            ],
+            2 => [
+                'id' => 3,
+                'name' => 'Cổng thanh toán'
+            ],
+        ];
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách phương thức thanh toán',
+            'data' => $data
+        ]);
+    }
+
 }

@@ -52,6 +52,16 @@ class BankController extends Controller
         ]);
     }
 
+    public function getAll()
+    {
+        $data = $this->bankRepo->getAll();
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách ngân hàng',
+            'data' => $data
+        ]);
+    }
+
     /**
      * API lấy ds bank không cần login
      * URL: {{url}}/api/v1/banks/no-auth

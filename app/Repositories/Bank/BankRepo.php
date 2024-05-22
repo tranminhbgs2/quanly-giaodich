@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Bank;
 
+use App\Helpers\Constants;
 use App\Models\Bank;
 use App\Repositories\BaseRepo;
 
@@ -56,4 +57,8 @@ class BankRepo extends BaseRepo
         return $query->get();
     }
 
+    public function getAll()
+    {
+        return Bank::select('id', 'name', 'code')->where('is_active', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+    }
 }

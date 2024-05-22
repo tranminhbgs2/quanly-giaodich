@@ -86,7 +86,7 @@ class CategoryController extends Controller
     {
         $params['name'] = request('name', null); // ngân hàng
         $params['code'] = strtoupper(request('code', null)); // hình thức
-        $params['note'] = request('note', 0); // máy pos
+        $params['note'] = request('note', null); // máy pos
         $params['fee'] = floatval(request('fee', 0)); // phí
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
 
@@ -108,6 +108,16 @@ class CategoryController extends Controller
         ]);
     }
 
+    public function getAll()
+    {
+        $data = $this->cate_repo->getAll();
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách danh mục',
+            'data' => $data
+        ]);
+    }
+
     /**
      * API cập nhật thông tin KH theo id
      * URL: {{url}}/api/v1/transaction/update/id
@@ -123,7 +133,7 @@ class CategoryController extends Controller
 
             $params['name'] = request('name', null); // ngân hàng
             $params['code'] = strtoupper(request('code', null)); // hình thức
-            $params['note'] = request('note', 0); // máy pos
+            $params['note'] = request('note', null); // máy pos
             $params['fee'] = floatval(request('fee', 0)); // phí
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
 
