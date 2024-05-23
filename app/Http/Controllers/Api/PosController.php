@@ -100,6 +100,7 @@ class PosController extends Controller
         $params['price_pos'] = floatval(request('price_pos', 0)); // tiền tồn pos
         $params['created_by'] = auth()->user()->id; // người tạo
         $params['updated_by'] = auth()->user()->id; // người cập nhật
+        $params['note'] = request('note', null); // ghi chú
 
 
         $resutl = $this->pos_repo->store($params);
@@ -142,6 +143,7 @@ class PosController extends Controller
             $params['total_fee'] = floatval(request('total_fee', 0)); // tổng phí
             $params['price_pos'] = floatval(request('price_pos', 0)); // tiền tồn pos
             $params['updated_by'] = auth()->user()->id; // người cập nhật
+            $params['note'] = request('note', null); // ghi chú
 
             $resutl = $this->pos_repo->update($params, $params['id']);
 
@@ -210,7 +212,7 @@ class PosController extends Controller
     public function assignPosToAgent(AssignAgentRequest $request)
     {
         $params['pos_id'] = request('pos_id', 0);
-        $params['agent_id'] = request('pos_id', 0);
+        $params['agent_id'] = request('agent_id', 0);
         $params['fee'] = request('fee', 0);
         if ($params['pos_id']) {
 

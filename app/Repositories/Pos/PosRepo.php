@@ -91,6 +91,7 @@ class PosRepo extends BaseRepo
             'created_by',
             'updated_by',
             'status',
+            'note'
         ];
 
         $insert = [];
@@ -123,6 +124,7 @@ class PosRepo extends BaseRepo
             'created_by',
             'updated_by',
             'status',
+            'note'
         ];
 
         $update = [];

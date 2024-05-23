@@ -25,6 +25,7 @@ class Pos extends Model
         'price_pos',
         'created_by',
         'status',
+        'note',
     ];
 
     /**

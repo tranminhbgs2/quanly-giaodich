@@ -53,15 +53,18 @@ class SettingController extends Controller
         $data = [
             0 => [
                 'id' => 1,
-                'name' => 'Đáo hạn'
+                'name' => 'Đáo hạn',
+                'code' => 'DAO_HAN'
             ],
             1 => [
                 'id' => 2,
-                'name' => 'Rút tiền mặt'
+                'name' => 'Rút tiền mặt',
+                'code' => 'RUT_TIEN_MAT'
             ],
             2 => [
                 'id' => 3,
-                'name' => 'Online'
+                'name' => 'Online',
+                'code' => 'ONLINE'
             ],
         ];
         return response()->json([
@@ -83,15 +86,18 @@ class SettingController extends Controller
         $data = [
             0 => [
                 'id' => 1,
-                'name' => 'Máy Pos'
+                'name' => 'Máy Pos',
+                'code' => 'POS'
             ],
             1 => [
                 'id' => 2,
-                'name' => 'Thanh toán QR Code'
+                'name' => 'Thanh toán QR Code',
+                'code' => 'QR_CODE'
             ],
             2 => [
                 'id' => 3,
-                'name' => 'Cổng thanh toán'
+                'name' => 'Cổng thanh toán',
+                'code' => 'GATEWAY'
             ],
         ];
         return response()->json([
