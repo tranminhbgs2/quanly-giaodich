@@ -134,7 +134,7 @@ class PosRepo extends BaseRepo
                 $update[$field] = $params[$field];
             }
         }
-        $pos = Pos::where('id', $id);
+        $pos = Pos::where('id', $id)->first();
         if (isset($params['price_pos']) && $params['price_pos'] != $pos->price_pos) {
             // Lưu log qua event
             event(new ActionLogEvent([
