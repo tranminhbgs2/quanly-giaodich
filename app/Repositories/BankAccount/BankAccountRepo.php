@@ -2,6 +2,7 @@
 
 namespace App\Repositories\BankAccount;
 
+use App\Events\ActionLogEvent;
 use App\Models\BankAccounts;
 use App\Helpers\Constants;
 use App\Repositories\BaseRepo;
@@ -30,7 +31,7 @@ class BankAccountRepo extends BaseRepo
                     ->orWhere('account_name', 'LIKE', "%" . $keyword . "%");
             });
         }
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d', $date_to)->endOfDay();
@@ -206,5 +207,26 @@ class BankAccountRepo extends BaseRepo
     public function getAll()
     {
         return BankAccounts::select('id', 'bank_code', 'account_name', 'account_number')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+    }
+
+    public function updateBalance($id, $balance, $action = "")
+    {
+        $bank = BankAccounts::where('id', $id)->withTrashed()->first();
+        // Lưu log qua event
+        event(new ActionLogEvent([
+            'actor_id' => auth()->user()->id,
+            'username' => auth()->user()->username,
+            'action' => 'UPDATE_BANLANCE_ACC_BANK',
+            'description' => $action. ' Cập nhật số tiền cho TKHT ' . $bank->account_number . ' từ ' . $bank->balance . ' thành ' . $balance,
+            'data_new' => $balance,
+            'data_old' => $bank->balance,
+            'model' => 'BankAccounts',
+            'table' => 'bank_accounts',
+            'record_id' => $id,
+            'ip_address' => request()->ip()
+        ]));
+
+        $update = ['balance' => $balance];
+        return $bank->update($update);
     }
 }

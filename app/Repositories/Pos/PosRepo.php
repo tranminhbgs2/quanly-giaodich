@@ -134,7 +134,7 @@ class PosRepo extends BaseRepo
                 $update[$field] = $params[$field];
             }
         }
-        $pos = Pos::where('id', $id)->first();
+        $pos = Pos::where('id', $id)->withTrashed()->first();
         if (isset($params['price_pos']) && $params['price_pos'] != $pos->price_pos) {
             // Lưu log qua event
             event(new ActionLogEvent([
@@ -301,5 +301,28 @@ class PosRepo extends BaseRepo
     public function getAll()
     {
         return Pos::select('id', 'code', 'name', 'fee', 'fee_cashback', 'total_fee')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+    }
+
+    public function updatePricePos ($price_pos, $id, $action = "")
+    {
+        $pos = Pos::where('id', $id)->withTrashed()->first();
+        if (isset($price_pos)) {
+            // Lưu log qua event
+            event(new ActionLogEvent([
+                'actor_id' => auth()->user()->id,
+                'username' => auth()->user()->username,
+                'action' => 'UPDATE_BANLANCE_POS',
+                'description' => $action . ' Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $price_pos,
+                'data_new' => $price_pos,
+                'data_old' => $pos->price_pos,
+                'model' => 'Pos',
+                'table' => 'pos',
+                'record_id' => $pos->id,
+                'ip_address' => request()->ip()
+            ]));
+            $params = ['price_pos' => $price_pos];
+            return $pos->update($params);
+        }
+
     }
 }

@@ -50,4 +50,21 @@ class Transaction extends Model
     {
         return $this->belongsTo(Pos::class, 'pos_id', 'id');
     }
+    public function getMethodAttribute($value)
+    {
+        $name = '';
+        switch ($value) {
+            case 'DAO_HAN':
+                $name = 'Đáo hạn';
+                break;
+            case 'RUT_TIEN_MAT':
+                $name = 'Rút tiền mặt';
+                break;
+            case 'ONLINE':
+                $name = 'Online';
+                break;
+        }
+        // Định dạng dữ liệu của method tại đây
+        return $name; // Ví dụ: chuyển thành chữ hoa
+    }
 }

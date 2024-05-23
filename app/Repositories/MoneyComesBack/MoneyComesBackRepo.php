@@ -7,6 +7,7 @@ use App\Models\MoneyComesBack;
 use App\Helpers\Constants;
 use App\Models\Pos;
 use App\Repositories\BaseRepo;
+use App\Repositories\Pos\PosRepo;
 use Carbon\Carbon;
 
 class MoneyComesBackRepo extends BaseRepo
@@ -113,31 +114,17 @@ class MoneyComesBackRepo extends BaseRepo
         }
 
         if (!empty($insert['pos_id']) && !empty($insert['payment'])) {
-            $res = MoneyComesBack::create($insert) ? true : false;
+            $res = MoneyComesBack::create($insert);
             // Xử lý cộng tiền máy Pos
             if ($res) {
-                $pos = Pos::where('id', $insert['pos_id'])->first();
+                $pos = Pos::where('id', $insert['pos_id'])->withTrashed()->first();
                 if ($pos) {
                     $pos_balance = $pos->price_pos + $insert['payment'];
-                    // Lưu log qua event
-                    event(new ActionLogEvent([
-                        'actor_id' => auth()->user()->id,
-                        'username' => auth()->user()->username,
-                        'action' => 'UPDATE_BANLANCE_POS',
-                        'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $pos_balance,
-                        'data_new' => $pos_balance,
-                        'data_old' => $pos->price_pos,
-                        'model' => 'Pos',
-                        'table' => 'pos',
-                        'record_id' => $pos->id,
-                        'ip_address' => request()->ip()
-                    ]));
-
-                    $pos->price_pos = $pos_balance;
-                    $pos->save();
+                    $pos_repo = new PosRepo();
+                    $pos_repo->updatePricePos($pos_balance, $pos->id, "CREATE_MONEY_COMES_BACK_" . $res->id);
                 }
             }
-            return $res;
+            return $res ? true : false;
         }
 
         return false;
@@ -188,25 +175,11 @@ class MoneyComesBackRepo extends BaseRepo
                 'ip_address' => request()->ip()
             ]));
 
-            $pos = Pos::where('id', $params['pos_id'])->first();
+            $pos = Pos::where('id', $params['pos_id'])->withTrashed()->first();
             if ($pos) {
                 $pos_balance = $pos->price_pos + $balance_change;
-                // Lưu log qua event
-                event(new ActionLogEvent([
-                    'actor_id' => auth()->user()->id,
-                    'username' => auth()->user()->username,
-                    'action' => 'UPDATE_BANLANCE_POS',
-                    'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $pos_balance,
-                    'data_new' => $pos_balance,
-                    'data_old' => $pos->price_pos,
-                    'model' => 'Pos',
-                    'table' => 'pos',
-                    'record_id' => $pos->id,
-                    'ip_address' => request()->ip()
-                ]));
-
-                $pos->price_pos = $pos_balance;
-                $pos->save();
+                $pos_repo = new PosRepo();
+                $pos_repo->updatePricePos($pos_balance, $pos->id, "UPDATE_MONEY_COMES_BACK_" . $id);
             }
         }
         return $res;
@@ -231,25 +204,11 @@ class MoneyComesBackRepo extends BaseRepo
 
                 if ($moneyComesBack->save()) {
                     // Xóa lô tiền về thì trừ đi tiền pos tồn
-                    $pos = Pos::where('id', $moneyComesBack->pos_id)->first();
+                    $pos = Pos::where('id', $moneyComesBack->pos_id)->withTrashed()->first();
                     if ($pos && $pos->price_pos >= $balance_change) {
                         $pos_balance = $pos->price_pos - $balance_change;
-                        // Lưu log qua event
-                        event(new ActionLogEvent([
-                            'actor_id' => auth()->user()->id,
-                            'username' => auth()->user()->username,
-                            'action' => 'UPDATE_BANLANCE_POS',
-                            'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $pos_balance,
-                            'data_new' => $pos_balance,
-                            'data_old' => $pos->price_pos,
-                            'model' => 'Pos',
-                            'table' => 'pos',
-                            'record_id' => $pos->id,
-                            'ip_address' => request()->ip()
-                        ]));
-
-                        $pos->price_pos = $pos_balance;
-                        $pos->save();
+                        $pos_repo = new PosRepo();
+                        $pos_repo->updatePricePos($pos_balance, $pos->id, "DELETE_MONEY_COMES_BACK_" . $id);
                     }
                     return [
                         'code' => 200,

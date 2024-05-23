@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\WithdrawPos;
 
 use App\Helpers\Constants;
-use App\Models\Categories;
+use App\Models\WithdrawPos;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -61,13 +61,13 @@ class ChangeStatusRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
-            $dep = Categories::where('id', $this->request->get('id'))->withTrashed()->first();
+            $dep = WithdrawPos::where('id', $this->request->get('id'))->withTrashed()->first();
             if ($dep) {
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
-                    $validator->errors()->add('check_exist', 'Danh mục đã bị xóa');
+                    $validator->errors()->add('check_exist', 'Rút tiền máy pos đã bị xóa');
                 }
             } else {
-                $validator->errors()->add('check_exist', 'Không tìm thấy danh mục');
+                $validator->errors()->add('check_exist', 'Không tìm thấy Rút tiền máy pos');
             }
         });
     }
