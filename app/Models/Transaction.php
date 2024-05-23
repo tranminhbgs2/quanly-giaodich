@@ -67,4 +67,13 @@ class Transaction extends Model
         // Định dạng dữ liệu của method tại đây
         return $name; // Ví dụ: chuyển thành chữ hoa
     }
+
+    public function getPaymentCashbackAttribute()
+    {
+        $pos = $this->pos;
+        if ($pos) {
+            return $this->price_rut * $pos->fee_cashback / 100;
+        }
+        return 0;
+    }
 }

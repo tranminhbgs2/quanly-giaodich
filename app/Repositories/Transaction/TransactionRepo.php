@@ -97,6 +97,92 @@ class TransactionRepo extends BaseRepo
         return $query->get()->toArray();
     }
 
+
+    /**
+     * Hàm lấy ds gi, có tìm kiếm và phân trang
+     *
+     * @param $params
+     * @param false $is_counting
+     *
+     * @return mixed
+     */
+    public function getListingCashBack($params, $is_counting = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $status = $params['status'] ?? -1;
+        $page_index = $params['page_index'] ?? 1;
+        $page_size = $params['page_size'] ?? 10;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $pos_id = $params['pos_id'] ?? 0;
+        $category_id = $params['category_id'] ?? 0;
+        $lo_number = $params['lo_number'] ?? 0;
+        $created_by = $params['created_by'] ?? 0;
+        $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
+
+        $query = Transaction::select(["price_rut", "time_payment", "pos_id"])->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
+            },
+        ]);
+
+        if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
+            $query->where('created_by', $created_by);
+        }
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('customer_name', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d', $date_to)->endOfDay();
+                $query->whereBetween('time_payment', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($category_id > 0) {
+            $query->where('category_id', $category_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        if ($is_counting) {
+            return $query->count();
+        } else {
+            $offset = ($page_index - 1) * $page_size;
+            if ($page_size > 0 && $offset >= 0) {
+                $query->take($page_size)->skip($offset);
+            }
+        }
+
+        $query->orderBy('id', 'DESC');
+        $results = $query->get();
+
+        return $results->map(function ($transaction) {
+            $transaction->payment_cashback = $transaction->payment_cashback; // Accessor will calculate this
+            return $transaction;
+        })->toArray();
+    }
+
     /**
      * Hàm lấy tổng số giao dịch
      *
@@ -164,6 +250,75 @@ class TransactionRepo extends BaseRepo
             'price_transfer' => $query->sum('price_transfer'),
             'profit' => $query->sum('profit'),
             'price_repair' => $query->sum('price_repair')
+        ];
+
+        return $total;
+    }
+
+    /**
+     * Hàm lấy tổng số giao dịch
+     *
+     * @param $params
+     * @return array
+     */
+    public function getTotalCashBack($params)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $status = $params['status'] ?? -1;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $pos_id = $params['pos_id'] ?? 0;
+        $category_id = $params['category_id'] ?? 0;
+        $lo_number = $params['lo_number'] ?? 0;
+        $created_by = $params['created_by'] ?? 0;
+        $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
+
+        $query = Transaction::selectRaw('SUM(price_rut * pos.fee_cashback) as total_payment_cashback')
+            ->join('pos', 'transactions.pos_id', '=', 'pos.id');
+
+        if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
+            $query->where('transactions.created_by', $created_by);
+        }
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('transactions.customer_name', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d', $date_to)->endOfDay();
+                $query->whereBetween('transactions.time_payment', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('transactions.pos_id', $pos_id);
+        }
+
+        if ($category_id > 0) {
+            $query->where('transactions.category_id', $category_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('transactions.lo_number', $lo_number);
+        }
+
+        if ($status > 0) {
+            $query->where('transactions.status', $status);
+        } else {
+            $query->where('transactions.status', Constants::USER_STATUS_ACTIVE);
+        }
+
+        $result = $query->first();
+        // Tính tổng của từng trường cần thiết
+        $total = [
+            'payment_cashback' => $result->total_payment_cashback / 100
         ];
 
         return $total;

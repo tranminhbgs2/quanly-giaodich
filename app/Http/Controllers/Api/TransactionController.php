@@ -65,6 +65,44 @@ class TransactionController extends Controller
     }
 
     /**
+     * API lấy ds khách hàng
+     * URL: {{url}}/api/v1/transaction
+     *
+     * @param ListingRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getListingCashBack(ListingRequest $request)
+    {
+        $params['keyword'] = request('keyword', null);
+        $params['status'] = request('status', -1);
+        $params['page_index'] = request('page_index', 1);
+        $params['page_size'] = request('page_size', 10);
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
+        $params['pos_id'] = request('pos_id', 0);
+        $params['category_id'] = request('category_id', 0);
+        $params['lo_number'] = request('lo_number', 0);
+        $params['created_by'] = auth()->user()->id;
+        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+
+        $data = $this->tran_repo->getListingCashBack($params, false);
+        $total = $this->tran_repo->getListingCashBack($params, true);
+        $export = $this->tran_repo->getTotalCashBack($params); //số liệu báo cáo
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách Giao dịch hoàn tiền',
+            'data' => [
+                "total_elements" => $total,
+                "total_page" => ceil($total / $params['page_size']),
+                "page_no" => intval($params['page_index']),
+                "page_size" => intval($params['page_size']),
+                "data" => $data,
+                'total' => $export
+            ],
+        ]);
+    }
+
+    /**
      * API lấy thông tin chi tiết khách hàng
      * URL: {{url}}/api/v1/transaction/detail/8
      *
