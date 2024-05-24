@@ -46,6 +46,7 @@ Route::group(['namespace' => 'Api'], function () {
         includeRouteFiles(__DIR__ . '/Api/BankAccount/');
         includeRouteFiles(__DIR__ . '/Api/MoneyComesBack/');
         includeRouteFiles(__DIR__ . '/Api/WithdrawPos/');
+        includeRouteFiles(__DIR__ . '/Api/Transfer/');
     });
 });
 

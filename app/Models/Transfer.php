@@ -27,12 +27,12 @@ class Transfer extends Model
         'status',
     ];
 
-    public function bankFrom()
+    public function bankTransferFrom()
     {
         return $this->belongsTo(BankAccounts::class, 'acc_bank_from_id', 'id');
     }
 
-    public function bankTo()
+    public function bankTransferTo()
     {
         return $this->belongsTo(BankAccounts::class, 'acc_bank_to_id', 'id');
     }

@@ -28,14 +28,14 @@ class TransferRepo extends BaseRepo
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
 
         $query = Transfer::select()->with([
-            'bankFrom' => function ($sql) {
+            'bankTransferFrom' => function ($sql) {
                 $sql->select(['id', 'account_number', 'account_name', 'bank_code']);
             },
-            'bankTo' => function ($sql) {
+            'bankTransferTo' => function ($sql) {
                 $sql->select(['id', 'account_number', 'account_name', 'bank_code']);
             },
             'createdBy' => function ($sql) {
-                $sql->select(['id', 'username', 'email', 'fullname']);
+                $sql->select(['id', 'username', 'email', 'fullname', "status"]);
             },
         ]);
 
@@ -49,9 +49,9 @@ class TransferRepo extends BaseRepo
             });
         }
 
-        if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
-            $query->where('created_by', $created_by);
-        }
+        // if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
+        //     $query->where('created_by', $created_by);
+        // }
 
         if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
             try {
@@ -118,7 +118,7 @@ class TransferRepo extends BaseRepo
         }
 
         if (!empty($insert['acc_bank_from_id']) && !empty($insert['acc_bank_to_id'])) {
-            return Transfer::create($insert) ? true : false;
+            return Transfer::create($insert);
         }
 
         return false;
@@ -156,15 +156,15 @@ class TransferRepo extends BaseRepo
     public function getDetail($params)
     {
         $id = isset($params['id']) ? $params['id'] : 0;
-        $transfer = Transfer::select()->where('id', $id)->with([
-            'bankFrom' => function ($sql) {
-                $sql->select(['id', 'account_number', 'bank_name']);
+        $transfer = Transfer::where('id', $id)->with([
+            'bankTransferFrom' => function ($sql) {
+                $sql->select(['id', 'account_number', 'account_name', 'bank_code']);
             },
-            'bankTo' => function ($sql) {
-                $sql->select(['id', 'account_number', 'bank_name']);
+            'bankTransferTo' => function ($sql) {
+                $sql->select(['id', 'account_number', 'account_name', 'bank_code']);
             },
             'createdBy' => function ($sql) {
-                $sql->select(['id', 'username', 'email']);
+                $sql->select(['id', 'username', 'email', "status"]);
             },
         ])->first();
 
@@ -230,14 +230,14 @@ class TransferRepo extends BaseRepo
     public function getById($id, $with_trashed = false)
     {
         $tran = Transfer::where('id', $id)->with([
-            'bankFrom' => function ($sql) {
-                $sql->select(['id', 'account_number', 'bank_name']);
+            'bankTransferFrom' => function ($sql) {
+                $sql->select(['id', 'account_number', 'account_name', 'bank_code']);
             },
-            'bankTo' => function ($sql) {
-                $sql->select(['id', 'account_number', 'bank_name']);
+            'bankTransferTo' => function ($sql) {
+                $sql->select(['id', 'account_number', 'account_name', 'bank_code']);
             },
             'createdBy' => function ($sql) {
-                $sql->select(['id', 'username', 'email']);
+                $sql->select(['id', 'username', 'email', "status"]);
             },
         ]);
 
