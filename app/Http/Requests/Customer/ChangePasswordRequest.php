@@ -10,7 +10,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
-class CusChangePasswordRequest extends FormRequest
+class ChangePasswordRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -39,10 +39,6 @@ class CusChangePasswordRequest extends FormRequest
             ],
             'password_confirmation' => [
                 'required'
-            ],
-            'platform' => [
-                'required',
-                'in:' . Constants::PLATFORM
             ]
         ];
     }
@@ -61,9 +57,6 @@ class CusChangePasswordRequest extends FormRequest
             'password.max' => 'Mật khẩu dài tối đa :max ký tự',
             'password.confirmed' => 'Xác nhận mật khẩu không đúng',
             'password_confirmation.required' => 'Truyền thiếu tham số password_confirmation',
-
-            'platform.required' => 'Truyền thiếu tham số platform',
-            'platform.in' => 'Platform là một trong các giá trị ' . Constants::PLATFORM
         ];
     }
 
@@ -78,10 +71,10 @@ class CusChangePasswordRequest extends FormRequest
             $old_password = $this->request->get('old_password');
             if ($user && $user->password && $old_password) {
                 if (! Hash::check($old_password, $user->password)) {
-                    $validator->errors()->add('check_valid', 'Mật khẩu cũ lấy mã OTP (old_password) không đúng');
+                    $validator->errors()->add('check_valid', 'Mật khẩu cũ không đúng');
                 }
             } else {
-                $validator->errors()->add('check_exist', 'Không tìm thấy thông tin khách hàng');
+                $validator->errors()->add('check_exist', 'Không tìm thấy thông tin');
             }
 
             // Check mk cũ phải khác mk mới

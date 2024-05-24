@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CusDeleteRequest extends FormRequest
+class GetDetailRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,12 +27,7 @@ class CusDeleteRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'platform' => [
-                'required',
-                'in:' . Constants::PLATFORM
-            ],
-        ];
+        return [];
     }
 
     /**
@@ -48,10 +43,7 @@ class CusDeleteRequest extends FormRequest
      */
     public function messages()
     {
-        return [
-            'platform.required' => 'Truyền thiếu tham số platform',
-            'platform.in' => 'Platform là một trong các giá trị ' . Constants::PLATFORM,
-        ];
+        return [];
     }
 
     /**
@@ -64,7 +56,7 @@ class CusDeleteRequest extends FormRequest
             if ($this->request->get('id') > 0) {
                 $user = User::where('id', $this->request->get('id'))->withTrashed()->first();
                 if (!$user) {
-                    $validator->errors()->add('check_exist', 'Không tìm thấy thông tin khách hàng');
+                    $validator->errors()->add('check_exist', 'Không tìm thấy thông tin nhân viên');
                 }
             }
         });

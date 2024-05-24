@@ -34,19 +34,15 @@ class CustomerRepo extends BaseRepo
         $status = isset($params['status']) ? $params['status'] : -1;
         $page_index = isset($params['page_index']) ? $params['page_index'] : 1;
         $page_size = isset($params['page_size']) ? $params['page_size'] : 10;
-        $scope = isset($params['scope']) ? $params['scope'] : Constants::SCOPE_APP;
-        // $account_type = isset($params['account_type']) ? $params['account_type'] : Constants::ACCOUNT_TYPE_CUSTOMER;
+        $account_type = isset($params['account_type']) ? $params['account_type'] : Constants::ACCOUNT_TYPE_STAFF;
         $query = User::select([
-                'id', 'username', 'sscid',
-                'fullname', 'avatar', 'email', 'phone',
-                'display_name', 'status', 'last_login', 'department_id', 'position_id'
+                'id', 'username',
+                'fullname', 'email', 'phone',
+                'display_name', 'status', 'last_login', 'department_id as group_id',
             ]);
 
             $query->with([
                 'department' => function($sql){
-                    $sql->select(['id', 'name', 'code']);
-                },
-                'position' => function($sql){
                     $sql->select(['id', 'name', 'code']);
                 },
             ]);
@@ -62,9 +58,9 @@ class CustomerRepo extends BaseRepo
             });
         });
 
-        // $query->where('account_type', $account_type);
+        $query->where('account_type', $account_type);
 
-        if ($status >= 0) {
+        if ($status > 0) {
             $query->where('status', $status);
         }
 
@@ -103,19 +99,16 @@ class CustomerRepo extends BaseRepo
         $department_id = isset($params['department_id']) ? $params['department_id'] : null;
         $username = isset($params['username']) ? $params['username'] : null;
         $password = isset($params['password']) ? $params['password'] : null;
-        $avatar = isset($params['avatar']) ? $params['avatar'] : null;
         $status = isset($params['status']) ? $params['status'] : Constants::USER_STATUS_ACTIVE;
-        $account_type = isset($params['account_type']) ? $params['account_type'] : Constants::ACCOUNT_TYPE_CUSTOMER;
+        $account_type = isset($params['account_type']) ? $params['account_type'] : Constants::ACCOUNT_TYPE_STAFF;
 
         if ($fullname && $username && $password) {
             $user = new User();
             $user->fill([
                 'account_type' => $account_type,
                 'username' => $username,
-                'sscid' => strtoupper(uniqid()),
                 'fullname' => $fullname,
                 'birthday' => $birthday,
-                'avatar' => $avatar,
                 'address' => null,
                 'email' => $email,
                 'phone' => formatMobile($phone),

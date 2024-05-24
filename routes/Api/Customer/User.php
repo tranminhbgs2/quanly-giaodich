@@ -4,14 +4,14 @@
  * http://ssc.dcv.vn/api/v1/users
  * http://ssc.dcv.vn/api/v1/users/delete/1
  */
-Route::group(['prefix' => 'users'], function (){
-    Route::group(['middleware' => ['auth.jwt']], function (){
-        // Route::get('/', 'UserController@listing');
+Route::group(['prefix' => 'users'], function () {
+    Route::group(['middleware' => ['auth.jwt']], function () {
+        Route::get('/', 'UserController@getListing');
         Route::get('/user-info', 'UserController@getInfo');
-        // Route::post('/store', 'UserController@store');
-        // Route::post('/update/{id}', 'UserController@update');
-        // Route::post('/delete/{id}', 'UserController@delete');
+        Route::get('/detail/{id}', 'UserController@getDetail');
+        Route::post('/store', 'UserController@store');
+        Route::post('/update', 'UserController@update');
+        Route::get('/delete/{id}', 'UserController@delete');
         Route::post('/change-status', 'UserController@changeStatus');
     });
-
 });

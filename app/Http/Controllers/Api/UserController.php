@@ -4,32 +4,35 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Category\DeleteRequest;
-use App\Http\Requests\Category\GetDetailRequest;
-use App\Http\Requests\Category\ListingRequest;
-use App\Http\Requests\Category\StoreRequest;
-use App\Http\Requests\Category\UpdateRequest;
+use App\Http\Requests\Customer\DeleteRequest;
+use App\Http\Requests\Customer\GetDetailRequest;
+use App\Http\Requests\Customer\GetListingRequest;
+use App\Http\Requests\Customer\StoreRequest;
+use App\Http\Requests\Customer\UpdateRequest;
 use App\Http\Requests\User\ChangeStatusRequest;
+use App\Repositories\Customer\CustomerRepo;
 use App\Repositories\User\UserRepo;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
     protected $user_repo;
+    protected $cus_repo;
 
-    public function __construct(UserRepo $cateRepo)
+    public function __construct(UserRepo $cateRepo, CustomerRepo $cusRepo)
     {
         $this->user_repo = $cateRepo;
+        $this->cus_repo = $cusRepo;
     }
 
     /**
      * API lấy ds khách hàng
      * URL: {{url}}/api/v1/transaction
      *
-     * @param ListingRequest $request
+     * @param GetListingRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getListing(ListingRequest $request)
+    public function getListing(GetListingRequest $request)
     {
         $params['keyword'] = request('keyword', null);
         $params['status'] = request('status', -1);
@@ -37,8 +40,8 @@ class UserController extends Controller
         $params['page_size'] = request('page_size', 10);
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
 
-        $data = $this->user_repo->getListing($params, false);
-        $total = $this->user_repo->getListing($params, true);
+        $data = $this->cus_repo->getListing($params, false);
+        $total = $this->cus_repo->getListing($params, true);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách User',
@@ -70,7 +73,6 @@ class UserController extends Controller
                 'account_type' => $user->account_type,
                 'username' => $user->username,
                 'fullname' => $user->fullname,
-                'avatar' => $user->avatar,
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'birthday' => $user->birthday,
@@ -127,14 +129,20 @@ class UserController extends Controller
      */
     public function store(StoreRequest $request)
     {
-        $params['name'] = request('name', null); // ngân hàng
-        $params['code'] = strtoupper(request('code', null)); // hình thức
-        $params['note'] = request('note', 0); // máy pos
-        $params['fee'] = floatval(request('fee', 0)); // phí
-        $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
+        $params['username'] = request('username', null);
+        $params['password'] = request('password', null);
+        $params['fullname'] = request('fullname', null);
+        $params['email'] = request('email', null);
+        $params['phone'] = request('phone', null);
+        $params['birthday'] = request('birthday', null);
+        $params['address'] = request('address', null);
+        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
+        $params['gender'] = request('gender', "P");
+        $params['display_name'] = request('display_name', $params['fullname']);
 
 
-        $resutl = $this->user_repo->store($params);
+        $resutl = $this->cus_repo->store($params);
 
         if ($resutl) {
             return response()->json([
@@ -164,13 +172,17 @@ class UserController extends Controller
         $params['id'] = request('id', null);
         if ($params['id']) {
 
-            $params['name'] = request('name', null); // ngân hàng
-            $params['code'] = strtoupper(request('code', null)); // hình thức
-            $params['note'] = request('note', 0); // máy pos
-            $params['fee'] = floatval(request('fee', 0)); // phí
+            $params['fullname'] = request('fullname', null);
+            $params['email'] = request('email', null);
+            $params['phone'] = request('phone', null);
+            $params['birthday'] = request('birthday', null);
+            $params['address'] = request('address', null);
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
+            $params['gender'] = request('gender', "P");
+            $params['display_name'] = request('display_name', $params['fullname']);
+            $params['birthday'] = request('birthday', null);
 
-            $resutl = $this->user_repo->update($params, $params['id']);
+            $resutl = $this->cus_repo->update($params, $params['id']);
 
             if ($resutl) {
                 return response()->json([

@@ -7,7 +7,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class CusGetListingRequest extends FormRequest
+class GetListingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -34,10 +34,6 @@ class CusGetListingRequest extends FormRequest
             ],
             'page_index' => 'integer|min:1|required_with:page_size',
             'page_size' => 'integer|min:1|required_with:page_index',
-            'platform' => [
-                'required',
-                'in:' . Constants::PLATFORM
-            ],
         ];
     }
 
@@ -65,9 +61,6 @@ class CusGetListingRequest extends FormRequest
             'page_size.integer' => 'Tham số page_size phải là số nguyên',
             'page_size.min' => "Tham số page_size tối thiểu phải là :min",
             'page_size.required_with' => 'Truyền thiếu tham số page_size',
-
-            'platform.required' => 'Truyền thiếu tham số platform',
-            'platform.in' => 'Platform là một trong các giá trị ' . Constants::PLATFORM,
         ];
     }
 
