@@ -29,9 +29,9 @@ class StoreRequest extends FormRequest
         $rule = [
             'pos_id' => ['required', 'numeric', 'min:1'],
             'lo_number' => ['required', 'numeric', 'min:1'],
-            'fee' => ['required', 'numeric', 'min:0'],
+            // 'fee' => ['required', 'numeric', 'min:0'],
             'total_price' => ['required', 'numeric', 'min:0'],
-            'payment' => ['required', 'numeric', 'min:0'],
+            // 'payment' => ['required', 'numeric', 'min:0'],
             'time_end' => 'required|date_format:Y-m-d H:i:s',
             'agent_id' => 'numeric|min:0',
         ];

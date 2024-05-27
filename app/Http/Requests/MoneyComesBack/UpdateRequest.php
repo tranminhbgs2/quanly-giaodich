@@ -30,9 +30,9 @@ class UpdateRequest extends FormRequest
         $rule = [
             'pos_id' => ['required', 'numeric', 'min:1'],
             'lo_number' => ['required', 'numeric', 'min:1'],
-            'fee' => ['required', 'numeric', 'min:0'],
+            // 'fee' => ['required', 'numeric', 'min:0'],
             'total_price' => ['required', 'numeric', 'min:0'],
-            'payment' => ['required', 'numeric', 'min:0'],
+            // 'payment' => ['required', 'numeric', 'min:0'],
             'time_end' => 'required|date_format:Y-m-d H:i:s',
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];
