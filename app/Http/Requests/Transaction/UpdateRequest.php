@@ -34,7 +34,7 @@ class UpdateRequest extends FormRequest
             'category_id' => ['required', 'integer', 'min:1'],
             'pos_id' => ['required', 'integer', 'min:1'],
             'fee' => ['required', 'numeric', 'min:0', 'max:99'],
-            'time_payment' => ['date_format:Y-m-d H:i:s'],
+            'time_payment' => ['date_format:Y/m/d H:i:s'],
             'customer_name' => ['required'],
             'account_type' => ['string', 'in:' . Constants::ACCOUNT_TYPE_STAFF . ',' . Constants::ACCOUNT_TYPE_SYSTEM],
             'price_nop' => ['required', 'numeric', 'min:0'],

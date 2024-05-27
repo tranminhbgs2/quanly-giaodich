@@ -44,6 +44,9 @@ class MoneyComesBackController extends Controller
         $params['date_to'] = request('date_to', null);
         $params['pos_id'] = request('pos_id', 0);
 
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
+
 
         $data = $this->money_repo->getListing($params, false);
         $total = $this->money_repo->getListing($params, true);
@@ -103,6 +106,7 @@ class MoneyComesBackController extends Controller
         $params['balance'] = floatval(request('balance', 0)); // tiền  tổng
         $params['agent_id'] = request('agent_id', 0); // id đại lý
         $params['time_end'] = request('time_end', 0); // id đại lý
+        $params['time_end'] = str_replace('/', '-', $params['time_end']);
         if (request('time_end')) {
             $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
         }
@@ -167,7 +171,7 @@ class MoneyComesBackController extends Controller
             $params['balance'] = floatval(request('balance', 0)); // tiền  tổng
             $params['agent_id'] = request('agent_id', 0); // id đại lý
             $params['time_end'] = request('time_end', 0); // id đại lý
-
+            $params['time_end'] = str_replace('/', '-', $params['time_end']);
             if (request('time_end')) {
                 $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
             }

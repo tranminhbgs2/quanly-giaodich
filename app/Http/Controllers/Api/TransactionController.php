@@ -85,6 +85,9 @@ class TransactionController extends Controller
         $params['created_by'] = auth()->user()->id;
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
 
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
+
         $data = $this->tran_repo->getListingCashBack($params, false);
         $total = $this->tran_repo->getListingCashBack($params, true);
         $export = $this->tran_repo->getTotalCashBack($params); //số liệu báo cáo
@@ -153,6 +156,8 @@ class TransactionController extends Controller
         $params['status'] = Constants::USER_STATUS_ACTIVE; // trạng thái
         $params['customer_id'] = request('customer_id', 0); // id khách hàng
         $params['lo_number'] = request('lo_number', 0); // số lô
+
+        $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
         $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
         $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100; // lợi nhuận
@@ -245,6 +250,9 @@ class TransactionController extends Controller
             $params['lo_number'] = request('lo_number', 0);
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
             $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
+
+
+            $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
             $resutl = $this->tran_repo->update($params);
 

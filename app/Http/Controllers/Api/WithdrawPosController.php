@@ -94,6 +94,7 @@ class WithdrawPosController extends Controller
         $params['price_withdraw'] = request('price_withdraw', 0); // phí
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
         $params['created_by'] = auth()->user()->id; // người tạo
+        $params['time_withdraw'] = str_replace('/', '-', $params['time_withdraw']);
 
         $resutl = $this->cate_repo->store($params);
 
@@ -131,6 +132,7 @@ class WithdrawPosController extends Controller
             $params['pos_id'] = request('pos_id', 0); // phí
             $params['price_withdraw'] = request('price_withdraw', 0); // phí
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
+            $params['time_withdraw'] = str_replace('/', '-', $params['time_withdraw']);
 
             $resutl = $this->cate_repo->update($params, $params['id']);
 

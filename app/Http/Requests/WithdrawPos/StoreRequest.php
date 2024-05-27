@@ -30,7 +30,7 @@ class StoreRequest extends FormRequest
         $rule = [
             'pos_id' => ['required', 'integer', 'min:1'],
             'account_bank_id' => ['required', 'integer', 'min:1'],
-            'time_payment' => ['date_format:Y-m-d H:i:s'],
+            'time_payment' => ['date_format:Y/m/d H:i:s'],
             'price_withdraw' => ['required', 'numeric', 'min:0'],
 
         ];

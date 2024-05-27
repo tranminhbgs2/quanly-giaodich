@@ -49,7 +49,7 @@ class UpdateRequest extends FormRequest
                 },
             ],
             'birthday' => [
-                'date_format:Y-m-d'
+                'date_format:Y/m/d'
             ],
             'status' => [
                 'in:1,2,3'

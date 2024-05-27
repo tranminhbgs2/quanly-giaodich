@@ -43,6 +43,9 @@ class TransferController extends Controller
         $params['date_to'] = request('date_to', null);
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
 
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
+
         $data = $this->cate_repo->getListing($params, false);
         $total = $this->cate_repo->getListing($params, true);
         return response()->json([
@@ -104,6 +107,7 @@ class TransferController extends Controller
         $params['acc_number_from'] = $bank_from->account_number;
         $params['acc_name_from'] = $bank_from->account_name;
         $params['bank_from'] = $bank_from->bank_code;
+        $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
         if ($bank_from->balance < $params['price']) {
             return response()->json([
@@ -176,6 +180,7 @@ class TransferController extends Controller
             $params['acc_name_from'] = $bank_from->account_name;
             $params['bank_from'] = $bank_from->bank_code;
 
+            $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
             if ($bank_from->balance < $params['price']) {
                 return response()->json([
                     'code' => 400,
@@ -266,7 +271,7 @@ class TransferController extends Controller
                 $bank_to = $this->bank_acc_repo->getById($transfer->acc_bank_to_id);
                 $bank_to_balance = $bank_to->balance - $transfer->price;
                 $this->bank_acc_repo->updateBalance($transfer->acc_bank_to_id, $bank_to_balance, "DELETE_TRANSFER_". $params['id']);
-                
+
                 return response()->json([
                     'code' => 422,
                     'error' => 'ID không hợp lệ',

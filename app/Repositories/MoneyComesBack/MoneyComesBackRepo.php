@@ -137,7 +137,7 @@ class MoneyComesBackRepo extends BaseRepo
             'pos_id',
             'lo_number',
             'time_end',
-            'time_process', // 'time_process' => 'date_format:Y-m-d'
+            'time_process', // 'time_process' => 'date_format:Y/m/d'
             'created_by',
             'fee',
             'total_price',

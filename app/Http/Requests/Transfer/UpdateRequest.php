@@ -34,7 +34,7 @@ class UpdateRequest extends FormRequest
             'acc_bank_to_id' => ['required'],
             'type_to' => ['required', 'in:STAFF,AGENCY'],
             'price' => ['required', 'numeric', 'min:0'],
-            'time_payment' => ['required', 'date_format:Y-m-d H:i:s'],
+            'time_payment' => ['required', 'date_format:Y/m/d H:i:s'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];
 
