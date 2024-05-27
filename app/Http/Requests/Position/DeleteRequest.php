@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\Position;
 
-use App\Models\Categories;
+use App\Models\Position;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -53,7 +53,7 @@ class DeleteRequest extends FormRequest
         $validator->after(function ($validator) {
             // Check sự tồn tại
             if ($this->request->get('id') > 0) {
-                $user = Categories::where('id', $this->request->get('id'))->withTrashed()->first();
+                $user = Position::where('id', $this->request->get('id'))->withTrashed()->first();
                 if (!$user) {
                     $validator->errors()->add('check_exist', 'Không tìm thấy thông tin');
                 }

@@ -32,6 +32,8 @@ class DepUpdateRequest extends FormRequest
             'id' => ['required', 'integer', 'min:1'],
             'name' => ['required'],
             'code' => ['required'],
+            'url' => ['required', ],
+            'is_default' => ['required', 'boolean'],
         ];
 
         return $rule;
@@ -40,17 +42,18 @@ class DepUpdateRequest extends FormRequest
     public function attributes()
     {
         return [
+            'id' => 'ID',
             'name' => 'Tên nhóm quyền',
             'code' => 'Mã nhóm quyền',
-        ];
+            'url' => 'Đường dẫn',
+            'is_default' => 'Mặc định',];
     }
 
     public function messages()
     {
         return [
-            'name.required' => 'Truyền thiếu tham số name',
-            'code.required' => 'Truyền thiếu tham số code',
-        ];
+            'required' => ':attribute không được để trống',
+            'boolean' => ':attribute phải là true hoặc false',];
     }
 
     /**

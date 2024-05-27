@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\Position;
 
 use App\Helpers\Constants;
-use App\Models\Categories;
+use App\Models\Position;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -29,9 +29,11 @@ class UpdateRequest extends FormRequest
     {
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
+            'function_id' => ['required', 'integer'],
             'name' => ['required'],
             'code' => ['required'],
-            'fee' => ['required', 'numeric', 'min:0', 'max:99'],
+            'url' => ['required', ],
+            'is_default' => ['required', 'boolean'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];
 
@@ -41,25 +43,22 @@ class UpdateRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' => 'Tên danh mục',
-            'code' => 'Mã danh mục',
-            'fee' => 'Phí',
-            'status' => 'Trạng thái',
-        ];
+            'id' => 'ID',
+            'function_id' => 'function_id nhóm quyền',
+            'name' => 'Tên hành động',
+            'code' => 'Mã hành động',
+            'url' => 'Đường dẫn',
+            'is_default' => 'Mặc định',
+            'status' => 'Trạng thái',];
     }
 
     public function messages()
     {
         return [
-            'name.required' => 'Truyền thiếu tham số name',
-            'code.required' => 'Truyền thiếu tham số code',
-            'fee.required' => 'Truyền thiếu tham số fee',
-            'fee.numeric' => 'Tham số fee phải là số',
-            'fee.min' => "Tham số fee tối thiểu phải là :min",
-            'status.integer' => 'Tham số status phải là số nguyên',
-            'status.in' => 'Tham số status không hợp lệ',
-            'fee.max' => "Tham số fee tối đa phải là :max",
-        ];
+            'required' => ':attribute không được để trống',
+            'boolean' => ':attribute phải là true hoặc false',
+            'integer' => ':attribute phải là số nguyên',
+            'in' => ':attribute không hợp lệ',];
     }
 
     /**
@@ -69,7 +68,7 @@ class UpdateRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
-            $dep = Categories::where('id', $this->request->get('id'))->withTrashed()->first();
+            $dep = Position::where('id', $this->request->get('id'))->withTrashed()->first();
             if ($dep) {
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Danh mục đã bị xóa');
@@ -80,7 +79,7 @@ class UpdateRequest extends FormRequest
 
             // Check theo email
             if ($this->request->get('name')) {
-                $user = Categories::where('name', $this->request->get('name'))
+                $user = Position::where('name', $this->request->get('name'))
                     ->whereNotIn('id', [$this->request->get('id')])
                     ->whereNotNull('name')
                     ->withTrashed()
@@ -92,7 +91,7 @@ class UpdateRequest extends FormRequest
 
             // Check theo identifier
             if ($this->request->get('code')) {
-                $user = Categories::where('code', $this->request->get('code'))
+                $user = Position::where('code', $this->request->get('code'))
                     ->whereNotIn('id', [$this->request->get('id')])
                     ->whereNotNull('code')
                     ->withTrashed()

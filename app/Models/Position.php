@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Helpers\Constants;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Position extends Model
 {
+    use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_POSITIONS;
     public $timestamps = true;
 
@@ -17,6 +19,7 @@ class Position extends Model
         'description',
         'status',
         'url',
+        'is_default',
     ];
 
     /**
@@ -24,6 +27,15 @@ class Position extends Model
      */
     public function groupRule()
     {
-        return $this->belongsToMany(Department::class);
+        return $this->belongsTo(Department::class, 'function_id', 'id');
+    }
+    /**
+     * Get the is_default attribute.
+     *
+     * @return string
+     */
+    public function getIsDefaultAttribute()
+    {
+        return $this->attributes['is_default'] == 1 ? 'true' : 'false';
     }
 }

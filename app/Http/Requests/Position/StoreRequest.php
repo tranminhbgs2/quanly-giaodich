@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\Position;
 
-use App\Helpers\Constants;
-use App\Models\Categories;
+use App\Models\Position;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -28,9 +27,11 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         $rule = [
+            'function_id' => ['required', 'integer'],
             'name' => ['required'],
             'code' => ['required'],
-            'fee' => ['required', 'numeric', 'min:0', 'max:99'],
+            'url' => ['required', ],
+            'is_default' => ['required', 'boolean'],
 
         ];
 
@@ -40,24 +41,18 @@ class StoreRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' => 'Tên danh mục',
-            'code' => 'Mã danh mục',
-            'fee' => 'Phí',
-
-        ];
+            'function_id' => 'ID nhóm quyền',
+            'name' => 'Tên hành động',
+            'code' => 'Mã hành động',
+            'url' => 'Đường dẫn',
+            'is_default' => 'Mặc định',];
     }
 
     public function messages()
     {
         return [
-            'name.required' => 'Truyền thiếu tham số name',
-            'code.required' => 'Truyền thiếu tham số code',
-            'fee.required' => 'Truyền thiếu tham số fee',
-            'fee.numeric' => 'Tham số fee phải là số',
-            'fee.min' => "Tham số fee tối thiểu phải là :min",
-            'fee.max' => "Tham số fee tối đa phải là :max",
-
-        ];
+            'required' => ':attribute không được để trống',
+            'boolean' => ':attribute phải là true hoặc false',];
     }
 
     /**
@@ -67,15 +62,15 @@ class StoreRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check username
-            $dep = Categories::where('name', $this->request->get('name'))->withTrashed()->first();
+            $dep = Position::where('name', $this->request->get('name'))->withTrashed()->first();
 
             if ($dep) {
-                $validator->errors()->add('check_exist', 'Tên danh mục đã tồn tại');
+                $validator->errors()->add('check_exist', 'Tên hành động đã tồn tại');
             }
 
-            $dep_code = Categories::where('code', $this->request->get('code'))->withTrashed()->first();
+            $dep_code = Position::where('code', $this->request->get('code'))->withTrashed()->first();
             if ($dep_code) {
-                $validator->errors()->add('check_exist', 'Mã danh mục đã tồn tại');
+                $validator->errors()->add('check_exist', 'Mã hành động đã tồn tại');
             }
         });
     }

@@ -20,6 +20,9 @@ Route::group(['prefix' => 'dropdown'], function (){
         Route::get('/pos', 'PosController@getAll');
         Route::get('/hinh-thuc', 'SettingController@getHinhThuc');
         Route::get('/phuong-thuc', 'SettingController@getPhuongThuc');
+        Route::get('/function', 'DepartmentController@getAll');
+        Route::get('/action', 'PositionController@getAll');
+        Route::get('/action-by-func/{func_id}', 'PositionController@getAllByFunc');
     });
 
 });

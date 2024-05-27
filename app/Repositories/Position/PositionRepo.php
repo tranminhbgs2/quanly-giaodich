@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Repositories\Category;
+namespace App\Repositories\Position;
 
 use App\Helpers\Constants;
-use App\Models\Department;
+use App\Models\Position;
 use App\Repositories\BaseRepo;
 use Carbon\Carbon;
 
-class DepartmentRepo extends BaseRepo
+class PositionRepo extends BaseRepo
 {
     public function __construct()
     {
@@ -27,7 +27,7 @@ class DepartmentRepo extends BaseRepo
         $page_index = isset($params['page_index']) ? $params['page_index'] : 1;
         $page_size = isset($params['page_size']) ? $params['page_size'] : 10;
         //
-        $query = Department::select('id', 'name', 'code', 'description', 'url', 'status', 'is_default');
+        $query = Position::select('id', 'name', 'code', 'function_id', 'description', 'url', 'status', 'is_default');
 
         $query->when(!empty($keyword), function ($sql) use ($keyword) {
             $keyword = translateKeyWord($keyword);
@@ -49,8 +49,8 @@ class DepartmentRepo extends BaseRepo
         }
 
         $query->with([
-            'actionsFunc' => function ($sql) {
-                $sql->select(['id', 'function_id', 'name', 'code']);
+            'groupRule' => function ($sql) {
+                $sql->select(['id', 'name', 'code']);
             }
         ]);
 
@@ -63,23 +63,13 @@ class DepartmentRepo extends BaseRepo
      * @param $id
      * @return mixed
      */
-    public function getById($id, $with_trashed = false)
+    public function getById($id)
     {
         //check $id is not null
         if (empty($id)) {
             return null;
         }
-        $tran = Department::select()
-        ->with(['actionsFunc' => function ($sql) {
-            $sql->select(['id', 'function_id', 'name', 'code']);
-        }])
-        ->where('id', $id);
-        if($with_trashed){
-            $tran->withTrashed();
-        }
-
-        $data = $tran->first();
-        return $data;
+        return Position::find($id)->groupRule();
     }
 
     public function store($params)
@@ -91,6 +81,7 @@ class DepartmentRepo extends BaseRepo
             'url',
             'status',
             'is_default',
+            'function_id'
         ];
 
         $insert = [];
@@ -102,7 +93,7 @@ class DepartmentRepo extends BaseRepo
         }
 
         if (!empty($insert['code']) && !empty($insert['name'])) {
-            return Department::create($insert) ? true : false;
+            return Position::create($insert) ? true : false;
         }
 
         return false;
@@ -127,13 +118,13 @@ class DepartmentRepo extends BaseRepo
             }
         }
 
-        return Department::where('id', $id)->update($update);
+        return Position::where('id', $id)->update($update);
     }
 
     public function delete($params)
     {
         $id = isset($params['id']) ? $params['id'] : null;
-        $category = Department::find($id);
+        $category = Position::find($id);
 
         if ($category) {
             $category->status = Constants::USER_STATUS_DELETED;
@@ -169,9 +160,9 @@ class DepartmentRepo extends BaseRepo
     public function getDetail($params, $with_trashed = false)
     {
         $id = isset($params['id']) ? $params['id'] : 0;
-        $tran = Department::select()
-        ->with(['actionsFunc' => function ($sql) {
-            $sql->select(['id', 'function_id', 'name', 'code']);
+        $tran = Position::select()
+        ->with(['groupRule' => function ($sql) {
+            $sql->select(['id', 'name', 'code']);
         }])
         ->where('id', $id);
 
@@ -201,27 +192,38 @@ class DepartmentRepo extends BaseRepo
 
         $update = ['status' => $status];
 
-        return Department::where('id', $id)->update($update);
+        return Position::where('id', $id)->update($update);
     }
 
     public function getAll()
     {
-        return Department::select('id', 'name', 'code', 'is_default', 'status')
-        ->with(['actionsFunc' => function ($sql) {
-            $sql->select(['id', 'function_id', 'name', 'code', 'is_default']);
+        return Position::select('id', 'name', 'code', 'function_id', 'status', 'is_default')
+        ->with(['groupRule' => function ($sql) {
+            $sql->select(['id', 'name', 'code', 'is_default']);
         }])
         ->where('status', Constants::USER_STATUS_ACTIVE)
         ->orderBy('id', 'DESC')->get()->toArray();
     }
-    public function attachPositions($departmentId, array $positionIds)
+
+    public function getAllByFunc($func_id)
     {
-        $department = Department::find($departmentId);
-        return $department->positions()->attach($positionIds);
+        return Position::select('id', 'name', 'code', 'function_id', 'status', 'is_default')
+        ->with(['groupRule' => function ($sql) {
+            $sql->select(['id', 'name', 'code', 'is_default']);
+        }])
+        ->where('status', Constants::USER_STATUS_ACTIVE)
+        ->where('function_id', $func_id)
+        ->orderBy('id', 'DESC')->get()->toArray();
+    }
+    public function attachPositions($PositionId, array $positionIds)
+    {
+        $Position = Position::find($PositionId);
+        return $Position->positions()->attach($positionIds);
     }
 
-    public function detachAllPositions($departmentId)
+    public function detachAllPositions($PositionId)
     {
-        $department = Department::find($departmentId);
-        return $department->positions()->detach();
+        $Position = Position::find($PositionId);
+        return $Position->positions()->detach();
     }
 }

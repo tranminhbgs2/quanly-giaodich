@@ -133,7 +133,6 @@ class MoneyComesBackController extends Controller
                 ]);
             }
         }
-        // print_r($params);die;
         $resutl = $this->money_repo->store($params);
 
         if ($resutl) {

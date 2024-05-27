@@ -4,45 +4,47 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Department\ChangeStatusRequest;
-use App\Http\Requests\Department\DepDeleteRequest;
-use App\Http\Requests\Department\DepGetDetailRequest;
-use App\Http\Requests\Department\DepListingRequest;
-use App\Http\Requests\Department\DepStoreRequest;
-use App\Http\Requests\Department\DepUpdateRequest;
+use App\Http\Requests\Position\ChangeStatusRequest;
+use App\Http\Requests\Position\DeleteRequest;
+use App\Http\Requests\Position\GetDetailRequest;
+use App\Http\Requests\Position\ListingRequest;
+use App\Http\Requests\Position\StoreRequest;
+use App\Http\Requests\Position\UpdateRequest;
 use App\Repositories\Category\DepartmentRepo;
+use App\Repositories\Position\PositionRepo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PHPUnit\TextUI\XmlConfiguration\Constant;
 
-class DepartmentController extends Controller
+class PositionController extends Controller
 {
-    protected $department_repo;
+    protected $Position_repo;
+    protected $Department_repo;
 
-    public function __construct(DepartmentRepo $departmentRepo)
+    public function __construct(PositionRepo $PositionRepo, DepartmentRepo $DepartmentRepo)
     {
-        $this->department_repo = $departmentRepo;
+        $this->Position_repo = $PositionRepo;
+        $this->Department_repo = $DepartmentRepo;
     }
 
     /**
      * API lấy ds phòng ban
-     * URL: {{url}}/api/v1/departments
+     * URL: {{url}}/api/v1/Positions
      *
-     * @param DepListingRequest $request
+     * @param ListingRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getListing(DepListingRequest $request)
+    public function getListing(ListingRequest $request)
     {
         $params['keyword'] = request('keyword', null);
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
 
-        $data = $this->department_repo->listing($params, false);
-        $total = $this->department_repo->listing($params, true);
+        $data = $this->Position_repo->listing($params, false);
+        $total = $this->Position_repo->listing($params, true);
 
         return response()->json([
             'code' => 200,
-            'error' => 'Danh sách Nhóm quyền',
+            'error' => 'Danh sách hành động',
             'data' => $data,
             'meta' => [
                 'page_index' => intval($params['page_index']),
@@ -55,12 +57,12 @@ class DepartmentController extends Controller
 
     /**
      * API thêm mới Nhóm quyền
-     * URL: {{url}}/api/v1/departments/store
+     * URL: {{url}}/api/v1/Positions/store
      *
-     * @param DepStoreRequest $request
+     * @param StoreRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(DepStoreRequest $request)
+    public function store(StoreRequest $request)
     {
         $params['name'] = request('name', null);
         $params['code'] = request('code', null);
@@ -68,21 +70,30 @@ class DepartmentController extends Controller
         $params['is_default'] = request('is_default', false);
         $params['created_by'] = Auth::user()->id;
         $params['description'] = request('description', null);
+        $params['function_id'] = request('function_id', null);
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
+        $func = $this->Department_repo->getById(['id' => $params['function_id']]);
 
-        $resutl = $this->department_repo->store($params);
+        if (!$func) {
+            return response()->json([
+                'code' => 422,
+                'error' => 'Nhóm quyền không tồn tại',
+                'data' => $func
+            ]);
+        }
+        $resutl = $this->Position_repo->store($params);
 
         if ($resutl) {
             return response()->json([
                 'code' => 200,
-                'error' => 'Thêm mới nhóm quyền thành công',
+                'error' => 'Thêm mới hành động thành công',
                 'data' => null
             ]);
         }
 
         return response()->json([
             'code' => 400,
-            'error' => 'Thêm mới nhóm quyền không thành công',
+            'error' => 'Thêm mới hành động không thành công',
             'data' => null
         ]);
     }
@@ -91,11 +102,11 @@ class DepartmentController extends Controller
      * API cập nhật thông tin KH theo id
      * URL: {{url}}/api/v1/transaction/update/id
      *
-     * @param DepUpdateRequest $request
+     * @param UpdateRequest $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(DepUpdateRequest $request)
+    public function update(UpdateRequest $request)
     {
         $params['id'] = request('id', null);
         if ($params['id']) {
@@ -106,8 +117,16 @@ class DepartmentController extends Controller
             $params['created_by'] = Auth::user()->id;
             $params['description'] = request('description', null);
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
-
-            $resutl = $this->department_repo->update($params, $params['id']);
+            $params['function_id'] = request('function_id', null);
+            $func = $this->Department_repo->getById(['id' => $params['function_id']]);
+            if (!$func) {
+                return response()->json([
+                    'code' => 422,
+                    'error' => 'Nhóm quyền không tồn tại',
+                    'data' => $func
+                ]);
+            }
+            $resutl = $this->Position_repo->update($params, $params['id']);
 
             if ($resutl) {
                 return response()->json([
@@ -131,56 +150,48 @@ class DepartmentController extends Controller
         }
     }
 
-    // Gán nhiều positions cho department
-    public function attachPositionsToDepartment(Request $request, $departmentId)
-    {
-        $positions = $request->input('position_ids');
-        $departmentId = $request->input('department_id');
-
-        //Xóa hết quyền đi gán lại
-        $this->department_repo->detachAllPositions($departmentId);
-
-        if (is_array($positions)) {
-            $this->department_repo->attachPositions($departmentId, $positions);
-            return response()->json([
-                'code' => 200,
-                'error' => 'Gán quyền cho nhóm quyền thành công',
-                'data' => null
-            ]);
-        } else {
-            return response()->json([
-                'code' => 200,
-                'error' => 'Đã có lỗi xảy ra',
-                'data' => null
-            ]);
-        }
-    }
-
-
     public function getAll()
     {
-        $data = $this->department_repo->getAll();
+        $data = $this->Position_repo->getAll();
         return response()->json([
             'code' => 200,
-            'error' => 'Danh sách nhóm quyền',
+            'error' => 'Danh sách hành động',
             'data' => $data
         ]);
     }
 
+    public function getAllByFunc($func_id)
+    {
+        if($func_id > 0) {
+            $data = $this->Position_repo->getAllByFunc($func_id);
+            return response()->json([
+                'code' => 200,
+                'error' => 'Danh sách hành động theo nhóm quyền',
+                'data' => $data
+            ]);
+        } else {
+            return response()->json([
+                'code' => 422,
+                'error' => 'ID Function không hợp lệ',
+                'data' => null
+            ]);
+
+        }
+    }
     /**
      * API xóa thông tin khách hàng, xóa trạng thái, ko xóa vật lý
      * URL: {{url}}/api/v1/transaction/delete/1202112817000308
      *
-     * @param DepDeleteRequest $request
+     * @param DeleteRequest $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function delete(DepDeleteRequest $request, $id)
+    public function delete(DeleteRequest $request, $id)
     {
         if ($id) {
             $params['id'] = request('id', null);
             if ($id == $params['id']) {
-                $data = $this->department_repo->delete($params);
+                $data = $this->Position_repo->delete($params);
             } else {
                 return response()->json([
                     'code' => 422,
@@ -204,7 +215,7 @@ class DepartmentController extends Controller
         $params['id'] = request('id', null);
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
 
-        $resutl = $this->department_repo->changeStatus($params['status'], $params['id']);
+        $resutl = $this->Position_repo->changeStatus($params['status'], $params['id']);
 
         if ($resutl) {
             return response()->json([
@@ -225,15 +236,15 @@ class DepartmentController extends Controller
      * API lấy thông tin chi tiết khách hàng
      * URL: {{url}}/api/v1/transaction/detail/8
      *
-     * @param DepGetDetailRequest $request
+     * @param GetDetailRequest $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getDetail(DepGetDetailRequest $request, $id)
+    public function getDetail(GetDetailRequest $request, $id)
     {
         if ($id) {
             $params['id'] = request('id', null);
-            $data = $this->department_repo->getDetail($params);
+            $data = $this->Position_repo->getDetail($params);
         } else {
             $data = [
                 'code' => 422,

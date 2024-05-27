@@ -8,7 +8,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class DepStoreRequest extends FormRequest
+class ChangeStatusRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,11 +28,8 @@ class DepStoreRequest extends FormRequest
     public function rules()
     {
         $rule = [
-            'name' => ['required'],
-            'code' => ['required'],
-            'url' => ['required', ],
-            'is_default' => ['required', 'boolean'],
-
+            'id' => ['required', 'integer', 'min:1'],
+            'status' => ['required', 'integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];
 
         return $rule;
@@ -41,17 +38,20 @@ class DepStoreRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' => 'Tên nhóm quyền',
-            'code' => 'Mã nhóm quyền',
-            'url' => 'Đường dẫn',
-            'is_default' => 'Mặc định',];
+            'status' => 'Trạng thái',
+        ];
     }
 
     public function messages()
     {
         return [
-            'required' => ':attribute không được để trống',
-            'boolean' => ':attribute phải là true hoặc false',];
+            'id.required' => 'Truyền thiếu tham số id',
+            'id.integer' => 'Mã giao dịch phải là số nguyên dương',
+            'id.min' => 'Mã giao dịch phải là số nguyên dương, nhỏ nhất là 1',
+
+            'status.integer' => 'Trạng thái phải là số nguyên',
+            'status.in' => 'Trạng thái không hợp lệ',
+        ];
     }
 
     /**
@@ -60,16 +60,14 @@ class DepStoreRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Check username
-            $dep = Department::where('name', $this->request->get('name'))->withTrashed()->first();
-
+            // Check tồn tại
+            $dep = Department::where('id', $this->request->get('id'))->withTrashed()->first();
             if ($dep) {
-                $validator->errors()->add('check_exist', 'Tên nhóm quyền đã tồn tại');
-            }
-
-            $dep_code = Department::where('code', $this->request->get('code'))->withTrashed()->first();
-            if ($dep_code) {
-                $validator->errors()->add('check_exist', 'Mã nhóm quyền đã tồn tại');
+                if ($dep->status == Constants::USER_STATUS_DELETED) {
+                    $validator->errors()->add('check_exist', 'Nhóm quyền đã bị xóa');
+                }
+            } else {
+                $validator->errors()->add('check_exist', 'Không tìm thấy nhóm quyền');
             }
         });
     }

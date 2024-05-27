@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Category;
+namespace App\Http\Requests\Position;
 
 use App\Helpers\Constants;
-use App\Models\Categories;
+use App\Models\Position;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -61,7 +61,7 @@ class ChangeStatusRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
-            $dep = Categories::where('id', $this->request->get('id'))->withTrashed()->first();
+            $dep = Position::where('id', $this->request->get('id'))->withTrashed()->first();
             if ($dep) {
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Danh mục đã bị xóa');
