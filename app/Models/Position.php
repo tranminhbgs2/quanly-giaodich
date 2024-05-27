@@ -11,18 +11,18 @@ class Position extends Model
     public $timestamps = true;
 
     protected $fillable = [
-        'department_id',
+        'function_id',
         'name',
         'code',
         'description',
-        'created_by',
+        'status',
         'url',
     ];
 
     /**
      * Tính xem vị trí này thuộc phòng/ban nào
      */
-    public function department()
+    public function groupRule()
     {
         return $this->belongsToMany(Department::class);
     }

@@ -120,8 +120,10 @@ class MoneyComesBackController extends Controller
                         'data' => null
                     ]);
                 } else {
+                    $params['fee'] = $pos->total_fee;
                     $params['fee_agent'] = $pos->activeAgents[0]->fee;
                     $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
+                    $params['payment'] = $params['total_price'] - $params['fee']*$params['total_price']/100;
                 }
             } else {
                 return response()->json([
@@ -131,6 +133,7 @@ class MoneyComesBackController extends Controller
                 ]);
             }
         }
+        // print_r($params);die;
         $resutl = $this->money_repo->store($params);
 
         if ($resutl) {

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Department;
+namespace App\Http\Requests\Category;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class DepListingRequest extends FormRequest
+class ListingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,6 +27,7 @@ class DepListingRequest extends FormRequest
     {
         return [
             'keyword' => [],
+            'status' => 'integer|min:0',
             'page_index' => 'integer|min:1|required_with:page_size',
             'page_size' => 'integer|min:1|required_with:page_index'
         ];
@@ -53,6 +54,8 @@ class DepListingRequest extends FormRequest
             'page_size.integer' => 'Tham số page_size phải là số nguyên',
             'page_size.min' => "Tham số page_size tối thiểu phải là :min",
             'page_size.required_with' => 'Truyền thiếu tham số page_size',
+            'status.integer' => 'Tham số status phải là số nguyên',
+            'status.min' => "Tham số status tối thiểu phải là :min",
         ];
     }
 

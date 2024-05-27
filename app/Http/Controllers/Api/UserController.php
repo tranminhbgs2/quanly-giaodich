@@ -140,6 +140,7 @@ class UserController extends Controller
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
         $params['gender'] = request('gender', "P");
         $params['display_name'] = request('display_name', $params['fullname']);
+        $params['birthday'] = str_replace('/', '-', $params['birthday']);
 
 
         $resutl = $this->cus_repo->store($params);
@@ -175,12 +176,12 @@ class UserController extends Controller
             $params['fullname'] = request('fullname', null);
             $params['email'] = request('email', null);
             $params['phone'] = request('phone', null);
-            $params['birthday'] = request('birthday', null);
             $params['address'] = request('address', null);
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
             $params['gender'] = request('gender', "P");
             $params['display_name'] = request('display_name', $params['fullname']);
             $params['birthday'] = request('birthday', null);
+            $params['birthday'] = str_replace('/', '-', $params['birthday']);
 
             $resutl = $this->cus_repo->update($params, $params['id']);
 

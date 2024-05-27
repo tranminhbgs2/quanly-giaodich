@@ -14,13 +14,15 @@ class Department extends Model
         'name',
         'code',
         'description',
-        'created_by',
+        'url',
+        'status',
+        'is_default',
     ];
 
     /**
      * Tính xem vị trí này thuộc phòng/ban nào
      */
-    public function positions()
+    public function actionFunc()
     {
         return $this->belongsToMany(Position::class);
     }
