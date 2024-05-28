@@ -87,7 +87,7 @@ class TransactionController extends Controller
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
-
+        
         $data = $this->tran_repo->getListingCashBack($params, false);
         $total = $this->tran_repo->getListingCashBack($params, true);
         $export = $this->tran_repo->getTotalCashBack($params); //số liệu báo cáo

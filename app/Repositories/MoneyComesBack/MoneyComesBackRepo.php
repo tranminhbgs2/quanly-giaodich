@@ -43,8 +43,8 @@ class MoneyComesBackRepo extends BaseRepo
 
         if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
             try {
-                $date_from = Carbon::createFromFormat('Y-m-d', $date_from)->startOfDay();
-                $date_to = Carbon::createFromFormat('Y-m-d', $date_to)->endOfDay();
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
                 $query->whereBetween('time_end', [$date_from, $date_to]);
             } catch (\Exception $e) {
                 // Handle invalid date format
