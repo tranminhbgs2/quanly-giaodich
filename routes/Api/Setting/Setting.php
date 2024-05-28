@@ -23,6 +23,7 @@ Route::group(['prefix' => 'dropdown'], function (){
         Route::get('/function', 'DepartmentController@getAll');
         Route::get('/action', 'PositionController@getAll');
         Route::get('/action-by-func/{func_id}', 'PositionController@getAllByFunc');
+        Route::get('/type-transfer', 'SettingController@getTypeTransfer');
     });
 
 });

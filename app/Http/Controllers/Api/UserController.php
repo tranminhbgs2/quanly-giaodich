@@ -93,7 +93,6 @@ class UserController extends Controller
             ];
             return response()->json($data);
         }
-
     }
 
     /**
@@ -146,6 +145,7 @@ class UserController extends Controller
         $resutl = $this->cus_repo->store($params);
 
         if ($resutl) {
+            $this->cus_repo->attachPositions($resutl, request('action_ids', []) ?? []);
             return response()->json([
                 'code' => 200,
                 'error' => 'Thêm mới thành công',
@@ -183,9 +183,13 @@ class UserController extends Controller
             $params['birthday'] = request('birthday', null);
             $params['birthday'] = str_replace('/', '-', $params['birthday']);
 
+            $action_ids = request('action_ids', []) ?? [];
             $resutl = $this->cus_repo->update($params, $params['id']);
 
             if ($resutl) {
+                //Xóa các permission cũ
+                $this->cus_repo->detachAllPositions($params['id']);
+                $this->cus_repo->attachPositions($params['id'], $action_ids);
                 return response()->json([
                     'code' => 200,
                     'error' => 'Cập nhật thông tin thành công',

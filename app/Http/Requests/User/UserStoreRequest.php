@@ -38,21 +38,8 @@ class UserStoreRequest extends FormRequest
                 'date_format:d/m/Y',
                 new CurrentDateLimitRule()
             ],
-            'department_id' => ['required', 'integer', 'min:1'],
-            'position_id' => [
-                'required',
-                'integer',
-                'min:1',
-                function ($attribute, $value, $fail) {
-                    $check_pos = Position::where('id', $value)
-                        ->where('department_id', $this->request->get('department_id'))
-                        ->first();
-
-                    if (! $check_pos) {
-                        return $fail('Chức danh không thuộc phòng ban đã chọn');
-                    }
-                },
-            ],
+            'action_ids' => 'required|array',
+            'action_ids.*' => 'exists:positions,id',
             'username' => [
                 'required',
                 new UsernameRule()
@@ -65,11 +52,7 @@ class UserStoreRequest extends FormRequest
             'password_confirmation' => ['required'],
             'status' => [
                 'required',
-                'in:0,1,2,3'
-            ],
-            'platform' => [
-                'required',
-                'in:' . Constants::PLATFORM
+                'in:1,2,3'
             ]
         ];
 
@@ -103,14 +86,6 @@ class UserStoreRequest extends FormRequest
             'email.email' => 'Email không đúng định dạng',
             'avatar.image' => 'Ảnh đại diện không đúng định dạng (.jpg, .png)',
 
-            'department_id.required' => 'Truyền thiếu tham số department_id',
-            'department_id.integer' => 'Mã phòng ban phải là số nguyên dương',
-            'department_id.min' => 'Mã phòng ban phải là số nguyên dương, nhỏ nhất là 1',
-
-            'position_id.required' => 'Truyền thiếu tham số department_id',
-            'position_id.integer' => 'Mã chức danh phải là số nguyên dương',
-            'position_id.min' => 'Mã chức danh phải là số nguyên dương, nhỏ nhất là 1',
-
             'username.required' => 'Truyền thiếu tham số username',
 
             'password.required' => 'Truyền thiếu tham số password',
@@ -119,10 +94,9 @@ class UserStoreRequest extends FormRequest
             'password_confirmation.required' => 'Truyền thiếu tham số password_confirmation',
 
             'status.required' => 'Truyền thiếu tham số status',
-            'status.in' => 'Trạng thái không hợp lệ (0/1/2/3)',
-
-            'platform.required' => 'Truyền thiếu tham số platform',
-            'platform.in' => 'Platform là một trong các giá trị ' . Constants::PLATFORM,
+            'status.in' => 'Trạng thái không hợp lệ (1/2/3)',
+            'action_ids.required' => 'Truyền thiếu tham số action_ids',
+            'action_ids.array' => 'Danh sách hành động không đúng định dạng',
         ];
     }
 

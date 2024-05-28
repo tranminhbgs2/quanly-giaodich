@@ -106,5 +106,22 @@ class SettingController extends Controller
             'data' => $data
         ]);
     }
-
+    public function getTypeTransfer()
+    {
+        $data = [
+            0 => [
+                'name' => 'Chuyển cho đại lý',
+                'code' => 'AGENCY'
+            ],
+            1 => [
+                'name' => 'Chuyển cho nhân viên',
+                'code' => 'STAFF'
+            ],
+        ];
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách loại chuyển khoản',
+            'data' => $data
+        ]);
+    }
 }

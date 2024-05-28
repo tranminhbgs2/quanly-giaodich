@@ -38,4 +38,9 @@ class Position extends Model
     {
         return $this->attributes['is_default'] == 1 ? 'true' : 'false';
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'user_position', 'position_id', 'user_id');
+    }
 }

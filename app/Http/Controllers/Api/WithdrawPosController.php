@@ -33,10 +33,14 @@ class WithdrawPosController extends Controller
         $params['keyword'] = request('keyword', null);
         $params['status'] = request('status', -1);
         $params['pos_id'] = request('pos_id', 0);
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
 
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
         $data = $this->cate_repo->getListing($params, false);
         $total = $this->cate_repo->getListing($params, true);
         $export = $this->cate_repo->getTotal($params); //số liệu báo cáo

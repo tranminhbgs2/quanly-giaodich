@@ -52,33 +52,16 @@ class UserUpdateRequest extends FormRequest
                     }
                 },
             ],
-            'department_id' => ['required', 'integer', 'min:1'],
-            'position_id' => [
-                'required',
-                'integer',
-                'min:1',
-                function ($attribute, $value, $fail) {
-                    $check_pos = Position::where('id', $value)
-                        ->where('department_id', $this->request->get('department_id'))
-                        ->first();
-
-                    if (! $check_pos) {
-                        return $fail('Chức danh không thuộc phòng ban đã chọn');
-                    }
-                },
-            ],
+            'action_ids' => 'required|array',
+            'action_ids.*' => 'exists:positions,id', // Kiểm tra từng phần tử trong mảng
             'birthday' => [
                 'date_format:d/m/Y',
                 new CurrentDateLimitRule()
             ],
             'status' => [
                 'required',
-                'in:0,1,2,3'
+                'in:1,2,3'
             ],
-            'platform' => [
-                'required',
-                'in:' . Constants::PLATFORM
-            ]
         ];
 
         // Nếu nhập email thì check
@@ -108,14 +91,6 @@ class UserUpdateRequest extends FormRequest
             'id.integer' => 'Mã nhân viên phải là số nguyên dương',
             'id.min' => 'Mã nhân viên phải là số nguyên dương, nhỏ nhất là 1',
 
-            'department_id.required' => 'Truyền thiếu tham số department_id',
-            'department_id.integer' => 'Mã phòng ban phải là số nguyên dương',
-            'department_id.min' => 'Mã phòng ban phải là số nguyên dương, nhỏ nhất là 1',
-
-            'position_id.required' => 'Truyền thiếu tham số department_id',
-            'position_id.integer' => 'Mã chức danh phải là số nguyên dương',
-            'position_id.min' => 'Mã chức danh phải là số nguyên dương, nhỏ nhất là 1',
-
             'fullname.required' => 'Truyền thiếu tham số fullname',
             'phone.required' => 'Truyền thiếu tham số phone',
             'email.email' => 'Email không đúng định dạng',
@@ -123,10 +98,11 @@ class UserUpdateRequest extends FormRequest
             'birthday.date_format' => 'Ngày sinh sai định dạng (dd/mm/yyyy)',
 
             'status.required' => 'Truyền thiếu tham số status',
-            'status.in' => 'Trạng thái không hợp lệ (0/1/2/3)',
+            'status.in' => 'Trạng thái không hợp lệ (1/2/3)',
+            'action_ids.required' => 'Truyền thiếu tham số action_ids',
+            'action_ids.array' => 'Danh sách hành động không đúng định dạng',
 
-            'platform.required' => 'Truyền thiếu tham số platform',
-            'platform.in' => 'Platform là một trong các giá trị ' . Constants::PLATFORM,
+
         ];
     }
 

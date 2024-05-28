@@ -88,7 +88,7 @@ class CustomerRepo extends BaseRepo
      * Hàm tạo thông tin Khách hàng, Nhân viên
      *
      * @param $params
-     * @return bool
+     * @return number
      */
     public function store($params)
     {
@@ -120,12 +120,12 @@ class CustomerRepo extends BaseRepo
             ]);
 
             if ($user->save()) {
-                return true;
+                return $user->id;
             }
 
         }
 
-        return false;
+        return 0;
     }
 
     /**
@@ -415,5 +415,16 @@ class CustomerRepo extends BaseRepo
 
     }
 
+    public function attachPositions($userId, array $positionIds)
+    {
+        $department = User::find($userId);
+        return $department->userPermissions()->attach($positionIds);
+    }
+
+    public function detachAllPositions($userId)
+    {
+        $department = User::find($userId);
+        return $department->userPermissions()->detach();
+    }
 
 }
