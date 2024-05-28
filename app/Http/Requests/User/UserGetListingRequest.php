@@ -29,15 +29,10 @@ class UserGetListingRequest extends FormRequest
         return [
             'keyword' => [],
             'status' => [
-                'required',
-                'in:-1,0,1,2,3'
+                'in:0,1,2,3'
             ],
             'page_index' => 'integer|min:1|required_with:page_size',
             'page_size' => 'integer|min:1|required_with:page_index',
-            'platform' => [
-                'required',
-                'in:' . Constants::PLATFORM
-            ],
         ];
     }
 

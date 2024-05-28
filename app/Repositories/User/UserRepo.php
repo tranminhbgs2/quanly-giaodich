@@ -130,7 +130,9 @@ class UserRepo extends BaseRepo
     public function getDetail($params, $with_trashed = false)
     {
         $id = isset($params['id']) ? $params['id'] : 0;
-        $tran = User::where('id', $id);
+        $tran = User::where('id', $id)->with(['userPermissions' => function ($query) {
+            $query->select('positions.id as action_id', 'positions.name as action_name', 'positions.code as action_code'); // Chọn các trường cụ thể từ bảng positions
+        }]);
 
         if ($with_trashed) {
             $tran->withTrashed();
@@ -161,7 +163,9 @@ class UserRepo extends BaseRepo
      */
     public function getById($id, $with_trashed = false)
     {
-        $tran = User::where('id', $id);
+        $tran = User::where('id', $id)->with(['userPermissions' => function ($query) {
+            $query->select('positions.id as action_id', 'positions.name as action_name', 'positions.code as action_code'); // Chọn các trường cụ thể từ bảng positions
+        }]);
 
         if ($with_trashed) {
             $tran->withTrashed();

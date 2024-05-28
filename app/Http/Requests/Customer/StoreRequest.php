@@ -39,7 +39,9 @@ class StoreRequest extends FormRequest
             ],
             'password' => [
                 'required',
-            ]
+            ],
+            'action_ids' => 'required|array',
+            'action_ids.*' => 'exists:positions,id',
         ];
 
         // Nếu nhập email thì check
@@ -73,6 +75,8 @@ class StoreRequest extends FormRequest
             'username.required' => 'Truyền thiếu tham số username',
 
             'password.required' => 'Truyền thiếu tham số password',
+            'action_ids.required' => 'Truyền thiếu tham số action_ids',
+            'action_ids.array' => 'Tham số action_ids phải là mảng',
         ];
     }
 

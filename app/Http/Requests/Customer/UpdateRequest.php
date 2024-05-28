@@ -54,6 +54,8 @@ class UpdateRequest extends FormRequest
             'status' => [
                 'in:1,2,3'
             ],
+            'action_ids' => 'required|array',
+            'action_ids.*' => 'exists:positions,id',
         ];
 
         return $rule;
@@ -89,6 +91,9 @@ class UpdateRequest extends FormRequest
 
             'status.required' => 'Truyền thiếu tham số status',
             'status.in' => 'Trạng thái không hợp lệ',
+            'action_ids.required' => 'Truyền thiếu tham số action_ids',
+            'action_ids.array' => 'Tham số action_ids phải là mảng',
+            'action_ids.*.exists' => 'Một hoặc nhiều action_id không tồn tại',
         ];
     }
 
