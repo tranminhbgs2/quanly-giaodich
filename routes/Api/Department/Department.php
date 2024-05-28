@@ -12,6 +12,7 @@ Route::group(['prefix' => 'function'], function (){
         Route::post('/update', 'DepartmentController@update');
         Route::get('/delete/{id}', 'DepartmentController@delete');
         Route::post('/change-status', 'DepartmentController@changeStatus');
+        Route::get('/get-all', 'DepartmentController@getAll');
     });
 
 });
