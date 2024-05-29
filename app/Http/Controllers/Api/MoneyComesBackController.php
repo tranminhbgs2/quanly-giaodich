@@ -110,20 +110,22 @@ class MoneyComesBackController extends Controller
         if (request('time_end')) {
             $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
         }
+
         if ($params['agent_id'] > 0) {
             $pos = $this->pos_repo->getById($params['pos_id']);
-            if ($pos && count($pos->activeAgents) > 0) {
-                if ($pos->activeAgents[0]->id != $params['agent_id']) {
+            if ($pos) {
+                $activeAgents = $pos->activeByAgentsDate($params['agent_id']);
+                if ($activeAgents) {
+                    $params['fee'] = $pos->total_fee;
+                    $params['fee_agent'] = $activeAgents->fee;
+                    $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
+                    $params['payment'] = $params['total_price'] - $params['fee']*$params['total_price']/100;
+                } else {
                     return response()->json([
                         'code' => 400,
                         'error' => 'Máy POS không thuộc đại lý này',
-                        'data' => null
+                        'data' => $activeAgents
                     ]);
-                } else {
-                    $params['fee'] = $pos->total_fee;
-                    $params['fee_agent'] = $pos->activeAgents[0]->fee;
-                    $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
-                    $params['payment'] = $params['total_price'] - $params['fee']*$params['total_price']/100;
                 }
             } else {
                 return response()->json([
@@ -179,16 +181,18 @@ class MoneyComesBackController extends Controller
             }
             if ($params['agent_id'] > 0) {
                 $pos = $this->pos_repo->getById($params['pos_id']);
-                if ($pos && count($pos->activeAgents) > 0) {
-                    if ($pos->activeAgents[0]->id != $params['agent_id']) {
+                if ($pos) {
+                    $activeAgents = $pos->activeByAgentsDate($params['agent_id']);
+                    if ($activeAgents) {
+                        $params['fee'] = $pos->total_fee;
+                        $params['fee_agent'] = $activeAgents->fee;
+                        $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
+                    } else {
                         return response()->json([
                             'code' => 400,
                             'error' => 'Máy POS không thuộc đại lý này',
-                            'data' => null
+                            'data' => $activeAgents
                         ]);
-                    } else {
-                        $params['fee_agent'] = $pos->activeAgents[0]->fee;
-                        $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
                     }
                 } else {
                     return response()->json([

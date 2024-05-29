@@ -14,6 +14,7 @@ class MoneyComesBackRepo extends BaseRepo
 {
     public function getListing($params, $is_counting = false)
     {
+        $keyword = $params['keyword'] ?? null;
         $lo_number = $params['lo_number'] ?? 0;
         $status = $params['status'] ?? -1;
         $page_index = $params['page_index'] ?? 1;
@@ -37,6 +38,12 @@ class MoneyComesBackRepo extends BaseRepo
             }
         ]);
 
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
         // if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
         //     $query->where('created_by', $created_by);
         // }

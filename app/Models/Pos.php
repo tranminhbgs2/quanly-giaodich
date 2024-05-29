@@ -41,11 +41,11 @@ class Pos extends Model
     public function agents()
     {
         return $this->belongsToMany(Agent::class, 'agent_pos')
-        ->wherePivot('status', Constants::USER_STATUS_ACTIVE)
-        ->withPivot('status', 'fee')->withTimestamps();
+            ->wherePivot('status', Constants::USER_STATUS_ACTIVE)
+            ->withPivot('status', 'fee')->withTimestamps();
     }
 
-     /**
+    /**
      * Deactive tất cả các bản ghi agent_pos liên quan đến pos này
      */
     public function deactivateAgents()
@@ -90,6 +90,22 @@ class Pos extends Model
         return $this->belongsToMany(Agent::class, 'agent_pos')
             ->wherePivot('status', Constants::USER_STATUS_ACTIVE)
             ->wherePivot('agent_id', $agent_id)
+            ->withPivot('status', 'fee')
+            ->select('agency.id', 'agent_pos.pos_id', 'agent_pos.agent_id', 'agent_pos.status', 'agent_pos.fee', 'agent_pos.created_at', 'agent_pos.updated_at')
+            ->first();
+    }
+    public function activeByAgentsDate($agent_id)
+    {
+        return $this->belongsToMany(Agent::class, 'agent_pos')
+            ->where(function ($query) use ($agent_id) {
+                $query->where('agent_pos.agent_id', $agent_id)
+                ->where('agent_pos.status', Constants::USER_STATUS_ACTIVE);
+            })
+            ->orWhere(function ($query) use ($agent_id) {
+                $query->whereDate('agent_pos.created_at', today())
+                    ->where('agent_pos.agent_id', $agent_id);
+            })
+            ->where('agency.deleted_at', null) // Bạn cần thêm điều kiện này nếu agency có soft delete
             ->withPivot('status', 'fee')
             ->select('agency.id', 'agent_pos.pos_id', 'agent_pos.agent_id', 'agent_pos.status', 'agent_pos.fee', 'agent_pos.created_at', 'agent_pos.updated_at')
             ->first();
