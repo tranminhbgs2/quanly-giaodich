@@ -56,6 +56,8 @@ class PositionRepo extends BaseRepo
                 $sql->select(['id', 'name', 'code']);
             }
         ]);
+        
+        $query->orderBy('id', 'DESC');
 
         return $query->get();
     }

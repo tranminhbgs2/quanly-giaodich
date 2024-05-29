@@ -53,6 +53,7 @@ class DepartmentRepo extends BaseRepo
                 $sql->select(['id', 'function_id', 'name', 'code']);
             }
         ]);
+        $query->orderBy('id', 'DESC');
 
         return $query->get();
     }
