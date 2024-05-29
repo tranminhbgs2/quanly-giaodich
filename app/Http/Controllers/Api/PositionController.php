@@ -41,17 +41,16 @@ class PositionController extends Controller
 
         $data = $this->Position_repo->listing($params, false);
         $total = $this->Position_repo->listing($params, true);
-
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách hành động',
-            'data' => $data,
-            'meta' => [
-                'page_index' => intval($params['page_index']),
-                'page_size' => intval($params['page_size']),
-                'records' => $total,
-                'pages' => ceil($total / $params['page_size'])
-            ]
+            'data' => [
+                "total_elements" => $total,
+                "total_page" => ceil($total / $params['page_size']),
+                "page_no" => intval($params['page_index']),
+                "page_size" => intval($params['page_size']),
+                "data" => $data
+            ],
         ]);
     }
 
