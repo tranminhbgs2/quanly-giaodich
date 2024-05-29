@@ -35,6 +35,7 @@ class WithdrawPosController extends Controller
         $params['pos_id'] = request('pos_id', 0);
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
+        $params['hkd_id'] = request('hkd_id', 0); // ngân hàng
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
