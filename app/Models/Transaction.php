@@ -31,6 +31,7 @@ class Transaction extends Model
         'status',
         'created_by',
         'original_fee',
+        'fee_cashback',
     ];
 
     /**
@@ -68,11 +69,11 @@ class Transaction extends Model
         return $name; // Ví dụ: chuyển thành chữ hoa
     }
 
-    public function getPaymentCashbackAttribute()
+    public function getTotalPaymentCashbackAttribute()
     {
         $pos = $this->pos;
         if ($pos) {
-            return $this->price_rut * $pos->fee_cashback / 100;
+            return $this->total_price_rut * $pos->fee_cashback / 100;
         }
         return 0;
     }

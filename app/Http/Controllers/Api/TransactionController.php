@@ -11,6 +11,7 @@ use App\Http\Requests\Transaction\ListingRequest;
 use App\Http\Requests\Transaction\StoreRequest;
 use App\Http\Requests\Transaction\UpdateRequest;
 use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
+use App\Repositories\Pos\PosRepo;
 use App\Repositories\Transaction\TransactionRepo;
 use App\Repositories\Upload\UploadRepo;
 use Illuminate\Support\Facades\Auth;
@@ -19,11 +20,13 @@ class TransactionController extends Controller
 {
     protected $tran_repo;
     protected $money_comes_back_repo;
+    protected $pos_repo;
 
-    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo)
+    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo, PosRepo $posRepo)
     {
         $this->tran_repo = $tranRepo;
         $this->money_comes_back_repo = $moneyComesBackRepo;
+        $this->pos_repo = $posRepo;
     }
 
     /**
@@ -87,7 +90,7 @@ class TransactionController extends Controller
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
-        
+
         $data = $this->tran_repo->getListingCashBack($params, false);
         $total = $this->tran_repo->getListingCashBack($params, true);
         $export = $this->tran_repo->getTotalCashBack($params); //số liệu báo cáo
@@ -162,6 +165,11 @@ class TransactionController extends Controller
         $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
         $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100; // lợi nhuận
 
+        $pos = $this->pos_repo->getById($params['pos_id'], false);
+
+        if($pos) {
+            $params['fee_cashback'] = $pos->fee_cashback;
+        }
 
         $resutl = $this->tran_repo->store($params);
 
@@ -254,6 +262,12 @@ class TransactionController extends Controller
 
             $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
+            $pos = $this->pos_repo->getById($params['pos_id'], false);
+
+            if($pos) {
+                $params['fee_cashback'] = $pos->fee_cashback;
+            }
+            
             $resutl = $this->tran_repo->update($params);
 
             if ($resutl) {

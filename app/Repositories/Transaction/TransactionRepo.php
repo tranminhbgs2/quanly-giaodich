@@ -175,12 +175,36 @@ class TransactionRepo extends BaseRepo
         }
 
         $query->orderBy('id', 'DESC');
-        $results = $query->get();
+        // Lấy kết quả và nhóm theo pos_id và ngày
+        $transactions = $query->with('pos')
+            ->get()
+            ->groupBy(function($transaction) {
+                return $transaction->pos_id . '_' . Carbon::parse($transaction->time_payment)->format('Y-m-d');
+            })
+            ->map(function($group) {
+                $pos = $group->first()->pos;
+                $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
+                $total_price_rut = $group->sum('price_rut');
+                $total_payment_cashback = $total_price_rut * $pos->fee_cashback / 100;
 
-        return $results->map(function ($transaction) {
-            $transaction->payment_cashback = $transaction->payment_cashback; // Accessor will calculate this
-            return $transaction;
-        })->toArray();
+                return [
+                    'pos_id' => $pos->id,
+                    'date' => $date,
+                    'total_price_rut' => $total_price_rut,
+                    'total_payment_cashback' => $total_payment_cashback,
+                    'pos' => [
+                        'id' => $pos->id,
+                        'name' => $pos->name,
+                        'fee' => $pos->fee,
+                        'total_fee' => $pos->total_fee,
+                        'fee_cashback' => $pos->fee_cashback
+                    ]
+                ];
+            })
+            ->values();
+        // $results = $query->get();
+
+        return $transactions;
     }
 
     /**
@@ -273,17 +297,18 @@ class TransactionRepo extends BaseRepo
         $created_by = $params['created_by'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
 
-        $query = Transaction::selectRaw('SUM(price_rut * pos.fee_cashback) as total_payment_cashback')
-            ->join('pos', 'transactions.pos_id', '=', 'pos.id');
+        // Khởi tạo query
+        $query = Transaction::query();
 
+        // Áp dụng các điều kiện lọc
         if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
-            $query->where('transactions.created_by', $created_by);
+            $query->where('created_by', $created_by);
         }
 
         if (!empty($keyword)) {
-            $keyword = translateKeyWord($keyword);
+            $keyword = translateKeyWord($keyword); // Giả định rằng hàm translateKeyWord đã được định nghĩa
             $query->where(function ($sub_sql) use ($keyword) {
-                $sub_sql->where('transactions.customer_name', 'LIKE', "%" . $keyword . "%");
+                $sub_sql->where('customer_name', 'LIKE', "%" . $keyword . "%");
             });
         }
 
@@ -291,34 +316,65 @@ class TransactionRepo extends BaseRepo
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
-                $query->whereBetween('transactions.time_payment', [$date_from, $date_to]);
+                $query->whereBetween('time_payment', [$date_from, $date_to]);
             } catch (\Exception $e) {
                 // Handle invalid date format
             }
         }
 
         if ($pos_id > 0) {
-            $query->where('transactions.pos_id', $pos_id);
+            $query->where('pos_id', $pos_id);
         }
 
         if ($category_id > 0) {
-            $query->where('transactions.category_id', $category_id);
+            $query->where('category_id', $category_id);
         }
 
         if ($lo_number > 0) {
-            $query->where('transactions.lo_number', $lo_number);
+            $query->where('lo_number', $lo_number);
         }
 
         if ($status > 0) {
-            $query->where('transactions.status', $status);
+            $query->where('status', $status);
         } else {
-            $query->where('transactions.status', Constants::USER_STATUS_ACTIVE);
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-        $result = $query->first();
+        $query->orderBy('id', 'DESC');
+
+        // Lấy kết quả và nhóm theo pos_id và ngày
+        $transactions = $query->with('pos')
+            ->get()
+            ->groupBy(function($transaction) {
+                return $transaction->pos_id . '_' . Carbon::parse($transaction->time_payment)->format('Y-m-d');
+            })
+            ->map(function($group) {
+                $pos = $group->first()->pos;
+                $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
+                $total_price_rut = $group->sum('price_rut');
+                $total_payment_cashback = $total_price_rut * $pos->fee_cashback / 100;
+
+                return [
+                    'pos_id' => $pos->id,
+                    'date' => $date,
+                    'total_price_rut' => $total_price_rut,
+                    'total_payment_cashback' => $total_payment_cashback,
+                    'pos' => [
+                        'id' => $pos->id,
+                        'name' => $pos->name,
+                        'fee' => $pos->fee,
+                        'total_fee' => $pos->total_fee,
+                        'fee_cashback' => $pos->fee_cashback
+                    ]
+                ];
+            })
+            ->values();
+
+        // Tính tổng total_payment_cashback
+        $total_cashback_sum = $transactions->sum('total_payment_cashback');
         // Tính tổng của từng trường cần thiết
         $total = [
-            'payment_cashback' => $result->total_payment_cashback / 100
+            'payment_cashback' => $total_cashback_sum
         ];
 
         return $total;
@@ -350,7 +406,8 @@ class TransactionRepo extends BaseRepo
             'time_payment',
             'status',
             'created_by',
-            'original_fee'
+            'original_fee',
+            'fee_cashback',
         ];
 
         $insert = [];
@@ -398,7 +455,8 @@ class TransactionRepo extends BaseRepo
             'time_payment',
             'status',
             'created_by',
-            'original_fee'
+            'original_fee',
+            'fee_cashback',
         ];
 
         $update = [];
