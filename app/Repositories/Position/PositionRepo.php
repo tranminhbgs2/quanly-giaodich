@@ -27,7 +27,11 @@ class PositionRepo extends BaseRepo
         $page_index = isset($params['page_index']) ? $params['page_index'] : 1;
         $page_size = isset($params['page_size']) ? $params['page_size'] : 10;
         //
-        $query = Position::select('id', 'name', 'code', 'function_id', 'description', 'url', 'status', 'is_default');
+        $query = Position::select('id', 'name', 'code', 'function_id', 'description', 'url', 'status', 'is_default')
+        ->with([
+            'groupRule' => function ($sql) {
+                $sql->select(['id', 'name', 'code', 'status', 'is_default']);
+            }]);
 
         $query->when(!empty($keyword), function ($sql) use ($keyword) {
             $keyword = translateKeyWord($keyword);
