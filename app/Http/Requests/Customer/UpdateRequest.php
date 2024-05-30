@@ -87,7 +87,7 @@ class UpdateRequest extends FormRequest
 
             'phone.required' => 'Truyền thiếu tham số phone',
 
-            'birthday.date_format' => 'Ngày sinh không đúng định dạng Y-m-d',
+            'birthday.date_format' => 'Ngày sinh không đúng định dạng Y/m/d',
 
             'status.required' => 'Truyền thiếu tham số status',
             'status.in' => 'Trạng thái không hợp lệ',
