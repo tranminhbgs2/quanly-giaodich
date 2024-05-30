@@ -141,10 +141,10 @@ class UserController extends Controller
         $params['gender'] = request('gender', "P");
         $params['display_name'] = request('display_name', $params['fullname']);
 // Chuyển đổi định dạng ngày tháng
-$birthday = Carbon::createFromFormat('d/m/Y', $param['birthday'])->format('Y-m-d');
+$birthday = Carbon::createFromFormat('d/m/Y', $params['birthday'])->format('Y-m-d');
 
 // Gán lại giá trị vào mảng
-$param['birthday'] = $birthday;
+$params['birthday'] = $birthday;
         $resutl = $this->cus_repo->store($params);
 
         if ($resutl) {
@@ -185,10 +185,10 @@ $param['birthday'] = $birthday;
             $params['display_name'] = request('display_name', $params['fullname']);
             $params['birthday'] = request('birthday', null);
 // Chuyển đổi định dạng ngày tháng
-$birthday = Carbon::createFromFormat('d/m/Y', $param['birthday'])->format('Y-m-d');
+$birthday = Carbon::createFromFormat('d/m/Y', $params['birthday'])->format('Y-m-d');
 
 // Gán lại giá trị vào mảng
-$param['birthday'] = $birthday;
+$params['birthday'] = $birthday;
 
             $action_ids = request('action_ids', []) ?? [];
             $resutl = $this->cus_repo->update($params, $params['id']);
