@@ -49,7 +49,7 @@ class UpdateRequest extends FormRequest
                 },
             ],
             'birthday' => [
-                'date_format:Y/m/d'
+                'date_format:d/m/Y'
             ],
             'status' => [
                 'in:1,2,3'
@@ -87,7 +87,7 @@ class UpdateRequest extends FormRequest
 
             'phone.required' => 'Truyền thiếu tham số phone',
 
-            'birthday.date_format' => 'Ngày sinh không đúng định dạng Y/m/d',
+            'birthday.date_format' => 'Ngày sinh không đúng định dạng d/m/Y',
 
             'status.required' => 'Truyền thiếu tham số status',
             'status.in' => 'Trạng thái không hợp lệ',
