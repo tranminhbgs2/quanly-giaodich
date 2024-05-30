@@ -40,16 +40,18 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request)
     {
-        $credentials = $request->only('account_type', 'username', 'password');
+        // $credentials = $request->only('account_type', 'username', 'password');
+        $credentials = $request->only('username', 'password');
         //
-        $session_id = strtoupper(uniqid(request('account_type').'-'));
+        // $session_id = strtoupper(uniqid(request('account_type').'-'));
+        $session_id = strtoupper(uniqid('system-'));
 
         try {
             // Attempt to verify the credentials and create a token for the user
             if (!$token = JWTAuth::attempt($credentials)) {
                 // Lưu log qua event
                 event(new SessionLogEvent([
-                    'account_type' => request('account_type'),
+                    // 'account_type' => request('account_type'),
                     'session_id' => $session_id,
                     'user_id' => null,
                     'action_type' => Constants::LOG_TYPE_LOGIN,
@@ -67,7 +69,7 @@ class AuthController extends Controller
         } catch (JWTException $e) {
             // Lưu log qua event
             event(new SessionLogEvent([
-                'account_type' => request('account_type'),
+                // 'account_type' => request('account_type'),
                 'session_id' => $session_id,
                 'user_id' => null,
                 'action_type' => Constants::LOG_TYPE_LOGIN,
