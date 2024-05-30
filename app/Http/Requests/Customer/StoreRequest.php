@@ -40,6 +40,9 @@ class StoreRequest extends FormRequest
             'password' => [
                 'required',
             ],
+            'birthday' => [
+                'date_format:d/m/Y'
+            ],
             'action_ids' => 'required|array',
             'action_ids.*' => 'exists:positions,id',
         ];
@@ -77,6 +80,7 @@ class StoreRequest extends FormRequest
             'password.required' => 'Truyền thiếu tham số password',
             'action_ids.required' => 'Truyền thiếu tham số action_ids',
             'action_ids.array' => 'Tham số action_ids phải là mảng',
+            'birthday.date_format' => 'Ngày sinh không đúng định dạng d/m/Y',
         ];
     }
 
