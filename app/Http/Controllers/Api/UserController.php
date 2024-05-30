@@ -13,6 +13,7 @@ use App\Http\Requests\User\ChangeStatusRequest;
 use App\Repositories\Customer\CustomerRepo;
 use App\Repositories\User\UserRepo;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -139,9 +140,11 @@ class UserController extends Controller
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
         $params['gender'] = request('gender', "P");
         $params['display_name'] = request('display_name', $params['fullname']);
-        $params['birthday'] = str_replace('/', '-', $params['birthday']);
+// Chuyển đổi định dạng ngày tháng
+$birthday = Carbon::createFromFormat('d/m/Y', $param['birthday'])->format('Y-m-d');
 
-
+// Gán lại giá trị vào mảng
+$param['birthday'] = $birthday;
         $resutl = $this->cus_repo->store($params);
 
         if ($resutl) {
@@ -181,7 +184,11 @@ class UserController extends Controller
             $params['gender'] = request('gender', "P");
             $params['display_name'] = request('display_name', $params['fullname']);
             $params['birthday'] = request('birthday', null);
-            $params['birthday'] = str_replace('/', '-', $params['birthday']);
+// Chuyển đổi định dạng ngày tháng
+$birthday = Carbon::createFromFormat('d/m/Y', $param['birthday'])->format('Y-m-d');
+
+// Gán lại giá trị vào mảng
+$param['birthday'] = $birthday;
 
             $action_ids = request('action_ids', []) ?? [];
             $resutl = $this->cus_repo->update($params, $params['id']);
