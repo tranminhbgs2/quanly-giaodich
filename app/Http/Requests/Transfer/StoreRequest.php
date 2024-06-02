@@ -62,7 +62,7 @@ class StoreRequest extends FormRequest
             'price.numeric' => 'Truyền tham số price phải là số',
             'price.min' => 'Truyền tham số price phải lớn hơn hoặc bằng 0',
             'time_payment.required' => 'Truyền thiếu tham số time_payment',
-            'time_payment.date_format' => 'Truyền tham số time_payment không đúng định dạng Y-m-d H:i:s',
+            'time_payment.date_format' => 'Truyền tham số time_payment không đúng định dạng Y/m/d H:i:s',
         ];
     }
 

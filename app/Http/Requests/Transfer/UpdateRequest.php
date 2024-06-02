@@ -69,7 +69,7 @@ class UpdateRequest extends FormRequest
             'price.numeric' => 'Số tiền phải là số',
             'price.min' => 'Số tiền phải lớn hơn hoặc bằng 0',
             'time_payment.required' => 'Truyền thiếu tham số time_payment',
-            'time_payment.date_format' => 'Thời gian chuyển tiền không đúng định dạng Y-m-d H:i:s',
+            'time_payment.date_format' => 'Thời gian chuyển tiền không đúng định dạng Y/m/d H:i:s',
             'status.integer' => 'Trạng thái phải là số nguyên',
             'status.in' => 'Trạng thái không hợp lệ',
         ];

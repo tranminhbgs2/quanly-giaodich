@@ -92,7 +92,7 @@ class TransactionRepo extends BaseRepo
                 $query->take($page_size)->skip($offset);
             }
         }
-
+        
         $query->orderBy('id', 'DESC');
         return $query->get()->toArray();
     }

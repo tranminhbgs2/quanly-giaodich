@@ -49,6 +49,8 @@ class TransactionController extends Controller
         $params['lo_number'] = request('lo_number', 0);
         $params['created_by'] = auth()->user()->id;
         $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
 
         $data = $this->tran_repo->getListing($params, false);
         $total = $this->tran_repo->getListing($params, true);
