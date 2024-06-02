@@ -91,6 +91,201 @@ class MoneyComesBackRepo extends BaseRepo
         return $query->get()->toArray();
     }
 
+
+    /**
+     * Hàm lấy ds gi, có tìm kiếm và phân trang
+     *
+     * @param $params
+     * @param false $is_counting
+     *
+     * @return mixed
+     */
+    public function getListingCashBack($params, $is_counting = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $status = $params['status'] ?? -1;
+        $page_index = $params['page_index'] ?? 1;
+        $page_size = $params['page_size'] ?? 10;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $lo_number = $params['lo_number'] ?? 0;
+        $pos_id = $params['pos_id'] ?? 0;
+
+        $query = MoneyComesBack::select(["total_price", "time_process as time_payment", "pos_id"])->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
+            },
+        ]);
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_process', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        $query->orderBy('id', 'DESC');
+        // Lấy kết quả và nhóm theo pos_id và ngày
+        $transactions = $query->with('pos')
+            ->get()
+            ->groupBy(function ($transaction) {
+                return $transaction->pos_id . '_' . Carbon::parse($transaction->time_payment)->format('Y-m-d');
+            })
+            ->map(function ($group) {
+                $pos = $group->first()->pos;
+                $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
+                $total_price_rut = $group->sum('total_price');
+                $total_payment_cashback = $total_price_rut * $pos->fee_cashback / 100;
+
+                return [
+                    'pos_id' => $pos->id,
+                    'date' => $date,
+                    'total_price_rut' => $total_price_rut,
+                    'total_payment_cashback' => $total_payment_cashback,
+                    'pos' => [
+                        'id' => $pos->id,
+                        'name' => $pos->name,
+                        'fee' => $pos->fee,
+                        'total_fee' => $pos->total_fee,
+                        'fee_cashback' => $pos->fee_cashback
+                    ]
+                ];
+            })
+            ->values();
+
+        // $results = $query->get();
+        // Tính toán tổng số lượng kết quả đã nhóm
+        $total = $transactions->count();
+
+        // Nếu đang đếm số lượng, trả về tổng số lượng
+        if ($is_counting) {
+            return $total;
+        }
+
+        // Xử lý phân trang trên kết quả đã nhóm
+        $offset = ($page_index - 1) * $page_size;
+        $pagedTransactions = $transactions->slice($offset, $page_size);
+
+        return $pagedTransactions->values();
+    }
+
+    /**
+     * Hàm lấy tổng số giao dịch
+     *
+     * @param $params
+     * @return array
+     */
+    public function getTotalCashBack($params)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $status = $params['status'] ?? -1;  
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $lo_number = $params['lo_number'] ?? 0;
+        $pos_id = $params['pos_id'] ?? 0;
+
+        $query = MoneyComesBack::select(["total_price", "time_process as time_payment", "pos_id"])->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
+            },
+        ]);
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_process', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        $query->orderBy('id', 'DESC');
+
+
+        // Lấy kết quả và nhóm theo pos_id và ngày
+        $transactions = $query->with('pos')
+            ->get()
+            ->groupBy(function ($transaction) {
+                return $transaction->pos_id . '_' . Carbon::parse($transaction->time_payment)->format('Y-m-d');
+            })
+            ->map(function ($group) {
+                $pos = $group->first()->pos;
+                $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
+                $total_price_rut = $group->sum('price_rut');
+                $total_payment_cashback = $total_price_rut * $pos->fee_cashback / 100;
+
+                return [
+                    'pos_id' => $pos->id,
+                    'date' => $date,
+                    'total_price_rut' => $total_price_rut,
+                    'total_payment_cashback' => $total_payment_cashback,
+                    'pos' => [
+                        'id' => $pos->id,
+                        'name' => $pos->name,
+                        'fee' => $pos->fee,
+                        'total_fee' => $pos->total_fee,
+                        'fee_cashback' => $pos->fee_cashback
+                    ]
+                ];
+            })
+            ->values();
+
+        // Tính tổng total_payment_cashback
+        $total_cashback_sum = $transactions->sum('total_payment_cashback');
+        // Tính tổng của từng trường cần thiết
+        $total = [
+            'payment_cashback' => $total_cashback_sum
+        ];
+
+        return $total;
+    }
+
     /**
      * Tạo GD lô tiền về
      */

@@ -232,6 +232,7 @@ class TransactionRepo extends BaseRepo
         $lo_number = $params['lo_number'] ?? 0;
         $created_by = $params['created_by'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
+        $method = $params['method'] ?? null;
 
         $query = Transaction::select();
 
@@ -272,6 +273,10 @@ class TransactionRepo extends BaseRepo
             $query->where('status', $status);
         } else {
             $query->where('status', Constants::USER_STATUS_ACTIVE);
+        }
+
+        if (!empty($method)) {
+            $query->where('method', $method);
         }
 
         // Tính tổng của từng trường cần thiết

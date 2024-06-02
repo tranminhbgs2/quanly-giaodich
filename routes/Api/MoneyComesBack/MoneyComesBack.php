@@ -12,6 +12,7 @@ Route::group(['prefix' => 'lo-tien-ve'], function (){
         Route::post('/update', 'MoneyComesBackController@update');
         Route::get('/delete/{id}', 'MoneyComesBackController@delete');
         Route::post('/change-status', 'MoneyComesBackController@changeStatus');
+        Route::get('/cashback', 'MoneyComesBackController@getListingCashBack');
     });
 
 });
