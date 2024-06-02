@@ -92,7 +92,7 @@ class TransactionRepo extends BaseRepo
                 $query->take($page_size)->skip($offset);
             }
         }
-        
+
         $query->orderBy('id', 'DESC');
         return $query->get()->toArray();
     }
@@ -165,23 +165,14 @@ class TransactionRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-        if ($is_counting) {
-            return $query->count();
-        } else {
-            $offset = ($page_index - 1) * $page_size;
-            if ($page_size > 0 && $offset >= 0) {
-                $query->take($page_size)->skip($offset);
-            }
-        }
-
         $query->orderBy('id', 'DESC');
         // Lấy kết quả và nhóm theo pos_id và ngày
         $transactions = $query->with('pos')
             ->get()
-            ->groupBy(function($transaction) {
+            ->groupBy(function ($transaction) {
                 return $transaction->pos_id . '_' . Carbon::parse($transaction->time_payment)->format('Y-m-d');
             })
-            ->map(function($group) {
+            ->map(function ($group) {
                 $pos = $group->first()->pos;
                 $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
                 $total_price_rut = $group->sum('price_rut');
@@ -202,9 +193,21 @@ class TransactionRepo extends BaseRepo
                 ];
             })
             ->values();
+            
         // $results = $query->get();
+        // Tính toán tổng số lượng kết quả đã nhóm
+        $total = $transactions->count();
 
-        return $transactions;
+        // Nếu đang đếm số lượng, trả về tổng số lượng
+        if ($is_counting) {
+            return $total;
+        }
+
+        // Xử lý phân trang trên kết quả đã nhóm
+        $offset = ($page_index - 1) * $page_size;
+        $pagedTransactions = $transactions->slice($offset, $page_size);
+
+        return $pagedTransactions->values();
     }
 
     /**
@@ -345,10 +348,10 @@ class TransactionRepo extends BaseRepo
         // Lấy kết quả và nhóm theo pos_id và ngày
         $transactions = $query->with('pos')
             ->get()
-            ->groupBy(function($transaction) {
+            ->groupBy(function ($transaction) {
                 return $transaction->pos_id . '_' . Carbon::parse($transaction->time_payment)->format('Y-m-d');
             })
-            ->map(function($group) {
+            ->map(function ($group) {
                 $pos = $group->first()->pos;
                 $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
                 $total_price_rut = $group->sum('price_rut');
