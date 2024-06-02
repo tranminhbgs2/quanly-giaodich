@@ -149,7 +149,6 @@ class TransactionController extends Controller
         $params['original_fee'] = floatval(request('original_fee', 0)); // phí gốc
         $params['time_payment'] = request('time_payment', null); // thời gian thanh toán
         $params['customer_name'] = request('customer_name', null); // tên khách hàng
-        $params['account_type'] = request('account_type', null); // loại tài khoản
         $params['price_nop'] = floatval(request('price_nop', 0)); // số tiền nộp
         $params['price_rut'] = floatval(request('price_rut', 0)); // số tiền rút
         $params['price_transfer'] = floatval(request('price_transfer', 0)); // số tiền chuyển
@@ -162,14 +161,16 @@ class TransactionController extends Controller
 
         $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
-        $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
-        $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100; // lợi nhuận
-
         $pos = $this->pos_repo->getById($params['pos_id'], false);
 
         if($pos) {
             $params['fee_cashback'] = $pos->fee_cashback;
+            $params['original_fee'] = $pos->total_fee;
         }
+
+        $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
+        $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100; // lợi nhuận
+
 
         $resutl = $this->tran_repo->store($params);
 
@@ -244,7 +245,6 @@ class TransactionController extends Controller
             $params['category_id'] = request('category_id', 0);
             $params['pos_id'] = request('pos_id', 0);
             $params['fee'] = floatval(request('fee', 0));
-            $params['original_fee'] = floatval(request('original_fee', 0));
             $params['time_payment'] = request('time_payment', null);
             $params['customer_name'] = request('customer_name', null);
             $params['account_type'] = request('account_type', null);
@@ -256,18 +256,20 @@ class TransactionController extends Controller
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
             $params['customer_id'] = request('customer_id', 0);
             $params['lo_number'] = request('lo_number', 0);
+
+
+            $pos = $this->pos_repo->getById($params['pos_id'], false);
+
+            if($pos) {
+                $params['fee_cashback'] = $pos->fee_cashback;
+                $params['original_fee'] = $pos->total_fee;
+            }
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
             $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
 
 
             $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
-            $pos = $this->pos_repo->getById($params['pos_id'], false);
-
-            if($pos) {
-                $params['fee_cashback'] = $pos->fee_cashback;
-            }
-            
             $resutl = $this->tran_repo->update($params);
 
             if ($resutl) {

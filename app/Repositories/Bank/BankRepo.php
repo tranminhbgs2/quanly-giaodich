@@ -59,6 +59,6 @@ class BankRepo extends BaseRepo
 
     public function getAll()
     {
-        return Bank::select('id', 'name', 'code')->where('is_active', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+        return Bank::select('id', 'name', 'code')->where('is_active', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'ASC')->get()->toArray();
     }
 }
