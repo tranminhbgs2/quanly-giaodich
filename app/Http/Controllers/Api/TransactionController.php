@@ -163,7 +163,7 @@ class TransactionController extends Controller
 
         $pos = $this->pos_repo->getById($params['pos_id'], false);
 
-        if($pos) {
+        if ($pos) {
             $params['fee_cashback'] = $pos->fee_cashback;
             $params['original_fee'] = $pos->total_fee;
         }
@@ -260,7 +260,7 @@ class TransactionController extends Controller
 
             $pos = $this->pos_repo->getById($params['pos_id'], false);
 
-            if($pos) {
+            if ($pos) {
                 $params['fee_cashback'] = $pos->fee_cashback;
                 $params['original_fee'] = $pos->total_fee;
             }
@@ -349,44 +349,35 @@ class TransactionController extends Controller
     public function delete(DeleteRequest $request, $id)
     {
         if ($id) {
-            $params['id'] = request('id', null);
-            if ($id == $params['id']) {
-                $tran = $this->tran_repo->getById($params['id'], false);
-                if ($tran->status != Constants::USER_STATUS_DELETED && $tran->lo_number > 0) {
-                    $time_process = date('Y-m-d', strtotime($tran->time_payment));
-                    $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
-                    if ($money_come) {
-                        if ($tran->lo_number > 0) {
-                            // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
-                            $total_price = $money_come->total_price + $params['price_rut'] - $tran->price_rut;
-                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran->price_rut - $tran->price_fee);
-                        } else {
-                            // Chưa có lần nào cộng
-                            $total_price = $money_come->total_price + $params['price_rut'];
-                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
-                        }
-                        $money_comes_back = [
-                            'pos_id' => $tran->pos_id,
-                            'lo_number' => $tran->lo_number,
-                            'time_end' => $tran->time_payment,
-                            'time_process' => $time_process,
-                            'fee' => $$tran->original_fee,
-                            'total_price' => $total_price,
-                            'payment' => $payment,
-                            'created_by' => auth()->user()->id,
-                            'status' => $money_come->status,
-                        ];
-                        $this->money_comes_back_repo->update($money_comes_back, $money_come->id);
+            $tran = $this->tran_repo->getById($id, false);
+            if ($tran->status != Constants::USER_STATUS_DELETED && $tran->lo_number > 0) {
+                $time_process = date('Y-m-d', strtotime($tran->time_payment));
+                $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $tran->lo_number, 'time_process' => $time_process]);
+                if ($money_come) {
+                    if ($tran->lo_number > 0) {
+                        // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
+                        $total_price = $money_come->total_price + $tran->price_rut - $tran->price_rut;
+                        $payment = $money_come->payment + ($tran->price_rut - $tran->price_fee) - ($tran->price_rut - $tran->price_fee);
+                    } else {
+                        // Chưa có lần nào cộng
+                        $total_price = $money_come->total_price + $tran->price_rut;
+                        $payment = $money_come->payment + ($tran->price_rut - $tran->price_fee);
                     }
+                    $money_comes_back = [
+                        'pos_id' => $tran->pos_id,
+                        'lo_number' => $tran->lo_number,
+                        'time_end' => $tran->time_payment,
+                        'time_process' => $time_process,
+                        'fee' => $$tran->original_fee,
+                        'total_price' => $total_price,
+                        'payment' => $payment,
+                        'created_by' => auth()->user()->id,
+                        'status' => $money_come->status,
+                    ];
+                    $this->money_comes_back_repo->update($money_comes_back, $money_come->id);
                 }
-                $data = $this->tran_repo->delete($params);
-            } else {
-                return response()->json([
-                    'code' => 422,
-                    'error' => 'ID không hợp lệ',
-                    'data' => null
-                ]);
             }
+            $data = $this->tran_repo->delete(['id' => $id]);
         } else {
             $data = [
                 'code' => 422,
