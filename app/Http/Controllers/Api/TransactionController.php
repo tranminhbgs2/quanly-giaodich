@@ -368,7 +368,7 @@ class TransactionController extends Controller
                         'lo_number' => $tran->lo_number,
                         'time_end' => $tran->time_payment,
                         'time_process' => $time_process,
-                        'fee' => $$tran->original_fee,
+                        'fee' => $tran->original_fee,
                         'total_price' => $total_price,
                         'payment' => $payment,
                         'created_by' => auth()->user()->id,
