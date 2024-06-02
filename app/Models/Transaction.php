@@ -11,6 +11,7 @@ class Transaction extends Model
     use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_TRANSACTION;
     public $timestamps = true;
+    protected $appends = ['method_name'];
 
     protected $fillable = [
         'category_id',
@@ -51,10 +52,10 @@ class Transaction extends Model
     {
         return $this->belongsTo(Pos::class, 'pos_id', 'id');
     }
-    public function getMethodAttribute($value)
+    public function getMethodNameAttribute()
     {
         $name = '';
-        switch ($value) {
+        switch ($this->method) {
             case 'DAO_HAN':
                 $name = 'Đáo hạn';
                 break;
