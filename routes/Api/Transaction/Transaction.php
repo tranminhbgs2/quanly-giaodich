@@ -7,12 +7,13 @@
 Route::group(['prefix' => 'transaction'], function (){
     Route::group(['middleware' => ['auth.jwt']], function (){
         Route::get('/', 'TransactionController@getListing');
-        Route::get('/cashback', 'TransactionController@getListingCashBack');
+        // Route::get('/cashback', 'TransactionController@getListingCashBack');
         Route::get('/detail/{id}', 'TransactionController@getDetail');
         Route::post('/store', 'TransactionController@store');
         Route::post('/update', 'TransactionController@update');
         Route::get('/delete/{id}', 'TransactionController@delete');
         Route::post('/change-status', 'TransactionController@changeStatus');
+        Route::get('/cashback', 'MoneyComesBackController@getListingCashBack');
     });
 
 });

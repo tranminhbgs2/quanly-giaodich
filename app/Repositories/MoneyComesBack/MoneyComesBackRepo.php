@@ -202,7 +202,7 @@ class MoneyComesBackRepo extends BaseRepo
     public function getTotalCashBack($params)
     {
         $keyword = $params['keyword'] ?? null;
-        $status = $params['status'] ?? -1;  
+        $status = $params['status'] ?? -1;
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
         $lo_number = $params['lo_number'] ?? 0;
@@ -257,7 +257,7 @@ class MoneyComesBackRepo extends BaseRepo
             ->map(function ($group) {
                 $pos = $group->first()->pos;
                 $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
-                $total_price_rut = $group->sum('price_rut');
+                $total_price_rut = $group->sum('total_price');
                 $total_payment_cashback = $total_price_rut * $pos->fee_cashback / 100;
 
                 return [
