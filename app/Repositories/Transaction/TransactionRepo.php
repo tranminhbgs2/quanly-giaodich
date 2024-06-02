@@ -35,6 +35,7 @@ class TransactionRepo extends BaseRepo
         $lo_number = $params['lo_number'] ?? 0;
         $created_by = $params['created_by'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
+        $method = $params['method'] ?? null;
 
         $query = Transaction::select()->with([
             'category' => function ($sql) {
@@ -82,6 +83,10 @@ class TransactionRepo extends BaseRepo
             $query->where('status', $status);
         } else {
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        if (!empty($method)) {
+            $query->where('method', $method);
         }
 
         if ($is_counting) {
@@ -193,7 +198,7 @@ class TransactionRepo extends BaseRepo
                 ];
             })
             ->values();
-            
+
         // $results = $query->get();
         // Tính toán tổng số lượng kết quả đã nhóm
         $total = $transactions->count();
