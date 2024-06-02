@@ -291,12 +291,10 @@ class MoneyComesBackRepo extends BaseRepo
     {
         $lo_number = isset($params['lo_number']) ? $params['lo_number'] : 0;
         $time_process = isset($params['time_process']) ? $params['time_process'] : 0;
-        $tran = MoneyComesBack::where('lo_number', $lo_number, 'time_process', $time_process);
-
+        $tran = MoneyComesBack::where('lo_number', $lo_number)->where('time_process', $time_process);
         if ($with_trashed) {
             $tran->withTrashed();
         }
-
         return $tran->first();
     }
 
