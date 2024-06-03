@@ -93,8 +93,25 @@ class BankAccountController extends Controller
         $params['balance'] = request('balance', 0);
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
         $params['account_name'] = unsigned($params['account_name']);
+        $params['type'] = request('type', null);
+        $params['staff_id'] = request('staff_id', null);
 
-
+        switch ($params['type']) {
+            case 'STAFF':
+                $params['agent_id'] = 0;
+                break;
+            case 'AGENCY':
+                $params['staff_id'] = 0;
+                break;
+            case 'FEE':
+                $params['agent_id'] = 0;
+                $params['staff_id'] = 0;
+                break;
+            case 'MASTER':
+                $params['agent_id'] = 0;
+                $params['staff_id'] = 0;
+                break;
+        }
         $resutl = $this->bankacc_repo->store($params);
 
         if ($resutl) {
@@ -131,6 +148,25 @@ class BankAccountController extends Controller
             $params['balance'] = request('balance', 0);
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
             $params['account_name'] = unsigned($params['account_name']);
+            $params['type'] = request('type', null);
+            $params['staff_id'] = request('staff_id', null);
+
+            switch ($params['type']) {
+                case 'STAFF':
+                    $params['agent_id'] = 0;
+                    break;
+                case 'AGENCY':
+                    $params['staff_id'] = 0;
+                    break;
+                case 'FEE':
+                    $params['agent_id'] = 0;
+                    $params['staff_id'] = 0;
+                    break;
+                case 'MASTER':
+                    $params['agent_id'] = 0;
+                    $params['staff_id'] = 0;
+                    break;
+            }
 
             $resutl = $this->bankacc_repo->update($params, $params['id']);
 
@@ -212,7 +248,8 @@ class BankAccountController extends Controller
 
     public function getAll()
     {
-        $data = $this->bankacc_repo->getAll();
+        $type = request('type', null);
+        $data = $this->bankacc_repo->getAll($type);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách Tài khoản hưởng thụ',

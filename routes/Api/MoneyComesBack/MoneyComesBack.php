@@ -13,6 +13,7 @@ Route::group(['prefix' => 'lo-tien-ve'], function (){
         Route::get('/delete/{id}', 'MoneyComesBackController@delete');
         Route::post('/change-status', 'MoneyComesBackController@changeStatus');
         Route::get('/cashback', 'MoneyComesBackController@getListingCashBack');
+        Route::get('/agency', 'MoneyComesBackController@getListingAgency');
     });
 
 });

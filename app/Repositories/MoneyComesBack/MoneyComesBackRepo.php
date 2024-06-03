@@ -12,7 +12,7 @@ use Carbon\Carbon;
 
 class MoneyComesBackRepo extends BaseRepo
 {
-    public function getListing($params, $is_counting = false)
+    public function getListing($params, $is_counting = false, $is_agent = false)
     {
         $keyword = $params['keyword'] ?? null;
         $lo_number = $params['lo_number'] ?? 0;
@@ -66,9 +66,11 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
-
-        if ($agent_id > 0) {
-            $query->where('agent_id', $agent_id);
+        if($is_agent){
+            $query->whereNotNull('agent_id');
+            if ($agent_id > 0) {
+                $query->where('agent_id', $agent_id);
+            }
         }
 
         if ($status > 0) {

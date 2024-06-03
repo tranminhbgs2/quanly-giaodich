@@ -31,7 +31,8 @@ class StoreRequest extends FormRequest
         $rule = [
             'acc_bank_from_id' => ['required'],
             'acc_bank_to_id' => ['required'],
-            'type_to' => ['required', 'in:STAFF,AGENCY'],
+            'type_to' => ['required', 'in:STAFF,AGENCY,MASTER,FEE'],
+            'type_from' => ['required', 'in:STAFF,AGENCY,MASTER,FEE'],
             'price' => ['required', 'numeric', 'min:0'],
             'time_payment' => ['required', 'date_format:Y/m/d H:i:s'],
 
@@ -48,6 +49,7 @@ class StoreRequest extends FormRequest
             'type_to' => 'Loại tài khoản đích',
             'price' => 'Số tiền',
             'time_payment' => 'Thời gian chuyển tiền',
+            'type_from' => 'Loại tài khoản nguồn'
         ];
     }
 
@@ -63,6 +65,8 @@ class StoreRequest extends FormRequest
             'price.min' => 'Truyền tham số price phải lớn hơn hoặc bằng 0',
             'time_payment.required' => 'Truyền thiếu tham số time_payment',
             'time_payment.date_format' => 'Truyền tham số time_payment không đúng định dạng Y/m/d H:i:s',
+            'type_from.required' => 'Truyền thiếu tham số type_from',
+            'type_from.in' => 'Truyền tham số type_from không hợp lệ',
         ];
     }
 
@@ -73,13 +77,17 @@ class StoreRequest extends FormRequest
     {
         $validator->after(function ($validator) {
 
-            $bank_from = BankAccounts::where('id', $this->request->get('acc_bank_from_id'))->first();
+            $bank_from = BankAccounts::where('id', $this->request->get('acc_bank_from_id'))->withTrashed()->first();
             if (!$bank_from) {
                 $validator->errors()->add('acc_bank_from_id', 'Tài khoản chuyển không tồn tại');
+            } elseif ($bank_from->type != $this->request->get('type_from')) {
+                $validator->errors()->add('acc_bank_from_id', 'Loại tài khoản chuyển đã chọn không khớp');
             }
             $bank_to = BankAccounts::where('id', $this->request->get('acc_bank_to_id'))->first();
             if (!$bank_to) {
                 $validator->errors()->add('acc_bank_to_id', 'Tài khoản nhận không tồn tại');
+            } elseif ($bank_to->type != $this->request->get('type_to')) {
+                $validator->errors()->add('acc_bank_to_id', 'Loại tài khoản nhận đã chọn không khớp');
             }
             // Check username
             $dep = Transfer::

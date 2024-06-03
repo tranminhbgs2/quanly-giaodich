@@ -70,6 +70,45 @@ class MoneyComesBackController extends Controller
      * @param ListingRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
+    public function getListingAgency(ListingRequest $request)
+    {
+        $params['keyword'] = request('keyword', null);
+        $params['status'] = request('status', -1);
+        $params['page_index'] = request('page_index', 1);
+        $params['page_size'] = request('page_size', 10);
+        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['lo_number'] = request('lo_number', 0);
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
+        $params['pos_id'] = request('pos_id', 0);
+        $params['agent_id'] = request('agent_id', 0);
+
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
+
+
+        $data = $this->money_repo->getListing($params, false, true);
+        $total = $this->money_repo->getListing($params, true, true);
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách Lô tiền về',
+            'data' => [
+                "total_elements" => $total,
+                "total_page" => ceil($total / $params['page_size']),
+                "page_no" => intval($params['page_index']),
+                "page_size" => intval($params['page_size']),
+                "data" => $data
+            ],
+        ]);
+    }
+
+    /**
+     * API lấy ds khách hàng
+     * URL: {{url}}/api/v1/transaction
+     *
+     * @param ListingRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getListingCashBack(ListingRequest $request)
     {
         $params['keyword'] = request('keyword', null);

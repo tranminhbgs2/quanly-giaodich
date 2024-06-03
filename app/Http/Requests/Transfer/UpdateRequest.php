@@ -32,7 +32,8 @@ class UpdateRequest extends FormRequest
             'id' => ['required', 'integer', 'min:1'],
             'acc_bank_from_id' => ['required'],
             'acc_bank_to_id' => ['required'],
-            'type_to' => ['required', 'in:STAFF,AGENCY'],
+            'type_to' => ['required', 'in:STAFF,AGENCY,MASTER,FEE'],
+            'type_from' => ['required', 'in:STAFF,AGENCY,MASTER,FEE'],
             'price' => ['required', 'numeric', 'min:0'],
             'time_payment' => ['required', 'date_format:Y/m/d H:i:s'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
@@ -51,6 +52,7 @@ class UpdateRequest extends FormRequest
             'price' => 'Số tiền',
             'time_payment' => 'Thời gian chuyển tiền',
             'status' => 'Trạng thái',
+            'type_from' => 'Loại tài khoản nguồn'
         ];
     }
 
@@ -72,6 +74,8 @@ class UpdateRequest extends FormRequest
             'time_payment.date_format' => 'Thời gian chuyển tiền không đúng định dạng Y/m/d H:i:s',
             'status.integer' => 'Trạng thái phải là số nguyên',
             'status.in' => 'Trạng thái không hợp lệ',
+            'type_from.required' => 'Truyền thiếu tham số type_from',
+            'type_from.in' => 'Truyền tham số type_from không hợp lệ',
         ];
     }
 
@@ -81,13 +85,17 @@ class UpdateRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $bank_from = BankAccounts::where('id', $this->request->get('acc_bank_from_id'))->first();
+            $bank_from = BankAccounts::where('id', $this->request->get('acc_bank_from_id'))->withTrashed()->first();
             if (!$bank_from) {
                 $validator->errors()->add('acc_bank_from_id', 'Tài khoản chuyển không tồn tại');
+            } elseif ($bank_from->type != $this->request->get('type_from')) {
+                $validator->errors()->add('acc_bank_from_id', 'Loại tài khoản đã chọn không khớp');
             }
-            $bank_to = BankAccounts::where('id', $this->request->get('acc_bank_to_id'))->first();
+            $bank_to = BankAccounts::where('id', $this->request->get('acc_bank_to_id'))->withTrashed()->first();
             if (!$bank_to) {
                 $validator->errors()->add('acc_bank_to_id', 'Tài khoản nhận không tồn tại');
+            } elseif ($bank_to->type != $this->request->get('type_to')) {
+                $validator->errors()->add('acc_bank_to_id', 'Loại tài khoản đã chọn không khớp');
             }
             // Check username
             $dep = Transfer::

@@ -18,10 +18,17 @@ class BankAccounts extends Model
         'account_name',
         'balance',
         'status',
+        'staff_id',
+        'type',
     ];
 
     public function agency()
     {
         return $this->belongsTo(Agent::class, 'agent_id', 'id');
+    }
+
+    public function staff()
+    {
+        return $this->belongsTo(User::class, 'staff_id', 'id');
     }
 }

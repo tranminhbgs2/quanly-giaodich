@@ -34,6 +34,8 @@ class UpdateRequest extends FormRequest
             'bank_code' => ['required', 'string'],
             'agent_id' => ['integer', 'min:0'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
+            'staff_id' => ['integer', 'min:0'],
+            'type' => ['required', 'in:STAFF,AGENCY,MASTER,FEE'],
         ];
 
         return $rule;
@@ -48,6 +50,8 @@ class UpdateRequest extends FormRequest
             'bank_code' => 'Mã ngân hàng',
             'agent_id' => 'ID đại lý',
             'status' => 'Trạng thái',
+            'staff_id' => 'ID nhân viên',
+            'type' => 'Loại tài khoản',
         ];
     }
 
@@ -65,6 +69,10 @@ class UpdateRequest extends FormRequest
             'agent_id.min' => "Tham số agent_id tối thiểu phải là :min",
             'status.integer' => 'Tham số status phải là số nguyên',
             'status.in' => 'Tham số status không hợp lệ',
+            'staff_id.integer' => 'Tham số staff_id phải là số nguyên',
+            'staff_id.min' => "Tham số staff_id tối thiểu phải là :min",
+            'type.required' => 'Truyền thiếu tham số type',
+            'type.in' => 'Tham số type không hợp lệ',
         ];
     }
 
@@ -84,6 +92,25 @@ class UpdateRequest extends FormRequest
                 $validator->errors()->add('check_exist', 'Không tìm thấy Tài khoản hưởng thụ');
             }
 
+            switch ($this->request->get('type')) {
+                case 'STAFF':
+                    if (empty($this->request->get('staff_id'))) {
+                        $validator->errors()->add('check_exist_staff', 'Nhân viên không được bỏ trống');
+                    }
+                    break;
+                case 'AGENCY':
+                    if (empty($this->request->get('agent_id'))) {
+                        $validator->errors()->add('check_exist_agent', 'Đại lý không được bỏ trống');
+                    }
+                    break;
+                case 'FEE':
+                    $fee = BankAccounts::where('type', 'FEE')->where('status', Constants::USER_STATUS_ACTIVE)
+                    ->withTrashed()->first();
+                    if ($fee) {
+                        $validator->errors()->add('check_exist', 'Tài khoản phí đã tồn tại');
+                    }
+                    break;
+            }
             // Check theo email
             if ($this->request->get('account_name')) {
                 $user = BankAccounts::where('account_name', $this->request->get('account_name'))

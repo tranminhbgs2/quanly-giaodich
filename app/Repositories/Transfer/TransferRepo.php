@@ -102,6 +102,7 @@ class TransferRepo extends BaseRepo
             'acc_name_to',
             'bank_to',
             'bank_from',
+            'type_from',
             'type_to',
             'time_payment',
             'created_by',

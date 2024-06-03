@@ -20,8 +20,10 @@ class BankAccountRepo extends BaseRepo
         $date_to = $params['date_to'] ?? null;
         $bank_code = $params['bank_code'] ?? null;
         $agent_id = $params['agent_id'] ?? null;
+        $staff_id = $params['staff_id'] ?? null;
+        $type = $params['type'] ?? null;
 
-        $query = BankAccounts::select()->with('agency');
+        $query = BankAccounts::select()->with('agency')->with('staff');
 
 
         if (!empty($keyword)) {
@@ -55,6 +57,14 @@ class BankAccountRepo extends BaseRepo
             $query->where('agent_id', $agent_id);
         }
 
+        if ($staff_id) {
+            $query->where('staff_id', $staff_id);
+        }
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
         if ($is_counting) {
             return $query->count();
         } else {
@@ -77,7 +87,9 @@ class BankAccountRepo extends BaseRepo
             'account_number',
             'account_name',
             'balance',
-            'status'
+            'status',
+            'staff_id',
+            'type',
         ];
 
         $insert = [];
@@ -103,7 +115,9 @@ class BankAccountRepo extends BaseRepo
             'account_number',
             'account_name',
             'balance',
-            'status'
+            'status',
+            'staff_id',
+            'type',
         ];
 
         $update = [];
@@ -172,7 +186,7 @@ class BankAccountRepo extends BaseRepo
     public function getDetail($params, $with_trashed = false)
     {
         $id = isset($params['id']) ? $params['id'] : 0;
-        $tran = BankAccounts::where('id', $id);
+        $tran = BankAccounts::select()->with('agency')->with('staff')->where('id', $id);
 
         if ($with_trashed) {
             $tran->withTrashed();
@@ -203,7 +217,7 @@ class BankAccountRepo extends BaseRepo
      */
     public function getById($id, $with_trashed = false)
     {
-        $tran = BankAccounts::where('id', $id);
+        $tran = BankAccounts::select()->with('agency')->with('staff')->where('id', $id);
 
         if ($with_trashed) {
             $tran->withTrashed();
@@ -220,9 +234,15 @@ class BankAccountRepo extends BaseRepo
         return BankAccounts::where('id', $id)->update($update);
     }
 
-    public function getAll()
+    public function getAll($type = null)
     {
-        return BankAccounts::select('id', 'bank_code', 'account_name', 'account_number')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+        $query = BankAccounts::select('id', 'bank_code', 'account_name', 'account_number', 'type')->where('status', Constants::USER_STATUS_ACTIVE);
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        return $query->orderBy('id', 'DESC')->get()->toArray();
     }
 
     public function updateBalance($id, $balance, $action = "")

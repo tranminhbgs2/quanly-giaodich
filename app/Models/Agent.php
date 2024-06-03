@@ -19,6 +19,7 @@ class Agent extends Model
         'phone',
         'manager_id',
         'status',
+        'balance',
     ];
 
     /**
