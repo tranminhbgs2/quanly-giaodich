@@ -148,6 +148,22 @@ class BankAccountRepo extends BaseRepo
         }
     }
 
+    public function deleteByAgent($agent_id)
+    {
+        $bankAccounts = BankAccounts::where('agent_id', $agent_id)->get();
+
+
+        if (count($bankAccounts) > 0) {
+            foreach ($bankAccounts as $bankAccount) {
+                $bankAccount->status = Constants::USER_STATUS_DELETED;
+                $bankAccount->deleted_at = Carbon::now();
+                $bankAccount->save();
+            }
+
+        }
+        return true;
+    }
+
     /**
      * Hàm lấy chi tiết thông tin GD
      *
@@ -228,5 +244,15 @@ class BankAccountRepo extends BaseRepo
 
         $update = ['balance' => $balance];
         return $bank->update($update);
+    }
+
+    public function checkAccount($account_name, $account_number, $bank_code)
+    {
+        $dep = BankAccounts::where('account_name', $account_name)
+            ->where('account_number', $account_number)
+            ->where('bank_code', $bank_code)
+            ->withTrashed()->first();
+
+        return $dep;
     }
 }

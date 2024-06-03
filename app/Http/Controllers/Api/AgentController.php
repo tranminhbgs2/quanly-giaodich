@@ -11,14 +11,17 @@ use App\Http\Requests\Agent\ListingRequest;
 use App\Http\Requests\Agent\StoreRequest;
 use App\Http\Requests\Agent\UpdateRequest;
 use App\Repositories\Agent\AgentRepo;
+use App\Repositories\BankAccount\BankAccountRepo;
 
 class AgentController extends Controller
 {
     protected $agent_repo;
+    protected $bankAccountRepo;
 
-    public function __construct(AgentRepo $agentRepo)
+    public function __construct(AgentRepo $agentRepo, BankAccountRepo $bankAccountRepo)
     {
         $this->agent_repo = $agentRepo;
+        $this->bankAccountRepo = $bankAccountRepo;
     }
 
     /**
@@ -90,11 +93,68 @@ class AgentController extends Controller
         $params['address'] = request('address', null); // phí
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
         $params['manager_id'] = auth()->user()->id; // người tạo
+        $params['account_banks'] = request('account_banks', []); // phí
+        $insert_banks = [];
+        if (count($params['account_banks']) > 0) {
+            foreach ($params['account_banks'] as $value) {
+                $account_name = strtoupper($value['account_name']);
+                $account_number = $value['account_number'];
+                $bank_code = $value['bank_code'];
+                $account_name = unsigned($account_name);
 
+                if (empty($account_name) || empty($account_number) || empty($bank_code)) {
 
-        $resutl = $this->agent_repo->store($params);
+                    return response()->json([
+                        'code' => 400,
+                        'error' => 'Một hoặc nhiều trường thông tin tài khoản không được để trống',
+                        'data' => null
+                    ]);
+                }
 
-        if ($resutl) {
+                $check_bank = $this->bankAccountRepo->checkAccount($account_name, $account_number, $bank_code);
+                if ($check_bank) {
+                    return response()->json([
+                        'code' => 400,
+                        'error' => 'Tài khoản '.$account_name .' đã tồn tại',
+                        'data' => null
+                    ]);
+                }
+
+                // Kiểm tra tài khoản đã tồn tại trong $insert_banks hay chưa
+                $exists_in_insert_banks = array_filter($insert_banks, function ($existing_bank) use ($account_name, $account_number, $bank_code) {
+                    return $existing_bank['account_name'] === $account_name &&
+                        $existing_bank['account_number'] === $account_number &&
+                        $existing_bank['bank_code'] === $bank_code;
+                });
+
+                if (!empty($exists_in_insert_banks)) {
+                    return response()->json([
+                        'code' => 200,
+                        'error' => 'Tài khoản ' . $account_name . ' đã tồn tại trong danh sách thêm mới.',
+                        'data' => null
+                    ]);
+                }
+                // Thêm tài khoản vào mảng $insert_banks
+                $insert_banks[] = [
+                    'account_name' => $account_name,
+                    'account_number' => $account_number,
+                    'bank_code' => $bank_code,
+                    'agent_id' => 0,
+                    'balance' => 0,
+                    'status' => Constants::USER_STATUS_ACTIVE
+                ];
+            }
+        }
+
+        $id = $this->agent_repo->store($params);
+
+        if ($id > 0) {
+            if (count($insert_banks) > 0) {
+                foreach ($insert_banks as $key => $value) {
+                    $value['agent_id'] = $id;
+                    $this->bankAccountRepo->store($value);
+                }
+            }
             return response()->json([
                 'code' => 200,
                 'error' => 'Thêm mới thành công',
@@ -128,7 +188,61 @@ class AgentController extends Controller
             $params['address'] = request('address', null); // phí
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
             $params['manager_id'] = auth()->user()->id; // người tạo
+            $params['account_banks'] = request('account_banks', []); // phí
+            $insert_banks = [];
 
+            $this->bankAccountRepo->deleteByAgent($params['id']);
+
+            if (count($params['account_banks']) > 0) {
+                foreach ($params['account_banks'] as $value) {
+                    $account_name = strtoupper($value['account_name']);
+                    $account_number = $value['account_number'];
+                    $bank_code = $value['bank_code'];
+                    $account_name = unsigned($account_name);
+
+                    if (empty($account_name) || empty($account_number) || empty($bank_code)) {
+
+                        return response()->json([
+                            'code' => 400,
+                            'error' => 'Một hoặc nhiều trường thông tin tài khoản không được để trống',
+                            'data' => null
+                        ]);
+                    }
+
+                    $check_bank = $this->bankAccountRepo->checkAccount($account_name, $account_number, $bank_code);
+                    if ($check_bank) {
+                        return response()->json([
+                            'code' => 400,
+                            'error' => 'Tài khoản '.$account_name .' đã tồn tại',
+                            'data' => null
+                        ]);
+                    }
+
+                    // Kiểm tra tài khoản đã tồn tại trong $insert_banks hay chưa
+                    $exists_in_insert_banks = array_filter($insert_banks, function ($existing_bank) use ($account_name, $account_number, $bank_code) {
+                        return $existing_bank['account_name'] === $account_name &&
+                            $existing_bank['account_number'] === $account_number &&
+                            $existing_bank['bank_code'] === $bank_code;
+                    });
+
+                    if (!empty($exists_in_insert_banks)) {
+                        return response()->json([
+                            'code' => 200,
+                            'error' => 'Tài khoản ' . $account_name . ' đã tồn tại trong danh sách thêm mới.',
+                            'data' => null
+                        ]);
+                    }
+                    // Thêm tài khoản vào mảng $insert_banks
+                    $insert_banks[] = [
+                        'account_name' => $account_name,
+                        'account_number' => $account_number,
+                        'bank_code' => $bank_code,
+                        'agent_id' => 0,
+                        'balance' => 0,
+                        'status' => Constants::USER_STATUS_ACTIVE
+                    ];
+                }
+            }
             $resutl = $this->agent_repo->update($params, $params['id']);
 
             if ($resutl) {

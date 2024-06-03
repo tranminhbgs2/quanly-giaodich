@@ -161,6 +161,7 @@ class TransactionController extends Controller
         $params['status'] = Constants::USER_STATUS_ACTIVE; // trạng thái
         $params['customer_id'] = request('customer_id', 0); // id khách hàng
         $params['lo_number'] = request('lo_number', 0); // số lô
+        $params['note'] = request('note', null); // số lô
 
         $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
@@ -259,6 +260,7 @@ class TransactionController extends Controller
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
             $params['customer_id'] = request('customer_id', 0);
             $params['lo_number'] = request('lo_number', 0);
+            $params['note'] = request('note', null); // số lô
 
 
             $pos = $this->pos_repo->getById($params['pos_id'], false);

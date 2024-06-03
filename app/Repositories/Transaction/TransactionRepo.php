@@ -421,6 +421,7 @@ class TransactionRepo extends BaseRepo
             'created_by',
             'original_fee',
             'fee_cashback',
+            'note'
         ];
 
         $insert = [];
@@ -470,6 +471,7 @@ class TransactionRepo extends BaseRepo
             'created_by',
             'original_fee',
             'fee_cashback',
+            'note'
         ];
 
         $update = [];

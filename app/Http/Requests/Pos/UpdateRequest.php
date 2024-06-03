@@ -30,7 +30,6 @@ class UpdateRequest extends FormRequest
     {
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
-            'name' => ['required'],
             'code' => ['required'],
             'fee' => ['required', 'numeric', 'min:0', 'max:99'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
@@ -43,7 +42,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => 'Tên danh mục',
-            'code' => 'Mã danh mục',
             'fee' => 'Phí',
             'status' => 'Trạng thái',
         ];
@@ -53,7 +51,6 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name.required' => 'Truyền thiếu tham số name',
-            'code.required' => 'Truyền thiếu tham số code',
             'fee.required' => 'Truyền thiếu tham số fee',
             'fee.numeric' => 'Tham số fee phải là số',
             'fee.min' => "Tham số fee tối thiểu phải là :min",
@@ -87,18 +84,6 @@ class UpdateRequest extends FormRequest
                     ->first();
                 if ($user) {
                     $validator->errors()->add('check_exist', 'Tên máy pos đã được đăng ký');
-                }
-            }
-
-            // Check theo identifier
-            if ($this->request->get('code')) {
-                $user = Pos::where('code', $this->request->get('code'))
-                    ->whereNotIn('id', [$this->request->get('id')])
-                    ->whereNotNull('code')
-                    ->withTrashed()
-                    ->first();
-                if ($user) {
-                    $validator->errors()->add('check_exist', 'Mã máy pos đã được đăng ký');
                 }
             }
         });

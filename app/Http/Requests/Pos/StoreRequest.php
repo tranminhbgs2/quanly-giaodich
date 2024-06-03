@@ -31,7 +31,6 @@ class StoreRequest extends FormRequest
             'method' => ['required'],
             'name' => ['required'],
             'fee' => ['required', 'numeric', 'min:0', 'max:99'],
-            'code' => ['required'],
             'hkd_id' => ['numeric', 'min:0'],
             'fee_cashback' => ['numeric', 'min:0', 'max:99'],
             'total_fee' => ['numeric', 'min:0', 'max:99'],
@@ -48,7 +47,6 @@ class StoreRequest extends FormRequest
             'method' => 'Phương thức',
             'name' => 'Tên máy Pos',
             'fee' => 'Phí',
-            'code' => 'Mã máy Pos',
             'hkd_id' => 'Hkd Id',
             'fee_cashback' => 'Phí cashback',
             'total_fee' => 'Tổng phí',
@@ -67,7 +65,6 @@ class StoreRequest extends FormRequest
             'fee.numeric' => 'Phí phải là số',
             'fee.min' => 'Phí phải lớn hơn hoặc bằng 0',
             'fee.max' => 'Phí phải nhỏ hơn hoặc bằng 99',
-            'code.required' => 'Mã máy Pos không được để trống',
             'hkd_id.numeric' => 'Hkd Id phải là số',
             'hkd_id.min' => 'Hkd Id phải lớn hơn hoặc bằng 0',
             'fee_cashback.numeric' => 'Phí cashback phải là số',
@@ -92,11 +89,6 @@ class StoreRequest extends FormRequest
 
             if ($dep) {
                 $validator->errors()->add('check_exist', 'Tên máy POS đã tồn tại');
-            }
-
-            $dep_code = Pos::where('code', $this->request->get('code'))->withTrashed()->first();
-            if ($dep_code) {
-                $validator->errors()->add('check_exist', 'Mã máy POS đã tồn tại');
             }
         });
     }

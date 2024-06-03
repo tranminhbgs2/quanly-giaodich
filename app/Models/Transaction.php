@@ -33,6 +33,7 @@ class Transaction extends Model
         'created_by',
         'original_fee',
         'fee_cashback',
+        'note',
     ];
 
     /**

@@ -28,6 +28,9 @@ class AgentRepo extends BaseRepo
             'managerBy' => function ($sql) {
                 $sql->select(['id', 'fullname', 'status']);
             },
+            'bankAccounts' => function ($sql) {
+                $sql->select(['id', 'account_number', 'account_name', 'bank_code', 'agent_id']);
+            },
         ]);
 
         if (!empty($keyword)) {
@@ -94,10 +97,11 @@ class AgentRepo extends BaseRepo
         }
 
         if (!empty($insert['name']) && !empty($insert['manager_id'])) {
-            return Agent::create($insert) ? true : false;
+            $res = Agent::create($insert);
+            return $res->id;
         }
 
-        return false;
+        return 0;
     }
 
     /**

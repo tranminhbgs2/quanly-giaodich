@@ -28,4 +28,12 @@ class Agent extends Model
     {
         return $this->belongsTo(User::class, 'manager_id', 'id');
     }
+
+    /**
+     * Danh sách các tài khoản ngân hàng của agent
+     */
+    public function bankAccounts()
+    {
+        return $this->hasMany(BankAccounts::class, 'agent_id', 'id');
+    }
 }

@@ -89,7 +89,6 @@ class PosController extends Controller
     public function store(StoreRequest $request)
     {
         $params['name'] = request('name', null); // ngân hàng
-        $params['code'] = strtoupper(request('code', null)); // hình thức
         $params['bank_code'] = request('bank_code', 0); // máy pos
         $params['fee'] = floatval(request('fee', 0)); // phí
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
@@ -102,7 +101,9 @@ class PosController extends Controller
         $params['updated_by'] = auth()->user()->id; // người cập nhật
         $params['note'] = request('note', null); // ghi chú
 
-
+        $params['code'] = strtoupper(request('name', null));
+        $params['code'] = unsigned($params['code']);
+        $params['code'] = str_replace(' ', '_', $params['code']);
         $resutl = $this->pos_repo->store($params);
 
         if ($resutl) {
@@ -133,7 +134,6 @@ class PosController extends Controller
         $params['id'] = request('id', null);
         if ($params['id']) {
             $params['name'] = request('name', null); // ngân hàng
-            $params['code'] = strtoupper(request('code', null)); // hình thức
             $params['bank_code'] = request('bank_code', 0); // máy pos
             $params['fee'] = floatval(request('fee', 0)); // phí
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
@@ -144,6 +144,10 @@ class PosController extends Controller
             $params['price_pos'] = floatval(request('price_pos', 0)); // tiền tồn pos
             $params['updated_by'] = auth()->user()->id; // người cập nhật
             $params['note'] = request('note', null); // ghi chú
+
+            $params['code'] = strtoupper(request('name', null));
+            $params['code'] = unsigned($params['code']);
+            $params['code'] = str_replace(' ', '_', $params['code']);
 
             $resutl = $this->pos_repo->update($params, $params['id']);
 
