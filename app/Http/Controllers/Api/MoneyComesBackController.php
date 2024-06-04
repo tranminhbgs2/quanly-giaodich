@@ -53,10 +53,12 @@ class MoneyComesBackController extends Controller
 
         $data = $this->money_repo->getListing($params, false);
         $total = $this->money_repo->getListing($params, true);
+        $total_pay = $this->money_repo->getTotal($params);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách Lô tiền về',
             'data' => [
+                "total_payment" => $total_pay,
                 "total_elements" => $total,
                 "total_page" => ceil($total / $params['page_size']),
                 "page_no" => intval($params['page_index']),
@@ -93,14 +95,19 @@ class MoneyComesBackController extends Controller
         $params_transfer['agent_date_from'] = request('agent_date_from', null);
         $params_transfer['agent_date_to'] = request('agent_date_to', null);
 
-        $data = $this->money_repo->getListing($params, false, true);
-        $total = $this->money_repo->getListing($params, true, true);
+        $data = $this->money_repo->getListingAgent($params, false, true);
+        $total = $this->money_repo->getListingAgent($params, true, true);
         $total_transfer = $this->transfer_repo->getTotalAgent($params_transfer);
+        $total_payment = $this->money_repo->getTotalAgent($params_transfer);
+        if (count($total_transfer) > 0) {
+            $total_payment['total_transfer'] = $total_transfer['total_transfer'];
+            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'];
+        }
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách Lô tiền về',
             'data' => [
-                "total_transfer" => $total_transfer,
+                "total_payment" => $total_payment,
                 "total_elements" => $total,
                 "total_page" => ceil($total / $params['page_size']),
                 "page_no" => intval($params['page_index']),

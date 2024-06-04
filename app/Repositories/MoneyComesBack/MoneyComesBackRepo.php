@@ -5,7 +5,9 @@ namespace App\Repositories\MoneyComesBack;
 use App\Events\ActionLogEvent;
 use App\Models\MoneyComesBack;
 use App\Helpers\Constants;
+use App\Models\Agent;
 use App\Models\Pos;
+use App\Repositories\Agent\AgentRepo;
 use App\Repositories\BaseRepo;
 use App\Repositories\Pos\PosRepo;
 use Carbon\Carbon;
@@ -22,7 +24,6 @@ class MoneyComesBackRepo extends BaseRepo
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
         $pos_id = $params['pos_id'] ?? 0;
-        $agent_id = $params['agent_id'] ?? 0;
         $created_by = $params['created_by'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
 
@@ -66,12 +67,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
-        if($is_agent){
-            $query->whereNotNull('agent_id');
-            if ($agent_id > 0) {
-                $query->where('agent_id', $agent_id);
-            }
-        }
+        $query->whereNull('agent_id');
 
         if ($status > 0) {
             $query->where('status', $status);
@@ -93,6 +89,81 @@ class MoneyComesBackRepo extends BaseRepo
         return $query->get()->toArray();
     }
 
+    public function getListingAgent($params, $is_counting = false, $is_agent = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $lo_number = $params['lo_number'] ?? 0;
+        $status = $params['status'] ?? -1;
+        $page_index = $params['page_index'] ?? 1;
+        $page_size = $params['page_size'] ?? 10;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $pos_id = $params['pos_id'] ?? 0;
+        $created_by = $params['created_by'] ?? 0;
+        $agent_id = $params['agent_id'] ?? 0;
+        $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
+
+        $query = MoneyComesBack::select()->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name']);
+            },
+            'agency' => function ($sql) {
+                $sql->select(['id', 'name']);
+            },
+            'user' => function ($sql) {
+                $sql->select(['id', 'status', 'username', 'email', 'fullname']);
+            }
+        ]);
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_end', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        $query->whereNotNull('agent_id');
+        if ($agent_id > 0) {
+            $query->where('agent_id', $agent_id);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        if ($is_counting) {
+            return $query->count();
+        } else {
+            $offset = ($page_index - 1) * $page_size;
+            if ($page_size > 0 && $offset >= 0) {
+                $query->take($page_size)->skip($offset);
+            }
+        }
+
+        $query->orderBy('id', 'DESC');
+
+        return $query->get()->toArray();
+    }
 
     /**
      * Hàm lấy ds gi, có tìm kiếm và phân trang
@@ -327,6 +398,14 @@ class MoneyComesBackRepo extends BaseRepo
                     $pos_repo = new PosRepo();
                     $pos_repo->updatePricePos($pos_balance, $pos->id, "CREATE_MONEY_COMES_BACK_" . $res->id);
                 }
+                if(isset($insert['agent_id']) && $insert['agent_id'] > 0){
+                    $agent = Agent::where('id', $insert['agent_id'])->withTrashed()->first();
+                    if ($agent) {
+                        $agent_balance = $agent->balance + $insert['payment_agent'];
+                        $agent_repo = new AgentRepo();
+                        $agent_repo->updateBalance($agent->id, $agent_balance, "CREATE_MONEY_COMES_BACK_" . $res->id);
+                    }
+                }
             }
             return $res ? true : false;
         }
@@ -384,6 +463,15 @@ class MoneyComesBackRepo extends BaseRepo
                 $pos_balance = $pos->price_pos + $balance_change;
                 $pos_repo = new PosRepo();
                 $pos_repo->updatePricePos($pos_balance, $pos->id, "UPDATE_MONEY_COMES_BACK_" . $id);
+            }
+
+            if(isset($params['agent_id']) && $params['agent_id'] > 0){
+                $agent = Agent::where('id', $params['agent_id'])->withTrashed()->first();
+                if ($agent) {
+                    $agent_balance = $agent->balance + $balance_change;
+                    $agent_repo = new AgentRepo();
+                    $agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_MONEY_COMES_BACK_" . $id);
+                }
             }
         }
         return $res;
@@ -528,5 +616,122 @@ class MoneyComesBackRepo extends BaseRepo
         $update = ['status' => $status];
 
         return MoneyComesBack::where('id', $id)->update($update);
+    }
+
+
+    public function getTotal($params, $is_counting = false, $is_agent = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $lo_number = $params['lo_number'] ?? 0;
+        $status = $params['status'] ?? -1;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $pos_id = $params['pos_id'] ?? 0;
+        $agent_id = $params['agent_id'] ?? 0;
+
+        $query = MoneyComesBack::select();
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_end', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        $query->whereNull('agent_id');
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        // Tính tổng của từng trường cần thiết
+        $total = [
+            'total_price' => $query->sum('total_price'),
+            'total_payment' => $query->sum('payment'),
+            'total_payment_agent' => $query->sum('payment_agent'),
+        ];
+
+        return $total;
+    }
+
+    public function getTotalAgent($params, $is_counting = false, $is_agent = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $lo_number = $params['lo_number'] ?? 0;
+        $status = $params['status'] ?? -1;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $pos_id = $params['pos_id'] ?? 0;
+        $agent_id = $params['agent_id'] ?? 0;
+
+        $query = MoneyComesBack::select();
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_end', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        $query->whereNotNull('agent_id');
+
+        if ($agent_id > 0) {
+            $query->where('agent_id', $agent_id);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+
+        // Tính tổng của từng trường cần thiết
+        $total = [
+            'total_price' => $query->sum('total_price'),
+            'total_payment' => $query->sum('payment'),
+            'total_payment_agent' => $query->sum('payment_agent'),
+            'total_profit' => $query->sum('payment') - $query->sum('payment_agent'),
+            'total_cash' => 0
+        ];
+        return $total;
     }
 }

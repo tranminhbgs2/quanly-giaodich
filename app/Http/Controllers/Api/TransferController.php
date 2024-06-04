@@ -142,14 +142,14 @@ class TransferController extends Controller
             $this->bank_acc_repo->updateBalance($params['acc_bank_from_id'], $bank_from_balance, "CREATED_TRANSFER_". $resutl->id);
             if($bank_from->type == "AGENCY"){
                 $agent = $this->agent_repo->getById($bank_from->agent_id);
-                $agent_balance = $agent->balance - $params['price'];
+                $agent_balance = $agent->balance + $params['price'];
                 $this->agent_repo->updateBalance($agent->id, $agent_balance, "CREATED_TRANSFER_". $resutl->id);
             }
             $bank_to_balance = $bank_to->balance + $params['price'];
             $this->bank_acc_repo->updateBalance($params['acc_bank_to_id'], $bank_to_balance, "CREATED_TRANSFER_". $resutl->id);
             if($bank_to->type == "AGENCY"){
                 $agent = $this->agent_repo->getById($bank_to->agent_id);
-                $agent_balance = $agent->balance + $params['price'];
+                $agent_balance = $agent->balance - $params['price'];
                 $this->agent_repo->updateBalance($agent->id, $agent_balance, "CREATED_TRANSFER_". $resutl->id);
             }
             return response()->json([
@@ -239,7 +239,7 @@ class TransferController extends Controller
 
                     if($bank_from_old->type == "AGENCY"){
                         $agent_old = $this->agent_repo->getById($bank_from_old->agent_id);
-                        $agent_balance = $agent_old->balance + $transfer_old->price;
+                        $agent_balance = $agent_old->balance - $transfer_old->price;
                         $this->agent_repo->updateBalance($agent_old->id, $agent_balance, "UPDATE_TRANSFER_". $params['id']);
                     }
 
@@ -249,7 +249,7 @@ class TransferController extends Controller
 
                     if($bank_from_new->type == "AGENCY"){
                         $agent_new = $this->agent_repo->getById($bank_from_new->agent_id);
-                        $agent_balance = $agent_new->balance - $params['price'];
+                        $agent_balance = $agent_new->balance + $params['price'];
                         $this->agent_repo->updateBalance($agent_new->id, $agent_balance, "UPDATE_TRANSFER_". $params['id']);
                     }
                 } else {
@@ -258,7 +258,7 @@ class TransferController extends Controller
 
                     if($bank_from->type == "AGENCY"){
                         $agent = $this->agent_repo->getById($bank_from->agent_id);
-                        $agent_balance = $agent->balance - $params['price'] + $transfer_old->price;
+                        $agent_balance = $agent->balance + $params['price'] - $transfer_old->price;
                         $this->agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_TRANSFER_". $params['id']);
                     }
                 }
@@ -271,7 +271,7 @@ class TransferController extends Controller
 
                     if($bank_to_old->type == "AGENCY"){
                         $agent_old = $this->agent_repo->getById($bank_to_old->agent_id);
-                        $agent_balance = $agent_old->balance - $transfer_old->price;
+                        $agent_balance = $agent_old->balance + $transfer_old->price;
                         $this->agent_repo->updateBalance($agent_old->id, $agent_balance, "UPDATE_TRANSFER_". $params['id']);
                     }
 
@@ -281,7 +281,7 @@ class TransferController extends Controller
 
                     if($bank_to_new->type == "AGENCY"){
                         $agent_new = $this->agent_repo->getById($bank_to_new->agent_id);
-                        $agent_balance = $agent_new->balance + $params['price'];
+                        $agent_balance = $agent_new->balance - $params['price'];
                         $this->agent_repo->updateBalance($agent_new->id, $agent_balance, "UPDATE_TRANSFER_". $params['id']);
                     }
                 } else {
@@ -335,9 +335,21 @@ class TransferController extends Controller
                 $bank_from = $this->bank_acc_repo->getById($transfer->acc_bank_from_id);
                 $bank_from_balance = $bank_from->balance + $transfer->price;
                 $this->bank_acc_repo->updateBalance($transfer->acc_bank_from_id, $bank_from_balance, "DELETE_TRANSFER_". $params['id']);
+
+                if($bank_from->type == "AGENCY"){
+                    $agent = $this->agent_repo->getById($bank_from->agent_id);
+                    $agent_balance = $agent->balance - $transfer->price;
+                    $this->agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_TRANSFER_". $params['id']);
+                }
+
                 $bank_to = $this->bank_acc_repo->getById($transfer->acc_bank_to_id);
                 $bank_to_balance = $bank_to->balance - $transfer->price;
                 $this->bank_acc_repo->updateBalance($transfer->acc_bank_to_id, $bank_to_balance, "DELETE_TRANSFER_". $params['id']);
+                if($bank_to->type == "AGENCY"){
+                    $agent = $this->agent_repo->getById($bank_to->agent_id);
+                    $agent_balance = $agent->balance + $transfer->price;
+                    $this->agent_repo->updateBalance($agent->id, $agent_balance, "DELETE_TRANSFER_". $params['id']);
+                }
 
                 return response()->json([
                     'code' => 422,
