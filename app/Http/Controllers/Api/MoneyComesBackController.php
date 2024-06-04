@@ -13,16 +13,19 @@ use App\Http\Requests\MoneyComesBack\UpdateRequest;
 use App\Models\Pos;
 use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
 use App\Repositories\Pos\PosRepo;
+use App\Repositories\Transfer\TransferRepo;
 
 class MoneyComesBackController extends Controller
 {
     protected $money_repo;
     protected $pos_repo;
+    protected $transfer_repo;
 
-    public function __construct(MoneyComesBackRepo $moneyRepo, PosRepo $posRepo)
+    public function __construct(MoneyComesBackRepo $moneyRepo, PosRepo $posRepo, TransferRepo $transferRepo)
     {
         $this->money_repo = $moneyRepo;
         $this->pos_repo = $posRepo;
+        $this->transfer_repo = $transferRepo;
     }
 
     /**
@@ -38,7 +41,7 @@ class MoneyComesBackController extends Controller
         $params['status'] = request('status', -1);
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
-        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['account_type'] = auth()->user()->account_type;
         $params['lo_number'] = request('lo_number', 0);
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
@@ -76,7 +79,7 @@ class MoneyComesBackController extends Controller
         $params['status'] = request('status', -1);
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
-        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['account_type'] = auth()->user()->account_type;
         $params['lo_number'] = request('lo_number', 0);
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
@@ -86,13 +89,18 @@ class MoneyComesBackController extends Controller
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
 
+        $params_transfer['agent_id'] = $params['agent_id'];
+        $params_transfer['agent_date_from'] = request('agent_date_from', null);
+        $params_transfer['agent_date_to'] = request('agent_date_to', null);
 
         $data = $this->money_repo->getListing($params, false, true);
         $total = $this->money_repo->getListing($params, true, true);
+        $total_transfer = $this->transfer_repo->getTotalAgent($params_transfer);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách Lô tiền về',
             'data' => [
+                "total_transfer" => $total_transfer,
                 "total_elements" => $total,
                 "total_page" => ceil($total / $params['page_size']),
                 "page_no" => intval($params['page_index']),

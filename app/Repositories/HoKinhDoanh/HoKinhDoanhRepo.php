@@ -19,8 +19,6 @@ class HoKinhDoanhRepo extends BaseRepo
         $date_to = $params['date_to'] ?? null;
         $created_by = $params['created_by'] ?? 0;
 
-        $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
-
         $query = HoKinhDoanh::select();
 
         if (!empty($keyword)) {

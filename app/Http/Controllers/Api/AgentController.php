@@ -37,7 +37,7 @@ class AgentController extends Controller
         $params['status'] = request('status', -1);
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
-        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['account_type'] = auth()->user()->account_type;
 
         $data = $this->agent_repo->getListing($params, false);
         $total = $this->agent_repo->getListing($params, true);

@@ -37,7 +37,7 @@ class PosController extends Controller
         $params['hkd_id'] = request('hkd_id', 0);
         $params['page_index'] = request('page_index', 1);
         $params['page_size'] = request('page_size', 10);
-        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['account_type'] = auth()->user()->account_type;
         $params['created_by'] = auth()->user()->id; // người tạo
 
         $data = $this->pos_repo->getListing($params, false);

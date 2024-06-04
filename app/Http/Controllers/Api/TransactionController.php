@@ -48,7 +48,7 @@ class TransactionController extends Controller
         $params['category_id'] = request('category_id', 0);
         $params['lo_number'] = request('lo_number', 0);
         $params['created_by'] = auth()->user()->id;
-        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['account_type'] = auth()->user()->account_type;
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
         $params['method'] = request('method', null);
@@ -89,7 +89,7 @@ class TransactionController extends Controller
         $params['category_id'] = request('category_id', 0);
         $params['lo_number'] = request('lo_number', 0);
         $params['created_by'] = auth()->user()->id;
-        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['account_type'] = auth()->user()->account_type;
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
@@ -251,7 +251,6 @@ class TransactionController extends Controller
             $params['fee'] = floatval(request('fee', 0));
             $params['time_payment'] = request('time_payment', null);
             $params['customer_name'] = request('customer_name', null);
-            $params['account_type'] = request('account_type', null);
             $params['price_nop'] = floatval(request('price_nop', 0));
             $params['price_rut'] = floatval(request('price_rut', 0));
             $params['price_transfer'] = floatval(request('price_transfer', 0));

@@ -25,7 +25,9 @@ class Transfer extends Model
         'created_by',
         'price',
         'status',
-        'type_from'
+        'type_from',
+        'from_agent_id',
+        'to_agent_id',
     ];
 
     public function bankTransferFrom()

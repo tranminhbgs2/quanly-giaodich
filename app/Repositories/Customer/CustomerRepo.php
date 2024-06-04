@@ -34,7 +34,7 @@ class CustomerRepo extends BaseRepo
         $status = isset($params['status']) ? $params['status'] : -1;
         $page_index = isset($params['page_index']) ? $params['page_index'] : 1;
         $page_size = isset($params['page_size']) ? $params['page_size'] : 10;
-        $account_type = isset($params['account_type']) ? $params['account_type'] : Constants::ACCOUNT_TYPE_STAFF;
+        $account_type = isset($params['account_type']) ? $params['account_type'] : auth()->user()->account_type;;
         $query = User::select([
                 'id', 'username',
                 'fullname', 'email', 'phone',

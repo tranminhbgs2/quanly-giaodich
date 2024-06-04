@@ -44,7 +44,7 @@ class TransferController extends Controller
         $params['page_size'] = request('page_size', 10);
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
-        $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
+        $params['account_type'] = auth()->user()->account_type;
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
@@ -100,6 +100,7 @@ class TransferController extends Controller
         $params['acc_bank_from_id'] = request('acc_bank_from_id', null); // ngân hàng
         $params['acc_bank_to_id'] = strtoupper(request('acc_bank_to_id', null)); // hình thức
         $params['type_to'] = request('type_to', null); // máy pos
+        $params['type_from'] = request('type_from', null); // máy pos
         $params['price'] = floatval(request('price', 0)); // phí
         $params['time_payment'] = request('time_payment', null); // trạng thái
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
@@ -124,6 +125,14 @@ class TransferController extends Controller
         $params['acc_number_to'] = $bank_to->account_number;
         $params['acc_name_to'] = $bank_to->account_name;
         $params['bank_to'] = $bank_to->bank_code;
+
+        if($bank_from->type == "AGENCY"){
+            $params['from_agent_id'] = $bank_from->agent_id;
+        }
+
+        if($bank_to->type == "AGENCY"){
+            $params['to_agent_id'] = $bank_to->agent_id;
+        }
 
         $resutl = $this->cate_repo->store($params);
 
@@ -209,6 +218,14 @@ class TransferController extends Controller
             $params['bank_to'] = $bank_to->bank_code;
 
             $transfer_old = $this->cate_repo->getById($params['id']);
+
+            if($bank_from->type == "AGENCY"){
+                $params['from_agent_id'] = $bank_from->agent_id;
+            }
+
+            if($bank_to->type == "AGENCY"){
+                $params['to_agent_id'] = $bank_to->agent_id;
+            }
 
             $resutl = $this->cate_repo->update($params, $params['id']);
 
