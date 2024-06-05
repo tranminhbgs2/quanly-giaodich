@@ -111,11 +111,15 @@ class SettingController extends Controller
         $data = [
             0 => [
                 'name' => 'Chuyển cho đại lý',
-                'code' => 'AGENCY'
+                'code' => 'MASTER'
             ],
             1 => [
                 'name' => 'Chuyển cho nhân viên',
                 'code' => 'STAFF'
+            ],
+            2 => [
+                'name' => 'Chuyển cho đại lý',
+                'code' => 'AGENCY'
             ],
         ];
         return response()->json([

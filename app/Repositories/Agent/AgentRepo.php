@@ -140,6 +140,9 @@ class AgentRepo extends BaseRepo
             'managerBy' => function ($sql) {
                 $sql->select(['id', 'fullname', 'status']);
             },
+            'bankAccounts' => function ($sql) {
+                $sql->select(['id', 'account_number', 'account_name', 'bank_code', 'agent_id']);
+            },
         ])->first();
 
         if ($agent) {
