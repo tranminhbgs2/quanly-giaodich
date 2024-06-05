@@ -49,6 +49,6 @@ class MoneyComesBack extends Model
 
     public function getProfitAttribute()
     {
-        return $this->payment_agent - $this->fee - $this->payment;
+        return $this->payment_agent - $this->payment;
     }
 }
