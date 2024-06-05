@@ -11,6 +11,7 @@ class MoneyComesBack extends Model
     use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_MONEY_COMES_BACK;
     public $timestamps = true;
+    protected $appends = ['profit'];
 
     protected $fillable = [
         'agent_id',
@@ -44,5 +45,10 @@ class MoneyComesBack extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
+    public function getProfitAttribute()
+    {
+        return $this->payment_agent - $this->fee - $this->payment;
     }
 }
