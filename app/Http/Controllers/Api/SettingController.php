@@ -110,15 +110,15 @@ class SettingController extends Controller
     {
         $data = [
             0 => [
-                'name' => 'Chuyển cho đại lý',
+                'name' => 'Tài khoản nguồn',
                 'code' => 'MASTER'
             ],
             1 => [
-                'name' => 'Chuyển cho nhân viên',
+                'name' => 'Tài khoản nhân viên',
                 'code' => 'STAFF'
             ],
             2 => [
-                'name' => 'Chuyển cho đại lý',
+                'name' => 'Tài khoản đại lý',
                 'code' => 'AGENCY'
             ],
         ];
