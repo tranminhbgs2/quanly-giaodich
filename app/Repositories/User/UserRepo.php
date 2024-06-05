@@ -256,4 +256,8 @@ class UserRepo extends BaseRepo
         // print_r($permissions);
         return $data;
     }
+    public function getAllStaff()
+    {
+        return User::select('id', 'fullname', 'status')->where('status', Constants::USER_STATUS_ACTIVE)->where('account_type', 'STAFF')->orderBy('id', 'DESC')->get()->toArray();
+    }
 }

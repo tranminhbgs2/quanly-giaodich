@@ -271,4 +271,14 @@ $params['birthday'] = $birthday;
             'data' => null
         ]);
     }
+
+    public function getAllStaff()
+    {
+        $data = $this->user_repo->getAllStaff();
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách nhân viên',
+            'data' => $data
+        ]);
+    }
 }
