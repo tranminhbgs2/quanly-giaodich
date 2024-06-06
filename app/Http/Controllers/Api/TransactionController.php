@@ -13,6 +13,7 @@ use App\Http\Requests\Transaction\UpdateRequest;
 use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
 use App\Repositories\Pos\PosRepo;
 use App\Repositories\Transaction\TransactionRepo;
+use App\Repositories\Transfer\TransferRepo;
 use App\Repositories\Upload\UploadRepo;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,12 +22,14 @@ class TransactionController extends Controller
     protected $tran_repo;
     protected $money_comes_back_repo;
     protected $pos_repo;
+    protected $transfer_repo;
 
-    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo, PosRepo $posRepo)
+    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo, PosRepo $posRepo, TransferRepo $transferRepo)
     {
         $this->tran_repo = $tranRepo;
         $this->money_comes_back_repo = $moneyComesBackRepo;
         $this->pos_repo = $posRepo;
+        $this->transfer_repo = $transferRepo;
     }
 
     /**
@@ -418,11 +421,31 @@ class TransactionController extends Controller
 
     public function ReportDashboard()
     {
-        $data = $this->tran_repo->ReportDashboard();
+        $tran_day = $this->tran_repo->ReportDashboard();
+        $data_day_agent = $this->money_comes_back_repo->ReportDashboardAgent();
+        $transfer_day = $this->transfer_repo->getTotalMaster([]);
+
+        $data_day = [
+            'san_luong' => $tran_day['san_luong'] + $data_day_agent['san_luong'],
+            'tien_nhan' => $tran_day['tien_nhan'] + $data_day_agent['tien_nhan'],
+            'profit' => $tran_day['profit'] + $data_day_agent['profit'],
+            'tien_chuyen' => $transfer_day['total_transfer'],
+        ];
+
+        $data_month = [
+            'san_luong' => 0,
+            'tien_nhan' => 0,
+            'profit' => 0,
+            'tien_chuyen' => 0,
+        ];
+
         return response()->json([
             'code' => 200,
             'error' => 'Báo cáo Dashboard',
-            'data' => $data
+            'data' => [
+                'day' => $data_day,
+                'month' => $data_month
+            ],
         ]);
     }
 }

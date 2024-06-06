@@ -733,4 +733,50 @@ class MoneyComesBackRepo extends BaseRepo
         ];
         return $total;
     }
+
+
+    public function ReportDashboard()
+    {
+        $query = MoneyComesBack::select()
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->where('created_at', '>=', Carbon::now()->startOfDay())
+            ->where('created_at', '<=', Carbon::now()->endOfDay())
+            ->whereNotNull('agent_id')
+            ->get();
+
+
+        // Tính tổng của từng trường cần thiết
+        $total = [
+            'san_luong' => $query->sum('price_rut'),
+            'profit' => $query->sum('profit')
+        ];
+        //Tính tiền gốc nhận được theo từng giao dịch sau đó tính tổng bằng = price_rut - price_rut * original_fee / 100
+        $total['tien_nhan'] = $query->sum(function ($transaction) {
+            return $transaction->price_rut - $transaction->price_rut * $transaction->original_fee / 100;
+        });
+
+        return $total;
+    }
+
+    public function ReportDashboardAgent()
+    {
+        $query = MoneyComesBack::select()
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->where('created_at', '>=', Carbon::now()->startOfDay())
+            ->where('created_at', '<=', Carbon::now()->endOfDay())
+            ->get();
+
+
+        // Tính tổng của từng trường cần thiết
+        $total = [
+            'san_luong' => $query->sum('total_price'),
+            'tien_nhan' => $query->sum('payment')
+        ];
+        //Tính lợi nhuận
+        $total['profit'] = $query->sum(function ($transaction) {
+            return $transaction->toto_price * ($transaction->fee_agent - $transaction->fee) / 100;
+        });
+
+        return $total;
+    }
 }

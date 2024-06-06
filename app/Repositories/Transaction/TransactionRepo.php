@@ -618,14 +618,11 @@ class TransactionRepo extends BaseRepo
 
         // Tính tổng của từng trường cần thiết
         $total = [
-            'price_nop' => $query->sum('price_nop'),
             'san_luong' => $query->sum('price_rut'),
-            'profit' => $query->sum('profit'),
-            'price_repair' => $query->sum('price_repair')
+            'profit' => $query->sum('profit')
         ];
-
         //Tính tiền gốc nhận được theo từng giao dịch sau đó tính tổng bằng = price_rut - price_rut * original_fee / 100
-        $total['payment'] = $query->sum(function ($transaction) {
+        $total['tien_nhan'] = $query->sum(function ($transaction) {
             return $transaction->price_rut - $transaction->price_rut * $transaction->original_fee / 100;
         });
 
