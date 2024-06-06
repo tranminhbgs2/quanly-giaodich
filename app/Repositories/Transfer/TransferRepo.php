@@ -331,6 +331,7 @@ class TransferRepo extends BaseRepo
         } else {
             $query->where('status', Constants::USER_STATUS_ACTIVE);
         }
+        $query->withTrashed();
         // Tính tổng của từng trường cần thiết
         $total = [
             'total_transfer' => $query->sum('price'),

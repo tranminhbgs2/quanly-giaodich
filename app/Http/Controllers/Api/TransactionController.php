@@ -8,8 +8,10 @@ use App\Http\Requests\Transaction\ChangeStatusRequest;
 use App\Http\Requests\Transaction\DeleteRequest;
 use App\Http\Requests\Transaction\GetDetailRequest;
 use App\Http\Requests\Transaction\ListingRequest;
+use App\Http\Requests\Transaction\PaymentFeeRequest;
 use App\Http\Requests\Transaction\StoreRequest;
 use App\Http\Requests\Transaction\UpdateRequest;
+use App\Repositories\BankAccount\BankAccountRepo;
 use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
 use App\Repositories\Pos\PosRepo;
 use App\Repositories\Transaction\TransactionRepo;
@@ -23,13 +25,15 @@ class TransactionController extends Controller
     protected $money_comes_back_repo;
     protected $pos_repo;
     protected $transfer_repo;
+    protected $bankAccountRepo;
 
-    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo, PosRepo $posRepo, TransferRepo $transferRepo)
+    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo, PosRepo $posRepo, TransferRepo $transferRepo, BankAccountRepo $bankAccountRepo)
     {
         $this->tran_repo = $tranRepo;
         $this->money_comes_back_repo = $moneyComesBackRepo;
         $this->pos_repo = $posRepo;
         $this->transfer_repo = $transferRepo;
+        $this->bankAccountRepo = $bankAccountRepo;
     }
 
     /**
@@ -452,6 +456,32 @@ class TransactionController extends Controller
                 'day' => $data_day,
                 'month' => $data_month
             ],
+        ]);
+    }
+
+    public function PaymentFee(PaymentFeeRequest $request)
+    {
+        $id = request('id', null);
+        $fee_paid = request('fee_paid', 0);
+        $tran = $this->tran_repo->changeFeePaid($fee_paid, $id);
+
+        if ($tran) {
+            //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
+            $bank_account = $this->bankAccountRepo->getAccountFee();
+            if ($bank_account) {
+                $bank_account->balance += $fee_paid;
+                $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $id);
+            }
+            return response()->json([
+                'code' => 200,
+                'error' => 'Thanh toán phí thành công',
+                'data' => null
+            ]);
+        }
+        return response()->json([
+            'code' => 400,
+            'error' => 'Thanh toán phí thất bại',
+            'data' => null,
         ]);
     }
 }

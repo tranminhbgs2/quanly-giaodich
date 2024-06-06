@@ -14,6 +14,7 @@ Route::group(['prefix' => 'transaction'], function (){
         Route::get('/delete/{id}', 'TransactionController@delete');
         Route::post('/change-status', 'TransactionController@changeStatus');
         Route::get('/report-dashboard', 'TransactionController@ReportDashboard');
+        Route::post('/payment-fee', 'TransactionController@PaymentFee');
         Route::get('/cashback', 'MoneyComesBackController@getListingCashBack');
     });
 

@@ -275,4 +275,11 @@ class BankAccountRepo extends BaseRepo
 
         return $dep;
     }
+
+    public function getAccountFee()
+    {
+        $dep = BankAccounts::where('type', 'FEE')->withTrashed()->first();
+
+        return $dep;
+    }
 }

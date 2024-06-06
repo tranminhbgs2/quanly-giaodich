@@ -766,6 +766,7 @@ class MoneyComesBackRepo extends BaseRepo
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->where('created_at', '>=', $date_from)
             ->where('created_at', '<=', $date_to)
+            ->withTrashed()
             ->get();
 
 

@@ -615,6 +615,7 @@ class TransactionRepo extends BaseRepo
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->where('created_at', '>=', $date_from)
             ->where('created_at', '<=', $date_to)
+            ->withTrashed()
             ->get();
 
 
@@ -629,5 +630,47 @@ class TransactionRepo extends BaseRepo
         });
 
         return $total;
+    }
+
+    public function topStaffTransaction()
+    {
+        // Lấy ra top 5 nhân viên có sản lượng giao dịch cao nhất theo khoảng thời gian truyền vào: gồm các trường dữ liệu trả về: id, tên nhân viên, tổng sản lượng giao dịch, tổng lợi nhuận, tổng tiền chuyển khoản, số tiền đã sử dụng, số tiền còn lại
+        $query = Transaction::select(['created_by', 'customer_name', 'price_rut', 'profit', 'price_transfer'])
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->where('created_at', '>=', Carbon::now()->startOfDay())
+            ->where('created_at', '<=', Carbon::now()->endOfDay())
+            ->get()
+            ->groupBy('created_by')
+            ->map(function ($group) {
+                $total_price_rut = $group->sum('price_rut');
+                $total_profit = $group->sum('profit');
+                $total_price_transfer = $group->sum('price_transfer');
+                $total_price_used = $group->sum(function ($transaction) {
+                    return $transaction->price_rut - $transaction->price_rut * $transaction->original_fee / 100;
+                });
+                $total_price_remain = $total_price_rut - $total_price_used;
+
+                return [
+                    'id' => $group->first()->created_by,
+                    'name' => $group->first()->customer_name,
+                    'total_price_rut' => $total_price_rut,
+                    'total_profit' => $total_profit,
+                    'total_price_transfer' => $total_price_transfer,
+                    'total_price_used' => $total_price_used,
+                    'total_price_remain' => $total_price_remain
+                ];
+            })
+            ->sortByDesc('total_price_rut')
+            ->take(5)
+            ->values();
+    }
+
+    public function changeFeePaid($fee_paid, $id)
+    {
+        $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->withTrashed()->first();
+        $fee_paid_new = $tran->fee_paid + $fee_paid;
+        $update = ['fee_paid' => $fee_paid_new];
+
+        return $tran->update($update);
     }
 }
