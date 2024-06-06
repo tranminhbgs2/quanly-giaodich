@@ -729,7 +729,7 @@ class MoneyComesBackRepo extends BaseRepo
             'total_price' => $query->sum('total_price'),
             'total_payment' => $query->sum('payment'),
             'total_payment_agent' => $query->sum('payment_agent'),
-            'total_profit' => $query->sum('payment') - $query->sum('payment_agent'),
+            'total_profit' => $query->sum('payment_agent') - $query->sum('payment'),
             'total_cash' => 0
         ];
         return $total;

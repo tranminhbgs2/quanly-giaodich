@@ -13,6 +13,7 @@ Route::group(['prefix' => 'transaction'], function (){
         Route::post('/update', 'TransactionController@update');
         Route::get('/delete/{id}', 'TransactionController@delete');
         Route::post('/change-status', 'TransactionController@changeStatus');
+        Route::get('/report-dashboard', 'TransactionController@ReportDashboard');
         Route::get('/cashback', 'MoneyComesBackController@getListingCashBack');
     });
 

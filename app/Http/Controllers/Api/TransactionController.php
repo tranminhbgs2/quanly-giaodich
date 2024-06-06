@@ -415,4 +415,14 @@ class TransactionController extends Controller
             'data' => null
         ]);
     }
+
+    public function ReportDashboard()
+    {
+        $data = $this->tran_repo->ReportDashboard();
+        return response()->json([
+            'code' => 200,
+            'error' => 'Báo cáo Dashboard',
+            'data' => $data
+        ]);
+    }
 }
