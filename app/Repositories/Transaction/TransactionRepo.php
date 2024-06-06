@@ -688,29 +688,48 @@ class TransactionRepo extends BaseRepo
 
     public function chartDashboard($params)
     {
-        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
-        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
-        // Trả về dữ liệu theo từng ngày, bao gồm tổng sản lượng giao dịch, tổng lợi nhuận và tổng sản lượng, tổng lợi nhuận của tất cả các ngày dựa trên date_from và date_to dù không có dữ liệu cũng trả về ngày
+        $date_from = Carbon::parse($params['date_from'])->startOfDay();
+        $date_to = Carbon::parse($params['date_to'])->endOfDay();
+
+        // Tạo một đối tượng Collection mới chứa các ngày trong khoảng thời gian đã chỉ định
+        $date_range = collect();
+        $current_date = $date_from->copy();
+        while ($current_date->lessThanOrEqualTo($date_to)) {
+            $date_range->push($current_date->toDateString());
+            $current_date->addDay();
+        }
+
+        // Truy vấn dữ liệu từ cơ sở dữ liệu
         $query = Transaction::select(['price_rut', 'profit', 'created_at'])
             ->where('status', Constants::USER_STATUS_ACTIVE)
-            ->where('created_at', '>=', $date_from)
-            ->where('created_at', '<=', $date_to)
+            ->whereBetween('created_at', [$date_from, $date_to])
             ->get()
             ->groupBy(function ($transaction) {
-                return Carbon::parse($transaction->created_at)->format('Y-m-d');
-            })
-            ->map(function ($group) {
-                $total_price_rut = $group->sum('price_rut');
-                $total_profit = $group->sum('profit');
+                return Carbon::parse($transaction->created_at)->toDateString();
+            });
 
-                return [
-                    'date' => Carbon::parse($group->first()->created_at)->format('Y-m-d'),
-                    'total_price_rut' => $total_price_rut,
-                    'total_profit' => $total_profit
-                ];
-            })
-            ->values();
+        // Merge các ngày trong khoảng thời gian đã chỉ định với các ngày trong kết quả truy vấn
+        $date_range = $date_range->merge($query->keys());
 
-        return $query;
+        // Đảm bảo không có ngày trùng lặp và sắp xếp lại danh sách các ngày
+        $date_range = $date_range->unique()->sort();
+
+        // Điền vào danh sách ngày không có dữ liệu và tính tổng hợp
+        $total = ['total_price_rut' => 0, 'total_profit' => 0];
+        $result = $date_range->map(function ($date) use ($query, &$total) {
+            $total_price_rut = $query->has($date) ? $query[$date]->sum('price_rut') : 0;
+            $total_profit = $query->has($date) ? $query[$date]->sum('profit') : 0;
+            $total['total_price_rut'] += $total_price_rut; // Cộng tổng sản lượng vào biến tổng hợp
+            $total['total_profit'] += $total_profit; // Cộng tổng lợi nhuận vào biến tổng hợp
+            return [
+                'date' => $date,
+                'total_price_rut' => $total_price_rut,
+                'total_profit' => $total_profit
+            ];
+        });
+
+        // Trả về mảng gồm data và total
+        return ['data' => $result, 'total' => $total];
     }
+
 }
