@@ -723,7 +723,6 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-
         // Tính tổng của từng trường cần thiết
         $total = [
             'total_price' => $query->sum('total_price'),
