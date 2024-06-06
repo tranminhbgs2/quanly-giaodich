@@ -152,6 +152,7 @@ class AgentController extends Controller
             if (count($insert_banks) > 0) {
                 foreach ($insert_banks as $key => $value) {
                     $value['agent_id'] = $id;
+                    $value['type'] = "AGENCY";
                     $this->bankAccountRepo->store($value);
                 }
             }
@@ -238,7 +239,6 @@ class AgentController extends Controller
                         'account_number' => $account_number,
                         'bank_code' => $bank_code,
                         'agent_id' => 0,
-                        'balance' => 0,
                         'status' => Constants::USER_STATUS_ACTIVE
                     ];
                 }
@@ -246,18 +246,19 @@ class AgentController extends Controller
             $resutl = $this->agent_repo->update($params, $params['id']);
 
             if ($resutl) {
+            if (count($insert_banks) > 0) {
+                foreach ($insert_banks as $key => $value) {
+                    $value['agent_id'] = $params['id'];
+                    $value['type'] = "AGENCY";
+                    $this->bankAccountRepo->store($value);
+                }
+            }
                 return response()->json([
                     'code' => 200,
                     'error' => 'Cập nhật thông tin thành công',
                     'data' => null
                 ]);
             }
-
-            return response()->json([
-                'code' => 400,
-                'error' => 'Cập nhật thông tin không thành công',
-                'data' => null
-            ]);
         } else {
             return response()->json([
                 'code' => 422,
