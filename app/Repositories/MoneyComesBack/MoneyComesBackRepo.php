@@ -758,12 +758,14 @@ class MoneyComesBackRepo extends BaseRepo
         return $total;
     }
 
-    public function ReportDashboardAgent()
+    public function ReportDashboardAgent($params)
     {
+        $date_from = $params['agent_date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['agent_date_to'] ?? Carbon::now()->endOfDay();
         $query = MoneyComesBack::select()
             ->where('status', Constants::USER_STATUS_ACTIVE)
-            ->where('created_at', '>=', Carbon::now()->startOfDay())
-            ->where('created_at', '<=', Carbon::now()->endOfDay())
+            ->where('created_at', '>=', $date_from)
+            ->where('created_at', '<=', $date_to)
             ->get();
 
 

@@ -607,12 +607,14 @@ class TransactionRepo extends BaseRepo
         return Transaction::where('id', $id)->update($update);
     }
 
-    public function ReportDashboard()
+    public function ReportDashboard($params)
     {
+        $date_from = $params['agent_date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['agent_date_to'] ?? Carbon::now()->endOfDay();
         $query = Transaction::select()
             ->where('status', Constants::USER_STATUS_ACTIVE)
-            ->where('created_at', '>=', Carbon::now()->startOfDay())
-            ->where('created_at', '<=', Carbon::now()->endOfDay())
+            ->where('created_at', '>=', $date_from)
+            ->where('created_at', '<=', $date_to)
             ->get();
 
 

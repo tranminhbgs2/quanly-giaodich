@@ -421,22 +421,28 @@ class TransactionController extends Controller
 
     public function ReportDashboard()
     {
-        $tran_day = $this->tran_repo->ReportDashboard();
-        $data_day_agent = $this->money_comes_back_repo->ReportDashboardAgent();
+        $tran_day = $this->tran_repo->ReportDashboard([]);
+        $data_day_agent = $this->money_comes_back_repo->ReportDashboardAgent([]);
         $transfer_day = $this->transfer_repo->getTotalMaster([]);
 
         $data_day = [
-            'san_luong' => $tran_day['san_luong'] + $data_day_agent['san_luong'],
-            'tien_nhan' => $tran_day['tien_nhan'] + $data_day_agent['tien_nhan'],
-            'profit' => $tran_day['profit'] + $data_day_agent['profit'],
+            'san_luong' => $tran_day['san_luong'] + $data_day_agent['san_luong'], // tổng số tiền GD trong ngày
+            'tien_nhan' => $tran_day['tien_nhan'] + $data_day_agent['tien_nhan'], // tổng tiền thực nhận của pos sau khi trừ phí gốc
+            'profit' => $tran_day['profit'] + $data_day_agent['profit'], // tổng lợi nhuận theo GD và lô tiền về
             'tien_chuyen' => $transfer_day['total_transfer'],
         ];
 
+        $params['date_from'] = date('Y-m-d H:i:s', strtotime('first day of this month'));
+        $params['date_to'] = date('Y-m-d H:i:s', strtotime('last day of this month'));
+        $tran_month = $this->tran_repo->ReportDashboard($params);
+        $data_month_agent = $this->money_comes_back_repo->ReportDashboardAgent($params);
+        $transfer_month = $this->transfer_repo->getTotalMaster($params);
+
         $data_month = [
-            'san_luong' => 0,
-            'tien_nhan' => 0,
-            'profit' => 0,
-            'tien_chuyen' => 0,
+            'san_luong' => $tran_month['san_luong'] + $data_month_agent['san_luong'], // tổng số tiền GD trong tháng
+            'tien_nhan' => $tran_month['tien_nhan'] + $data_month_agent['tien_nhan'], // tổng tiền thực nhận của pos sau khi trừ phí gốc
+            'profit' => $tran_month['profit'] + $data_month_agent['profit'], // tổng lợi nhuận theo GD và lô tiền về
+            'tien_chuyen' => $transfer_month['total_transfer'],
         ];
 
         return response()->json([
