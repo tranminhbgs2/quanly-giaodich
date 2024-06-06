@@ -246,18 +246,18 @@ class AgentController extends Controller
             $resutl = $this->agent_repo->update($params, $params['id']);
 
             if ($resutl) {
+            if (count($insert_banks) > 0) {
+                foreach ($insert_banks as $key => $value) {
+                    $value['agent_id'] = $params['id'];
+                    $this->bankAccountRepo->store($value);
+                }
+            }
                 return response()->json([
                     'code' => 200,
                     'error' => 'Cập nhật thông tin thành công',
                     'data' => null
                 ]);
             }
-
-            return response()->json([
-                'code' => 400,
-                'error' => 'Cập nhật thông tin không thành công',
-                'data' => null
-            ]);
         } else {
             return response()->json([
                 'code' => 422,
