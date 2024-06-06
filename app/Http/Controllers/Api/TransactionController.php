@@ -59,7 +59,8 @@ class TransactionController extends Controller
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
         $params['method'] = request('method', null);
-
+        $params['status_fee'] = request('status_fee', 1);
+        
         $data = $this->tran_repo->getListing($params, false);
         $total = $this->tran_repo->getListing($params, true);
         $export = $this->tran_repo->getTotal($params); //số liệu báo cáo
@@ -482,6 +483,20 @@ class TransactionController extends Controller
             'code' => 400,
             'error' => 'Thanh toán phí thất bại',
             'data' => null,
+        ]);
+    }
+
+    public function ChartDashboard()
+    {
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
+
+        $data = $this->tran_repo->ChartDashboard($params);
+
+        return response()->json([
+            'code' => 200,
+            'error' => 'Biểu đồ Dashboard',
+            'data' => $data,
         ]);
     }
 }

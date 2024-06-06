@@ -36,6 +36,7 @@ class TransactionRepo extends BaseRepo
         $created_by = $params['created_by'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
         $method = $params['method'] ?? null;
+        $status_fee = $params['status_fee'] ?? 1; // 1: tất cả, 2: chưa thanh toán, 3: đã thanh toán. chưa thanh toán khi fee_paid < price_fee, đã thanh toán khi fee_paid = price_fee
 
         $query = Transaction::select()->with([
             'category' => function ($sql) {
@@ -48,6 +49,12 @@ class TransactionRepo extends BaseRepo
 
         if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
             $query->where('created_by', $created_by);
+        }
+
+        if ($status_fee == 2) {
+            $query->whereRaw('transactions.fee_paid < transactions.price_fee');
+        } elseif ($status_fee == 3) {
+            $query->whereRaw('fee_paid >= price_fee');
         }
 
         if (!empty($keyword)) {
@@ -233,6 +240,7 @@ class TransactionRepo extends BaseRepo
         $created_by = $params['created_by'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
         $method = $params['method'] ?? null;
+        $status_fee = $params['status_fee'] ?? 1; // 1: tất cả, 2: chưa thanh toán, 3: đã thanh toán. chưa thanh toán khi fee_paid < price_fee, đã thanh toán khi fee_paid = price_fee
 
         $query = Transaction::select();
 
@@ -267,6 +275,12 @@ class TransactionRepo extends BaseRepo
 
         if ($lo_number > 0) {
             $query->where('lo_number', $lo_number);
+        }
+
+        if ($status_fee == 2) {
+            $query->whereRaw('transactions.fee_paid < transactions.price_fee');
+        } elseif ($status_fee == 3) {
+            $query->whereRaw('fee_paid >= price_fee');
         }
 
         if ($status > 0) {
@@ -648,7 +662,6 @@ class TransactionRepo extends BaseRepo
                 $total_price_used = $group->sum(function ($transaction) {
                     return $transaction->price_rut - $transaction->price_rut * $transaction->original_fee / 100;
                 });
-                $total_price_remain = $total_price_rut - $total_price_used;
 
                 return [
                     'id' => $group->first()->created_by,
@@ -656,8 +669,7 @@ class TransactionRepo extends BaseRepo
                     'total_price_rut' => $total_price_rut,
                     'total_profit' => $total_profit,
                     'total_price_transfer' => $total_price_transfer,
-                    'total_price_used' => $total_price_used,
-                    'total_price_remain' => $total_price_remain
+                    'total_price_used' => $total_price_used
                 ];
             })
             ->sortByDesc('total_price_rut')
@@ -672,5 +684,33 @@ class TransactionRepo extends BaseRepo
         $update = ['fee_paid' => $fee_paid_new];
 
         return $tran->update($update);
+    }
+
+    public function chartDashboard($params)
+    {
+        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
+        // Trả về dữ liệu theo từng ngày, bao gồm tổng sản lượng giao dịch, tổng lợi nhuận và tổng sản lượng, tổng lợi nhuận của tất cả các ngày dựa trên date_from và date_to dù không có dữ liệu cũng trả về ngày
+        $query = Transaction::select(['price_rut', 'profit', 'created_at'])
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->where('created_at', '>=', $date_from)
+            ->where('created_at', '<=', $date_to)
+            ->get()
+            ->groupBy(function ($transaction) {
+                return Carbon::parse($transaction->created_at)->format('Y-m-d');
+            })
+            ->map(function ($group) {
+                $total_price_rut = $group->sum('price_rut');
+                $total_profit = $group->sum('profit');
+
+                return [
+                    'date' => Carbon::parse($group->first()->created_at)->format('Y-m-d'),
+                    'total_price_rut' => $total_price_rut,
+                    'total_profit' => $total_profit
+                ];
+            })
+            ->values();
+
+        return $query;
     }
 }
