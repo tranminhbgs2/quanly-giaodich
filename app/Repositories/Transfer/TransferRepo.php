@@ -324,7 +324,7 @@ class TransferRepo extends BaseRepo
                 // Handle invalid date format
             }
         }
-        $query->where('type_to', "MASTER");
+        $query->where('type_from', "MASTER");
 
         if ($status > 0) {
             $query->where('status', $status);
