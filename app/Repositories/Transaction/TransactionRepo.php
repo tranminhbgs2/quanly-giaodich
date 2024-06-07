@@ -667,7 +667,7 @@ class TransactionRepo extends BaseRepo
                     'id' => $group->first()->created_by,
                     'name' => $group->first()->customer_name,
                     'total_price_rut' => $total_price_rut,
-                    'total_profit' => $total_profit,
+                    'total_profit' => round($total_profit, 2),
                     'total_price_transfer' => $total_price_transfer,
                     'total_price_used' => $total_price_used
                 ];
@@ -726,7 +726,7 @@ class TransactionRepo extends BaseRepo
             return [
                 'date' => $formatted_date,
                 'total_price_rut' => $total_price_rut,
-                'total_profit' => $total_profit
+                'total_profit' => round($total_profit, 2)
             ];
         });
 

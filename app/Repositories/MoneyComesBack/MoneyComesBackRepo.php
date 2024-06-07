@@ -806,7 +806,7 @@ class MoneyComesBackRepo extends BaseRepo
             return [
                 'date' => $formatted_date,
                 'total_price_rut' => $total_price_rut,
-                'total_profit' => $total_profit
+                'total_profit' => round($total_profit, 2)
             ];
         });
 
