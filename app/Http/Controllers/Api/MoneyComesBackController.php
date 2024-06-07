@@ -282,6 +282,7 @@ class MoneyComesBackController extends Controller
                         $params['fee'] = $pos->total_fee;
                         $params['fee_agent'] = $activeAgents->fee;
                         $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
+                        $params['payment'] = $params['total_price'] - $params['fee']*$params['total_price']/100;
                     } else {
                         return response()->json([
                             'code' => 400,
