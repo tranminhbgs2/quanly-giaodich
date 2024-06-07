@@ -490,7 +490,8 @@ class TransactionController extends Controller
     {
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
-
+$params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
         $data = $this->tran_repo->ChartDashboard($params);
 
         return response()->json([
