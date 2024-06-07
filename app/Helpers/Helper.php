@@ -189,12 +189,12 @@ if (!function_exists('getEmailBody')) {
                                 <table cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" align="center" style="background:#ffffff;width:100%;max-width:600px">
                                     <tbody>
                                     <tr>
-                                        <td bgcolor="#074B80" style="background-color: #1dabe3; font-size:20px;padding:20px 40px;color:#ffffff;border-bottom:5px solid #2b57a4">SSC-EDUCATION - Thiết lập lại mật khẩu</td>
+                                        <td bgcolor="#074B80" style="background-color: #1dabe3; font-size:20px;padding:20px 40px;color:#ffffff;border-bottom:5px solid #2b57a4">THANG-CREDIT - Thiết lập lại mật khẩu</td>
                                     </tr>
                                     <tr>
                                         <td style="padding:22px 40px;border:1px solid #dddddd;border-top:none">
                                             <p>Xin chào, <strong>' . $email . '</strong>!</p>
-                                            <p>Hệ thống SSC Education gửi Bạn thông tin mật khẩu.</p>
+                                            <p>Hệ thống Thắng Credit gửi Bạn thông tin mật khẩu.</p>
                                             <p>Mật khẩu mới: ' . $content . '</p>
                                             <br>
                                             <p>Trân trọng thông báo!</p>
@@ -202,7 +202,7 @@ if (!function_exists('getEmailBody')) {
                                     </tr>
                                     </tbody>
                                 </table>
-                                <p style="text-align:center;color:#aaabbb;font-size:9pt">2021 © By SSC-EDUCATION</p>
+                                <p style="text-align:center;color:#aaabbb;font-size:9pt">2021 © By THANG-CREDIT</p>
                                 <br>
                             </td>
                         </tr>

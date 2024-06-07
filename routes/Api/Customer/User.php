@@ -13,5 +13,6 @@ Route::group(['prefix' => 'users'], function () {
         Route::post('/update', 'UserController@update');
         Route::get('/delete/{id}', 'UserController@delete');
         Route::post('/change-status', 'UserController@changeStatus');
+        Route::post('/change-password', 'UserController@changePassword');
     });
 });

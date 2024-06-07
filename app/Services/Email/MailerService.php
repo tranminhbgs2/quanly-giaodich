@@ -30,6 +30,9 @@ class MailerService implements EmailInterface
         // TODO: Implement sendSingle() method.
         if (!empty($this->mailer)) {
             try {
+                // Đặt mức độ debug là 0 để tắt ghi log chi tiết
+                $this->mailer->SMTPDebug = 0;
+                
                 $this->mailer->addAddress($toEmail);
                 if($ccEmail){
                     $this->mailer->addCC($ccEmail);

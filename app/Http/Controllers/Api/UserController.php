@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Constants;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\ChangePasswordRequest;
 use App\Http\Requests\Customer\DeleteRequest;
 use App\Http\Requests\Customer\GetDetailRequest;
 use App\Http\Requests\Customer\GetListingRequest;
@@ -279,6 +280,34 @@ $params['birthday'] = $birthday;
             'code' => 200,
             'error' => 'Danh sách nhân viên',
             'data' => $data
+        ]);
+    }
+
+    /**
+     * API thay đổi mật khẩu
+     * URL: {{url}}/api/v1/me/change-password
+     *
+     * @param ChangePasswordRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function changePassword(ChangePasswordRequest $request)
+    {
+        $params['password'] = request('password', null);
+
+        $result = $this->cus_repo->changePassword($params, Auth::user());
+
+        if ($result) {
+            return response()->json([
+                'code' => 200,
+                'error' => 'Thay đổi mật khẩu thành công',
+                'data' => null
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'error' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
+            'data' => null
         ]);
     }
 }

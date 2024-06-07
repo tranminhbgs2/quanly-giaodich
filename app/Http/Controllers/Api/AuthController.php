@@ -212,8 +212,7 @@ class AuthController extends Controller
      */
     public function resetPassword(ResetPasswordRequest  $request)
     {
-        $params['account_type'] = request('account_type', null);
-        $params['receiver_by'] = request('receiver_by', null);
+        $params['email'] = request('email', null);
 
         $result = $this->customer_repo->resetPassword($params);
 

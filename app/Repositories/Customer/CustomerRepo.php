@@ -282,38 +282,21 @@ class CustomerRepo extends BaseRepo
      */
     public function resetPassword($params)
     {
-        $account_type = isset($params['account_type']) ? $params['account_type'] : null;
-        $receiver_by = isset($params['receiver_by']) ? $params['receiver_by'] : null;
+        $receiver_by = isset($params['email']) ? $params['email'] : null;
 
-        if ($account_type && $receiver_by) {
-            $channel = 'EMAIL';
-            $new_password = strval(rand(100000, 999999));
+        if ($receiver_by) {
+            $new_password = strval(rand(10000000, 99999999));
 
-            if (validateMobile($receiver_by)) {
-                $channel = 'SMS';
-            }
-
-            switch ($channel) {
-                case 'EMAIL':
-                    $body = getEmailBody(Constants::EMAIL_TYPE_RESET_PASSWORD, [
-                        'email' => $receiver_by,
-                        'content' => $new_password
-                    ]);
-                    break;
-                case 'SMS':
-                    $body = getEmailBody(Constants::EMAIL_TYPE_RESET_PASSWORD, [
-                        'email' => $receiver_by,
-                        'content' => $new_password
-                    ]);
-                    break;
-            }
+            $body = getEmailBody(Constants::EMAIL_TYPE_RESET_PASSWORD, [
+                'email' => $receiver_by,
+                'content' => $new_password
+            ]);
 
             $mailer = new MailerService();
             $res = $mailer->sendSingle($receiver_by, 'Thiết lập lại mật khẩu - ' . $new_password, $body);
 
             if ($res == 1) {
                 User::where([
-                    'account_type' => $account_type,
                     'email' => $receiver_by
                 ])->update([
                     'password' => Hash::make($new_password)
@@ -427,4 +410,8 @@ class CustomerRepo extends BaseRepo
         return $department->userPermissions()->detach();
     }
 
+    public function getByEmail($email)
+    {
+        return User::where('email', $email)->withTrashed()->first();
+    }
 }

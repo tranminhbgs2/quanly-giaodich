@@ -3,13 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Customer\CusChangePasswordRequest;
-use App\Http\Requests\Customer\CusDeleteRequest;
-use App\Http\Requests\Customer\CusGetDetailRequest;
-use App\Http\Requests\Customer\CusGetListingRequest;
+use App\Http\Requests\Customer\ChangePasswordRequest;
+use App\Http\Requests\Customer\DeleteRequest;
+use App\Http\Requests\Customer\GetDetailRequest;
+use App\Http\Requests\Customer\GetListingRequest;
 use App\Http\Requests\Customer\CusStoreRequest;
 use App\Http\Requests\Customer\CusUpdateAvatarRequest;
 use App\Http\Requests\Customer\CusUpdateRequest;
+use App\Http\Requests\Customer\StoreRequest;
+use App\Http\Requests\Customer\UpdateRequest;
 use App\Repositories\Customer\CustomerRepo;
 use App\Repositories\Upload\UploadRepo;
 use Illuminate\Support\Facades\Auth;
@@ -29,10 +31,10 @@ class CustomerController extends Controller
      * API lấy ds khách hàng
      * URL: {{url}}/api/v1/customers
      *
-     * @param CusGetListingRequest $request
+     * @param GetListingRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getListing(CusGetListingRequest $request)
+    public function getListing(GetListingRequest $request)
     {
         $params['keyword'] = request('keyword', null);
         $params['status'] = request('status', -1);
@@ -68,11 +70,11 @@ class CustomerController extends Controller
      * API lấy thông tin chi tiết khách hàng
      * URL: {{url}}/api/v1/customers/detail/8
      *
-     * @param CusGetDetailRequest $request
+     * @param GetDetailRequest $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function getDetail(CusGetDetailRequest $request, $sscid)
+    public function getDetail(GetDetailRequest $request, $sscid)
     {
         if ($sscid) {
             $params['id'] = request('id', null);
@@ -93,10 +95,10 @@ class CustomerController extends Controller
      * API thêm mới KH từ CMS
      * URL: {{url}}/api/v1/customers/store
      *
-     * @param CusStoreRequest $request
+     * @param StoreRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CusStoreRequest $request)
+    public function store(StoreRequest $request)
     {
         $params['fullname'] = request('fullname', null);
         $params['phone'] = request('phone', null);
@@ -141,11 +143,11 @@ class CustomerController extends Controller
      * API cập nhật thông tin KH theo id
      * URL: {{url}}/api/v1/customers/update/id
      *
-     * @param CusUpdateRequest $request
+     * @param UpdateRequest $request
      * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(CusUpdateRequest $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
         if ($id && is_numeric($id)) {
             $params['id'] = request('id', null);
@@ -218,7 +220,7 @@ class CustomerController extends Controller
      * @param $sscid
      * @return \Illuminate\Http\JsonResponse
      */
-    public function delete(CusDeleteRequest $request, $id)
+    public function delete(DeleteRequest $request, $id)
     {
         if ($id) {
             $params['id'] = request('id', null);
@@ -292,10 +294,10 @@ class CustomerController extends Controller
      * API thay đổi mật khẩu
      * URL: {{url}}/api/v1/me/change-password
      *
-     * @param CusChangePasswordRequest $request
+     * @param ChangePasswordRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function changePassword(CusChangePasswordRequest $request)
+    public function changePassword(ChangePasswordRequest $request)
     {
         $params['password'] = request('password', null);
 
