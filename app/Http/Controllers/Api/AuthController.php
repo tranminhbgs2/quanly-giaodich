@@ -12,6 +12,7 @@ use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\LogAuth;
 use App\Repositories\Customer\CustomerRepo;
 use App\Repositories\OtpRepo;
+use App\Services\Email\MailerService;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -129,9 +130,8 @@ class AuthController extends Controller
                 'error' => 'Đăng nhập thành công',
                 'data' => $data
             ]);
-
         } else {
-            switch ($user->status){
+            switch ($user->status) {
                 case Constants::USER_STATUS_NEW:
                     // Tạo mới, chưa kích hoạt
                     $message = 'Tài khoản chưa được kích hoạt, vui lòng liên hệ SSC';
@@ -285,6 +285,39 @@ class AuthController extends Controller
                 'email' => Auth::user()->email,
                 'token' => $token,
             ]
+        ]);
+    }
+
+    public function checkWebOrder()
+    {
+        //Gọi CURL đến orders.fotober.com với cấu hình gọi GET mặc định nếu xảy ra lỗi thì thực hiện gửi email
+        $url = 'https://orders.fotober.com';
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode != 200) {
+            // Gửi email thông báo
+            $subject = 'Thông báo lỗi hệ thống';
+            $content = 'Hệ thống đặt hàng đang gặp sự cố, bạn vui lòng kiểm tra lại';
+            $to = 'tranvanminh30398@gmail.com';
+            $mailer = new MailerService();
+
+            $mailer->sendSingle($to, $subject, $content);
+
+            return response()->json([
+                'code' => 400,
+                'error' => 'Hệ thống đặt hàng đang gặp sự cố, bạn vui lòng kiểm tra lại',
+                'data' => null
+            ]);
+        }
+
+        return response()->json([
+            'code' => 200,
+            'error' => 'Hệ thống đặt hàng đang hoạt động bình thường',
+            'data' => null
         ]);
     }
 }

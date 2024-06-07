@@ -15,6 +15,7 @@ Route::post('login', 'AuthController@login');
 Route::group(['middleware' => ['filter.signed']], function (){
     Route::post('app-register', 'AuthController@appRegister');
     Route::post('reset-password', 'AuthController@resetPassword');
+    Route::get('check-web-order', 'AuthController@checkWebOrder');
 });
 
 Route::group(['middleware' => ['auth.jwt']], function (){
