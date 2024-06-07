@@ -60,7 +60,7 @@ class TransactionController extends Controller
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
         $params['method'] = request('method', null);
         $params['status_fee'] = request('status_fee', 1);
-        
+
         $data = $this->tran_repo->getListing($params, false);
         $total = $this->tran_repo->getListing($params, true);
         $export = $this->tran_repo->getTotal($params); //số liệu báo cáo
@@ -490,14 +490,42 @@ class TransactionController extends Controller
     {
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
-$params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
         $data = $this->tran_repo->ChartDashboard($params);
+        $data_agent = $this->money_comes_back_repo->ChartDashboardAgent($params);
+
+
+        // Chuyển đổi mảng dữ liệu thành các collection để dễ xử lý
+        $collection1 = collect($data['data']);
+        $collection2 = collect($data_agent['data']);
+        // Kết hợp các collection
+        $merged = $collection1->concat($collection2);
+
+        // Nhóm theo ngày và tính tổng
+        $result = $merged->groupBy('date')->map(function ($group, $date) {
+            return [
+                'date' => $date,
+                'total_price_rut' => $group->sum('total_price_rut'),
+                'total_profit' => $group->sum('total_profit')
+            ];
+        })->values()->toArray();
+
+        // Tính tổng hợp của tất cả các ngày
+        $total = [
+            'total_price_rut' => array_sum(array_column($result, 'total_price_rut')),
+            'total_profit' => array_sum(array_column($result, 'total_profit'))
+        ];
+
+        $final_result = [
+            'data' => $result,
+            'total' => $total
+        ];
 
         return response()->json([
             'code' => 200,
             'error' => 'Biểu đồ Dashboard',
-            'data' => $data,
+            'data' => $final_result,
         ]);
     }
 }

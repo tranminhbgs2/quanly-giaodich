@@ -754,9 +754,63 @@ class MoneyComesBackRepo extends BaseRepo
         ];
         //Tính lợi nhuận
         $total['profit'] = $query->sum(function ($transaction) {
-            return $transaction->toto_price * ($transaction->fee_agent - $transaction->fee) / 100;
+            return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
         });
 
         return $total;
+    }
+
+
+    public function chartDashboardAgent($params)
+    {
+        $date_from = Carbon::parse($params['date_from'])->startOfDay();
+        $date_to = Carbon::parse($params['date_to'])->endOfDay();
+
+        // Tạo một đối tượng Collection mới chứa các ngày trong khoảng thời gian đã chỉ định
+        $date_range = collect();
+        $current_date = $date_from->copy();
+        while ($current_date->lessThanOrEqualTo($date_to)) {
+            $date_range->push($current_date->toDateString());
+            $current_date->addDay();
+        }
+
+        // Truy vấn dữ liệu từ cơ sở dữ liệu
+        $query = MoneyComesBack::select(['total_price', 'fee_agent', 'fee', 'created_at'])
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->whereNotNull('agent_id')
+            ->whereBetween('created_at', [$date_from, $date_to])
+            ->get()
+            ->groupBy(function ($transaction) {
+                return Carbon::parse($transaction->created_at)->toDateString();
+            });
+
+        // Merge các ngày trong khoảng thời gian đã chỉ định với các ngày trong kết quả truy vấn
+        $date_range = $date_range->merge($query->keys());
+
+        // Đảm bảo không có ngày trùng lặp và sắp xếp lại danh sách các ngày
+        $date_range = $date_range->unique()->sort();
+
+        // Điền vào danh sách ngày không có dữ liệu và tính tổng hợp
+        $total = ['total_price_rut' => 0, 'total_profit' => 0];
+        $result = $date_range->map(function ($date) use ($query, &$total) {
+            $total_price_rut = $query->has($date) ? $query[$date]->sum('total_price') : 0;
+            $total_profit = $query->has($date)
+            ? $query[$date]->sum(function ($transaction) {
+                return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
+            })
+            : 0;
+            $total['total_price_rut'] += $total_price_rut; // Cộng tổng sản lượng vào biến tổng hợp
+            $total['total_profit'] += $total_profit; // Cộng tổng lợi nhuận vào biến tổng hợp
+            // Định dạng lại ngày theo định dạng d/m/Y
+            $formatted_date = Carbon::parse($date)->format('d/m/Y');
+            return [
+                'date' => $formatted_date,
+                'total_price_rut' => $total_price_rut,
+                'total_profit' => $total_profit
+            ];
+        });
+
+        // Trả về mảng gồm data và total
+        return ['data' => $result, 'total' => $total];
     }
 }
