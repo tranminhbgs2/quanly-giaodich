@@ -721,8 +721,10 @@ class TransactionRepo extends BaseRepo
             $total_profit = $query->has($date) ? $query[$date]->sum('profit') : 0;
             $total['total_price_rut'] += $total_price_rut; // Cộng tổng sản lượng vào biến tổng hợp
             $total['total_profit'] += $total_profit; // Cộng tổng lợi nhuận vào biến tổng hợp
+            // Định dạng lại ngày theo định dạng d/m/Y
+            $formatted_date = Carbon::parse($date)->format('d/m/Y');
             return [
-                'date' => $date,
+                'date' => $formatted_date,
                 'total_price_rut' => $total_price_rut,
                 'total_profit' => $total_profit
             ];
