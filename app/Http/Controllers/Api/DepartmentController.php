@@ -99,6 +99,7 @@ class DepartmentController extends Controller
         $params['id'] = request('id', null);
         if ($params['id']) {
 
+            $params['name'] = request('name', null);
             $params['code'] = request('code', null);
             $params['url'] = request('url', null);
             $params['is_default'] = request('is_default', false);
