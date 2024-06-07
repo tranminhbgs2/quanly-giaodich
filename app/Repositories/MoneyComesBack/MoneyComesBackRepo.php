@@ -734,36 +734,13 @@ class MoneyComesBackRepo extends BaseRepo
         return $total;
     }
 
-
-    public function ReportDashboard()
-    {
-        $query = MoneyComesBack::select()
-            ->where('status', Constants::USER_STATUS_ACTIVE)
-            ->where('created_at', '>=', Carbon::now()->startOfDay())
-            ->where('created_at', '<=', Carbon::now()->endOfDay())
-            ->whereNotNull('agent_id')
-            ->get();
-
-
-        // Tính tổng của từng trường cần thiết
-        $total = [
-            'san_luong' => $query->sum('price_rut'),
-            'profit' => $query->sum('profit')
-        ];
-        //Tính tiền gốc nhận được theo từng giao dịch sau đó tính tổng bằng = price_rut - price_rut * original_fee / 100
-        $total['tien_nhan'] = $query->sum(function ($transaction) {
-            return $transaction->price_rut - $transaction->price_rut * $transaction->original_fee / 100;
-        });
-
-        return $total;
-    }
-
     public function ReportDashboardAgent($params)
     {
         $date_from = $params['agent_date_from'] ?? Carbon::now()->startOfDay();
         $date_to = $params['agent_date_to'] ?? Carbon::now()->endOfDay();
         $query = MoneyComesBack::select()
             ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->whereNotNull('agent_id')
             ->where('created_at', '>=', $date_from)
             ->where('created_at', '<=', $date_to)
             ->withTrashed()
