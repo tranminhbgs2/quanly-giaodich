@@ -380,7 +380,7 @@ class MoneyComesBackController extends Controller
     public function ketToanLo(KetToanLoRequest $request)
     {
         $params['id'] = request('id', null);
-        $params['time_end'] = request('time_end', 0); // id đại lý
+        $params['time_end'] = request('time_end', null); // id đại lý
         $params['time_end'] = str_replace('/', '-', $params['time_end']);
         if (request('time_end')) {
             $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));

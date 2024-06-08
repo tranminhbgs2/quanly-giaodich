@@ -16,8 +16,7 @@ use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
 use App\Repositories\Pos\PosRepo;
 use App\Repositories\Transaction\TransactionRepo;
 use App\Repositories\Transfer\TransferRepo;
-use App\Repositories\Upload\UploadRepo;
-use Illuminate\Support\Facades\Auth;
+use App\Repositories\User\UserRepo;
 
 class TransactionController extends Controller
 {
@@ -26,14 +25,16 @@ class TransactionController extends Controller
     protected $pos_repo;
     protected $transfer_repo;
     protected $bankAccountRepo;
+    protected $userRepo;
 
-    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo, PosRepo $posRepo, TransferRepo $transferRepo, BankAccountRepo $bankAccountRepo)
+    public function __construct(TransactionRepo $tranRepo, MoneyComesBackRepo $moneyComesBackRepo, PosRepo $posRepo, TransferRepo $transferRepo, BankAccountRepo $bankAccountRepo, UserRepo $userRepo)
     {
         $this->tran_repo = $tranRepo;
         $this->money_comes_back_repo = $moneyComesBackRepo;
         $this->pos_repo = $posRepo;
         $this->transfer_repo = $transferRepo;
         $this->bankAccountRepo = $bankAccountRepo;
+        $this->userRepo = $userRepo;
     }
 
     /**
@@ -73,7 +74,8 @@ class TransactionController extends Controller
                 "page_no" => intval($params['page_index']),
                 "page_size" => intval($params['page_size']),
                 "data" => $data,
-                'total' => $export
+                'total' => $export,
+                'params' => $params
             ],
         ]);
     }
@@ -199,6 +201,13 @@ class TransactionController extends Controller
             }
         }
 
+        if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
+            $params['price_nop'] = 0;
+            $params['fee_paid'] = $params['price_fee'];
+        } else {
+            $params['price_nop'] = $params['price_rut'];
+            $params['fee_paid'] = 0;
+        }
         $resutl = $this->tran_repo->store($params);
 
         if ($resutl) {
@@ -235,6 +244,17 @@ class TransactionController extends Controller
                         'status' => Constants::USER_STATUS_ACTIVE,
                     ];
                     $this->money_comes_back_repo->store($money_comes_back);
+                }
+
+                //Xử lý trừ tiền của nhân viên
+                if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
+                    $user = $this->userRepo->getById(auth()->user()->id);
+                    $user_balance = $user->balance - $params['price_transfer'];
+                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATE_TRANSACTION_" . $params['id']);
+                } else {
+                    $user = $this->userRepo->getById(auth()->user()->id);
+                    $user_balance = $user->balance - $params['price_nop'];
+                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATE_TRANSACTION_" . $params['id']);
                 }
             }
             return response()->json([
@@ -299,6 +319,8 @@ class TransactionController extends Controller
                 }
             }
 
+            $tran_old = $this->tran_repo->getById($params['id'], false);
+
             $pos = $this->pos_repo->getById($params['pos_id'], false);
 
             if ($pos) {
@@ -307,6 +329,15 @@ class TransactionController extends Controller
             }
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
             $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
+
+
+            if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
+                $params['price_nop'] = 0;
+                $params['fee_paid'] = $params['price_fee'];
+            } else {
+                $params['price_nop'] = $params['price_rut'];
+                $params['fee_paid'] = 0;
+            }
 
             $resutl = $this->tran_repo->update($params);
 
@@ -351,6 +382,18 @@ class TransactionController extends Controller
                             'status' => Constants::USER_STATUS_ACTIVE,
                         ];
                         $this->money_comes_back_repo->store($money_comes_back);
+                    }
+
+
+                    //Xử lý trừ tiền của nhân viên
+                    if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
+                        $user = $this->userRepo->getById(auth()->user()->id);
+                        $user_balance = $user->balance + $tran_old->price_transfer - $params['price_transfer'];
+                        $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
+                    } else {
+                        $user = $this->userRepo->getById(auth()->user()->id);
+                        $user_balance = $user->balance + $tran_old->price_nop - $params['price_nop'];
+                        $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
                     }
                 }
                 return response()->json([

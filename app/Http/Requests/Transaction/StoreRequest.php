@@ -28,7 +28,7 @@ class StoreRequest extends FormRequest
     {
         $rule = [
             'bank_card' => ['required'],
-            'method' => ['required'],
+            'method' => ['required', 'in:DAO_HAN,RUT_TIEN_MAT,ONLINE'],
             'category_id' => ['required', 'integer', 'min:1'],
             'pos_id' => ['required', 'integer', 'min:1'],
             'fee' => ['required', 'numeric', 'min:0', 'max:99'],

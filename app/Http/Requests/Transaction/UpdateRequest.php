@@ -30,7 +30,7 @@ class UpdateRequest extends FormRequest
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
             'bank_card' => ['required'],
-            'method' => ['required'],
+            'method' => ['required', 'in:DAO_HAN,RUT_TIEN_MAT,ONLINE'],
             'category_id' => ['required', 'integer', 'min:1'],
             'pos_id' => ['required', 'integer', 'min:1'],
             'fee' => ['required', 'numeric', 'min:0', 'max:99'],
@@ -41,7 +41,7 @@ class UpdateRequest extends FormRequest
             'price_fee' => ['required', 'numeric', 'min:0'],
             'price_transfer' => ['numeric', 'min:0'],
             'price_repair' => ['numeric', 'min:0'],
-            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
+            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED],
         ];
 
         return $rule;
@@ -110,8 +110,11 @@ class UpdateRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
-            $dep = Transaction::where('id', $this->request->get('id'))->withTrashed()->first();
+            $dep = Transaction::where('id', $this->request->get('id'))->first();
             if ($dep) {
+                if ($dep->method != $this->request->get('method')){
+                    $validator->errors()->add('check_exist', 'Không thể thay đổi hình thức giao dịch');
+                }
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
                 }

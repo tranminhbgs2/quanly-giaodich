@@ -427,6 +427,7 @@ class TransactionRepo extends BaseRepo
             'price_rut',
             'fee',
             'price_fee',
+            'fee_paid',
             'price_transfer',
             'profit',
             'price_repair',
@@ -485,7 +486,8 @@ class TransactionRepo extends BaseRepo
             'created_by',
             'original_fee',
             'fee_cashback',
-            'note'
+            'note',
+            'fee_paid',
         ];
 
         $update = [];

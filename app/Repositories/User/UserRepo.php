@@ -1,6 +1,7 @@
 <?php
 namespace App\Repositories\User;
 
+use App\Events\ActionLogEvent;
 use App\Helpers\Constants;
 use App\Models\User;
 use App\Repositories\BaseRepo;
@@ -259,5 +260,26 @@ class UserRepo extends BaseRepo
     public function getAllStaff()
     {
         return User::select('id', 'fullname', 'status')->where('status', Constants::USER_STATUS_ACTIVE)->where('account_type', 'STAFF')->orderBy('id', 'DESC')->get()->toArray();
+    }
+
+    public function updateBalance($id, $balance, $action)
+    {
+        $user = User::where('id', $id)->first();
+        // Lưu log qua event
+        event(new ActionLogEvent([
+            'actor_id' => auth()->user()->id,
+            'username' => auth()->user()->username,
+            'action' => 'UPDATE_BANLANCE_ACC_BANK',
+            'description' => $action. ' Cập nhật số tiền cho User ' . $user->username . ' từ ' . $user->balance . ' thành ' . $balance,
+            'data_new' => $balance,
+            'data_old' => $user->balance,
+            'model' => 'User',
+            'table' => 'users',
+            'record_id' => $id,
+            'ip_address' => request()->ip()
+        ]));
+
+        $update = ['balance' => $balance];
+        return $user->update($update);
     }
 }
