@@ -46,7 +46,6 @@ class TransactionController extends Controller
      */
     public function getListing(ListingRequest $request)
     {
-        print_r($request->all());die;
         $params['keyword'] = request('keyword', null);
         $params['status'] = request('status', -1);
         $params['page_index'] = request('page_index', 1);
@@ -76,7 +75,7 @@ class TransactionController extends Controller
                 "page_size" => intval($params['page_size']),
                 "data" => $data,
                 'total' => $export,
-                'params' => $params
+                'params' => $request->all()
             ],
         ]);
     }
