@@ -282,4 +282,10 @@ class BankAccountRepo extends BaseRepo
 
         return $dep;
     }
+    public function getAccountStaff($id)
+    {
+        $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', $id)->first();
+
+        return $dep;
+    }
 }

@@ -249,11 +249,23 @@ class TransactionController extends Controller
                 if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
                     $user = $this->userRepo->getById(auth()->user()->id);
                     $user_balance = $user->balance - $params['price_transfer'];
-                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATE_TRANSACTION_" . $params['id']);
+                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATE_TRANSACTION_" . $resutl->id);
+                    //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
+                    $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                    if ($bank_account) {
+                        $bank_account->balance -= $params['price_transfer'];
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "CREATE_TRANSACTION_" . $resutl->id);
+                    }
                 } else {
                     $user = $this->userRepo->getById(auth()->user()->id);
                     $user_balance = $user->balance - $params['price_nop'];
-                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATE_TRANSACTION_" . $params['id']);
+                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATE_TRANSACTION_" . $resutl->id);
+                    //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
+                    $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                    if ($bank_account) {
+                        $bank_account->balance -= $params['price_nop'];
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "CREATE_TRANSACTION_" . $resutl->id);
+                    }
                 }
             }
             return response()->json([
@@ -389,10 +401,22 @@ class TransactionController extends Controller
                         $user = $this->userRepo->getById(auth()->user()->id);
                         $user_balance = $user->balance + $tran_old->price_transfer - $params['price_transfer'];
                         $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
+                        //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
+                        $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                        if ($bank_account) {
+                            $bank_account->balance += $tran_old->price_transfer - $params['price_transfer'];
+                            $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
+                        }
                     } else {
                         $user = $this->userRepo->getById(auth()->user()->id);
                         $user_balance = $user->balance + $tran_old->price_nop - $params['price_nop'];
                         $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
+                        //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
+                        $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                        if ($bank_account) {
+                            $bank_account->balance += $tran_old->price_nop - $params['price_nop'];
+                            $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
+                        }
                     }
                 }
                 return response()->json([
