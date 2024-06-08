@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Transaction;
 
 use App\Helpers\Constants;
+use App\Models\BankAccounts;
 use App\Models\Transaction;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -120,6 +121,19 @@ class UpdateRequest extends FormRequest
                 }
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy giao dịch khách lẻ');
+            }
+
+            if (auth()->user()->account_type == "STAFF"){
+                $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                if($dep){
+                    if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')){
+                        $validator->errors()->add('check_exist', 'Số dư không đủ');
+                    }
+                } else {
+                    $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
+                }
+            } else if(auth()->user()->account_type == "SYSTEM") {
+                $validator->errors()->add('check_exist', 'Chỉ nhân viên thực hiện giao dịch');
             }
         });
     }
