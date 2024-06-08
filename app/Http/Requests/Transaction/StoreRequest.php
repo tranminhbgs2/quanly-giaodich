@@ -103,31 +103,33 @@ class StoreRequest extends FormRequest
      */
     public function withValidator($validator)
     {
-        // $validator->after(function ($validator) {
-        //     // Check username
-        //     $dep = Department::where('name', $this->request->get('name'))->withTrashed()->first();
+        $validator->after(function ($validator) {
+            //     // Check username
+            //     $dep = Department::where('name', $this->request->get('name'))->withTrashed()->first();
 
-        //     if ($dep) {
-        //         $validator->errors()->add('check_exist', 'Tên nhóm quyền đã tồn tại');
-        //     }
+            //     if ($dep) {
+            //         $validator->errors()->add('check_exist', 'Tên nhóm quyền đã tồn tại');
+            //     }
 
-        //     $dep_code = Department::where('code', $this->request->get('code'))->withTrashed()->first();
-        //     if ($dep_code) {
-        //         $validator->errors()->add('check_exist', 'Mã nhóm quyền đã tồn tại');
-        //     }
-        // });
-        if (auth()->user()->account_type == "STAFF") {
-            $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
-            if ($dep) {
-                if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
-                    $validator->errors()->add('check_exist', 'Số dư không đủ');
+            //     $dep_code = Department::where('code', $this->request->get('code'))->withTrashed()->first();
+            //     if ($dep_code) {
+            //         $validator->errors()->add('check_exist', 'Mã nhóm quyền đã tồn tại');
+            //     }
+            // });
+            if (auth()->user()->account_type == "STAFF") {
+                $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                if ($dep) {
+                    if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
+                        $validator->errors()->add('check_exist', 'Số dư không đủ');
+                    }
+                } else {
+                    $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
                 }
-            } else {
-                $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
+            } else if (auth()->user()->account_type == "SYSTEM") {
+                $validator
+                    ->errors()->add('check_exist', 'Chỉ nhân viên thực hiện giao dịch');
             }
-        } else if(auth()->user()->account_type == "SYSTEM") {
-            $validator->errors()->add('check_exist', 'Chỉ nhân viên thực hiện giao dịch');
-        }
+        });
     }
 
     /**
