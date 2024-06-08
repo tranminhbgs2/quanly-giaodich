@@ -183,6 +183,21 @@ class TransactionController extends Controller
         $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
         $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100; // lợi nhuận
 
+        if ($params['lo_number'] > 0) {
+            if ($params['time_payment']) {
+                $time_process = date('Y-m-d', strtotime($params['time_payment']));
+            } else {
+                $time_process = date('Y-m-d');
+            }
+            $money_comeb = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+            if ($money_comeb && !empty($money_comeb->time_end)) {
+                return response()->json([
+                    'code' => 400,
+                    'error' => 'Không thể thêm mới giao dịch cho lô đã kết toán',
+                    'data' => null
+                ]);
+            }
+        }
 
         $resutl = $this->tran_repo->store($params);
 
@@ -200,7 +215,6 @@ class TransactionController extends Controller
                     $money_comes_back = [
                         'pos_id' => $params['pos_id'],
                         'lo_number' => $params['lo_number'],
-                        'time_end' => $params['time_payment'],
                         'time_process' => $time_process,
                         'fee' => $params['original_fee'],
                         'total_price' => $total_price,
@@ -213,7 +227,6 @@ class TransactionController extends Controller
                     $money_comes_back = [
                         'pos_id' => $params['pos_id'],
                         'lo_number' => $params['lo_number'],
-                        'time_end' => $params['time_payment'],
                         'time_process' => $time_process,
                         'fee' => $params['original_fee'],
                         'total_price' => $params['price_rut'],
@@ -268,7 +281,23 @@ class TransactionController extends Controller
             $params['customer_id'] = request('customer_id', 0);
             $params['lo_number'] = request('lo_number', 0);
             $params['note'] = request('note', null); // số lô
+            $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
+            if ($params['lo_number'] > 0) {
+                if ($params['time_payment']) {
+                    $time_process = date('Y-m-d', strtotime($params['time_payment']));
+                } else {
+                    $time_process = date('Y-m-d');
+                }
+                $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+                if ($money_come && !empty($money_come->time_end)) {
+                    return response()->json([
+                        'code' => 400,
+                        'error' => 'Không thể thêm mới giao dịch cho lô đã kết toán',
+                        'data' => null
+                    ]);
+                }
+            }
 
             $pos = $this->pos_repo->getById($params['pos_id'], false);
 
@@ -278,9 +307,6 @@ class TransactionController extends Controller
             }
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
             $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
-
-
-            $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
             $resutl = $this->tran_repo->update($params);
 
@@ -305,7 +331,6 @@ class TransactionController extends Controller
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
                             'lo_number' => $params['lo_number'],
-                            'time_end' => $params['time_payment'],
                             'time_process' => $time_process,
                             'fee' => $params['original_fee'],
                             'total_price' => $total_price,
@@ -318,7 +343,6 @@ class TransactionController extends Controller
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
                             'lo_number' => $params['lo_number'],
-                            'time_end' => $params['time_payment'],
                             'time_process' => $time_process,
                             'fee' => $params['original_fee'],
                             'total_price' => $params['price_rut'],
@@ -378,7 +402,6 @@ class TransactionController extends Controller
                     $money_comes_back = [
                         'pos_id' => $tran->pos_id,
                         'lo_number' => $tran->lo_number,
-                        'time_end' => $tran->time_payment,
                         'time_process' => $time_process,
                         'fee' => $tran->original_fee,
                         'total_price' => $total_price,
@@ -536,7 +559,7 @@ class TransactionController extends Controller
         $fee_paid = 0;
         $fee_paid_balance = 0;
         if ($tran_fee && $tran_fee->fee_paid > 0) {
-            $fee_paid = $tran_fee->fee_paid*(-1);
+            $fee_paid = $tran_fee->fee_paid * (-1);
             $fee_paid_balance = $tran_fee->fee_paid;
         } else {
             return response()->json([

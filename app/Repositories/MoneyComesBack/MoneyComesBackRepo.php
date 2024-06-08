@@ -398,7 +398,7 @@ class MoneyComesBackRepo extends BaseRepo
                     $pos_repo = new PosRepo();
                     $pos_repo->updatePricePos($pos_balance, $pos->id, "CREATE_MONEY_COMES_BACK_" . $res->id);
                 }
-                if(isset($insert['agent_id']) && $insert['agent_id'] > 0){
+                if (isset($insert['agent_id']) && $insert['agent_id'] > 0) {
                     $agent = Agent::where('id', $insert['agent_id'])->first();
                     if ($agent) {
                         $agent_balance = $agent->balance + $insert['payment_agent'];
@@ -465,7 +465,7 @@ class MoneyComesBackRepo extends BaseRepo
                 $pos_repo->updatePricePos($pos_balance, $pos->id, "UPDATE_MONEY_COMES_BACK_" . $id);
             }
 
-            if(isset($params['agent_id']) && $params['agent_id'] > 0){
+            if (isset($params['agent_id']) && $params['agent_id'] > 0) {
                 $agent = Agent::where('id', $params['agent_id'])->first();
                 if ($agent) {
                     $agent_balance = $agent->balance + $balance_change;
@@ -575,8 +575,12 @@ class MoneyComesBackRepo extends BaseRepo
     public function getByLoTime($params, $with_trashed = false)
     {
         $lo_number = isset($params['lo_number']) ? $params['lo_number'] : 0;
-        $time_process = isset($params['time_process']) ? $params['time_process'] : 0;
-        $tran = MoneyComesBack::where('lo_number', $lo_number)->where('time_process', $time_process);
+        $time_process = isset($params['time_process']) ? $params['time_process'] : null;
+        $tran = MoneyComesBack::where('lo_number', $lo_number);
+        $tran->whereNull('agent_id');
+        if ($time_process) {
+            $tran->where('time_process', $time_process);
+        }
         return $tran->first();
     }
 
@@ -791,10 +795,10 @@ class MoneyComesBackRepo extends BaseRepo
         $result = $date_range->map(function ($date) use ($query, &$total) {
             $total_price_rut = $query->has($date) ? $query[$date]->sum('total_price') : 0;
             $total_profit = $query->has($date)
-            ? $query[$date]->sum(function ($transaction) {
-                return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
-            })
-            : 0;
+                ? $query[$date]->sum(function ($transaction) {
+                    return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
+                })
+                : 0;
             $total['total_price_rut'] += $total_price_rut; // Cộng tổng sản lượng vào biến tổng hợp
             $total['total_profit'] += $total_profit; // Cộng tổng lợi nhuận vào biến tổng hợp
             // Định dạng lại ngày theo định dạng d/m/Y

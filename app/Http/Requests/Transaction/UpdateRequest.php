@@ -82,7 +82,7 @@ class UpdateRequest extends FormRequest
             'fee.required' => 'Truyền thiếu tham số fee',
             'fee.numeric' => 'Tham số fee phải là số',
             'fee.min' => "Tham số fee tối thiểu phải là :min",
-            'time_payment.date_format' => 'Tham số time_payment không đúng định dạng Y-m-d H:i:s',
+            'time_payment.date_format' => 'Tham số time_payment không đúng định dạng Y/m/d H:i:s',
             'customer_name.required' => 'Truyền thiếu tham số customer_name',
             'price_nop.required' => 'Truyền thiếu tham số price_nop',
             'price_nop.numeric' => 'Tham số price_nop phải là số',
