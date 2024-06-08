@@ -577,7 +577,6 @@ class TransactionRepo extends BaseRepo
     {
         $id = isset($params['id']) ? $params['id'] : null;
         $tran = Transaction::where('id', $id)
-            ->withTrashed()
             ->first();
 
         if ($tran) {
@@ -629,7 +628,6 @@ class TransactionRepo extends BaseRepo
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->where('created_at', '>=', $date_from)
             ->where('created_at', '<=', $date_to)
-            ->withTrashed()
             ->get();
 
 
@@ -679,7 +677,7 @@ class TransactionRepo extends BaseRepo
 
     public function changeFeePaid($fee_paid, $id)
     {
-        $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->withTrashed()->first();
+        $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
         $fee_paid_new = $tran->fee_paid + $fee_paid;
         $update = ['fee_paid' => $fee_paid_new];
 

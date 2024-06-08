@@ -33,8 +33,8 @@ class UpdateRequest extends FormRequest
             // 'fee' => ['required', 'numeric', 'min:0'],
             'total_price' => ['required', 'numeric', 'min:0'],
             // 'payment' => ['required', 'numeric', 'min:0'],
-            'time_end' => 'required|date_format:Y/m/d H:i:s',
-            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
+            'time_end' => 'date_format:Y/m/d H:i:s',
+            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED],
         ];
 
         return $rule;
@@ -71,8 +71,12 @@ class UpdateRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check username
-            $dep = MoneyComesBack::where('id', $this->request->get('id'))->withTrashed()->first();
+            $dep = MoneyComesBack::where('id', $this->request->get('id'))->first();
             if ($dep) {
+
+                if ($dep && !empty($dep->time_end)) {
+                    $validator->errors()->add('check_exist', 'Lô tiền về đã kết toán');
+                }
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Lô tiền về đã bị xóa');
                 }
@@ -80,7 +84,6 @@ class UpdateRequest extends FormRequest
                 $validator->errors()->add('check_exist', 'Không tìm thấy lô tiền về');
             }
         });
-
     }
 
     /**

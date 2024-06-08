@@ -528,4 +528,42 @@ class TransactionController extends Controller
             'data' => $final_result,
         ]);
     }
+
+    public function RestoreFee()
+    {
+        $id = request('id', null);
+        $tran_fee = $this->tran_repo->getById($id, false);
+        $fee_paid = 0;
+        $fee_paid_balance = 0;
+        if ($tran_fee && $tran_fee->fee_paid > 0) {
+            $fee_paid = $tran_fee->fee_paid*(-1);
+            $fee_paid_balance = $tran_fee->fee_paid;
+        } else {
+            return response()->json([
+                'code' => 400,
+                'error' => 'Không tìm thấy giao dịch hoặc phí đã được hoàn',
+                'data' => null,
+            ]);
+        }
+        $tran = $this->tran_repo->changeFeePaid($fee_paid, $id);
+
+        if ($tran) {
+            //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
+            $bank_account = $this->bankAccountRepo->getAccountFee();
+            if ($bank_account) {
+                $bank_account->balance -= $fee_paid_balance;
+                $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "RESTORE_FEE_TRANSACTION_" . $id);
+            }
+            return response()->json([
+                'code' => 200,
+                'error' => 'Hoàn phí thành công',
+                'data' => null
+            ]);
+        }
+        return response()->json([
+            'code' => 400,
+            'error' => 'Hoàn phí thất bại',
+            'data' => null,
+        ]);
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\MoneyComesBack\ChangeStatusRequest;
 use App\Http\Requests\MoneyComesBack\DeleteRequest;
 use App\Http\Requests\MoneyComesBack\GetDetailRequest;
+use App\Http\Requests\MoneyComesBack\KetToanLoRequest;
 use App\Http\Requests\MoneyComesBack\ListingRequest;
 use App\Http\Requests\MoneyComesBack\StoreRequest;
 use App\Http\Requests\MoneyComesBack\UpdateRequest;
@@ -200,10 +201,10 @@ class MoneyComesBackController extends Controller
         $params['created_by'] = auth()->user()->id;
         $params['balance'] = floatval(request('balance', 0)); // tiền  tổng
         $params['agent_id'] = request('agent_id', 0); // id đại lý
-        $params['time_end'] = request('time_end', 0); // id đại lý
-        $params['time_end'] = str_replace('/', '-', $params['time_end']);
-        if (request('time_end')) {
-            $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
+        $params['time_end'] = request('time_end', null); // id đại lý
+        if ($params['time_end']) {
+            $params['time_end'] = str_replace('/', '-', $params['time_end']);
+            $params['time_process'] = date('Y-m-d', strtotime($params['time_end']));
         }
 
         if ($params['agent_id'] > 0) {
@@ -269,10 +270,10 @@ class MoneyComesBackController extends Controller
             $params['created_by'] = auth()->user()->id;
             $params['balance'] = floatval(request('balance', 0)); // tiền  tổng
             $params['agent_id'] = request('agent_id', 0); // id đại lý
-            $params['time_end'] = request('time_end', 0); // id đại lý
-            $params['time_end'] = str_replace('/', '-', $params['time_end']);
-            if (request('time_end')) {
-                $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
+            $params['time_end'] = request('time_end', null); // id đại lý
+            if ($params['time_end']) {
+                $params['time_end'] = str_replace('/', '-', $params['time_end']);
+                $params['time_process'] = date('Y-m-d', strtotime($params['time_end']));
             }
             if ($params['agent_id'] > 0) {
                 $pos = $this->pos_repo->getById($params['pos_id']);
@@ -372,6 +373,31 @@ class MoneyComesBackController extends Controller
         return response()->json([
             'code' => 400,
             'error' => 'Cập nhật trạng thái không thành công',
+            'data' => null
+        ]);
+    }
+
+    public function ketToanLo(KetToanLoRequest $request)
+    {
+        $params['id'] = request('id', null);
+        $params['time_end'] = request('time_end', 0); // id đại lý
+        $params['time_end'] = str_replace('/', '-', $params['time_end']);
+        if (request('time_end')) {
+            $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
+        }
+        $resutl = $this->money_repo->ketToanLo($params['id'], $params['time_process'], $params['time_end']);
+
+        if ($resutl) {
+            return response()->json([
+                'code' => 200,
+                'error' => 'Kết toán lô thành công',
+                'data' => null
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'error' => 'Kết toán lô không thành công',
             'data' => null
         ]);
     }

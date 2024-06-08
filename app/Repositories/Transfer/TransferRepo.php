@@ -187,7 +187,7 @@ class TransferRepo extends BaseRepo
     public function delete($params)
     {
         $id = isset($params['id']) ? $params['id'] : null;
-        $transfer = Transfer::where('id', $id)->withTrashed()->first();
+        $transfer = Transfer::where('id', $id)->first();
 
         if ($transfer) {
             if ($transfer->status == Constants::USER_STATUS_DELETED) {
@@ -331,7 +331,6 @@ class TransferRepo extends BaseRepo
         } else {
             $query->where('status', Constants::USER_STATUS_ACTIVE);
         }
-        $query->withTrashed();
         // Tính tổng của từng trường cần thiết
         $total = [
             'total_transfer' => $query->sum('price'),

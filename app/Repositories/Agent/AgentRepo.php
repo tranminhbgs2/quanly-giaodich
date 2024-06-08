@@ -163,7 +163,7 @@ class AgentRepo extends BaseRepo
     public function delete($params)
     {
         $id = isset($params['id']) ? $params['id'] : null;
-        $agent = Agent::where('id', $id)->withTrashed()->first();
+        $agent = Agent::where('id', $id)->first();
 
         if ($agent) {
             if ($agent->status == Constants::USER_STATUS_DELETED) {
@@ -228,7 +228,7 @@ class AgentRepo extends BaseRepo
 
     public function updateBalance($id, $balance, $action = "")
     {
-        $bank = Agent::where('id', $id)->withTrashed()->first();
+        $bank = Agent::where('id', $id)->first();
         // Lưu log qua event
         event(new ActionLogEvent([
             'actor_id' => auth()->user()->id,

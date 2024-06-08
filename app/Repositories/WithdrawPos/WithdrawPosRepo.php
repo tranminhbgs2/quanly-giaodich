@@ -184,7 +184,7 @@ class WithdrawPosRepo extends BaseRepo
         if (!empty($insert['pos_id']) && !empty($insert['price_withdraw'])) {
             $res = WithdrawPos::create($insert);
             if ($res) {
-                $pos = Pos::where('id', $insert['pos_id'])->withTrashed()->first();
+                $pos = Pos::where('id', $insert['pos_id'])->first();
                 $bank_acc = BankAccounts::where('id', $insert['account_bank_id'])->first();
                 if ($pos && $bank_acc) {
                     $price_bank = $bank_acc->balance + $insert['price_withdraw'];
@@ -222,13 +222,13 @@ class WithdrawPosRepo extends BaseRepo
                 $update[$field] = $params[$field];
             }
         }
-        $pos_withdraw = WithdrawPos::where('id', $id)->withTrashed()->first();
+        $pos_withdraw = WithdrawPos::where('id', $id)->first();
         $price_withdraw_old = $pos_withdraw->price_withdraw;
         $bank_acc_id = $pos_withdraw->account_bank_id;
         $res = $pos_withdraw->update($update);
         if ($res) {
             if ($price_withdraw_old != $update['price_withdraw']) {
-                $pos = Pos::where('id', $update['pos_id'])->withTrashed()->first();
+                $pos = Pos::where('id', $update['pos_id'])->first();
                 if ($pos) {
                     // update số tiền máy pos
                     $price_pos = $pos->price_pos - ($params['price_withdraw'] - $price_withdraw_old);
@@ -237,8 +237,8 @@ class WithdrawPosRepo extends BaseRepo
                 }
             }
             if ($bank_acc_id != $update['account_bank_id']) {
-                $bank_acc_old = BankAccounts::where('id', $bank_acc_id)->withTrashed()->first();
-                $bank_acc_new = BankAccounts::where('id', $update['account_bank_id'])->withTrashed()->first();
+                $bank_acc_old = BankAccounts::where('id', $bank_acc_id)->first();
+                $bank_acc_new = BankAccounts::where('id', $update['account_bank_id'])->first();
                 if ($bank_acc_old && $bank_acc_new) {
                     //update số tiền TKHT cũ
                     $price_bank_old = $bank_acc_old->balance - $price_withdraw_old;
@@ -250,7 +250,7 @@ class WithdrawPosRepo extends BaseRepo
                     $bank_acc->updateBalance($update['account_bank_id'], $price_bank, "WITHDRAWPOS_UPDATE_" . $id);
                 }
             } else {
-                $bank_acc = BankAccounts::where('id', $update['account_bank_id'])->withTrashed()->first();
+                $bank_acc = BankAccounts::where('id', $update['account_bank_id'])->first();
                 if ($bank_acc) {
                     //update số tiền TKHT
                     $price_bank = $bank_acc->balance + $update['price_withdraw'] - $price_withdraw_old;
@@ -318,7 +318,7 @@ class WithdrawPosRepo extends BaseRepo
     public function delete($params)
     {
         $id = isset($params['id']) ? $params['id'] : null;
-        $withdrawPos = WithdrawPos::where('id', $id)->withTrashed()->first();
+        $withdrawPos = WithdrawPos::where('id', $id)->first();
         $price_withdraw_old = $withdrawPos->price_withdraw;
 
         if ($withdrawPos) {
@@ -333,8 +333,8 @@ class WithdrawPosRepo extends BaseRepo
                 $withdrawPos->deleted_at = Carbon::now();
 
                 if ($withdrawPos->save()) {
-                    $pos = Pos::where('id', $withdrawPos->pos_id)->withTrashed()->first();
-                    $bank_acc = BankAccounts::where('id', $withdrawPos->account_bank_id)->withTrashed()->first();
+                    $pos = Pos::where('id', $withdrawPos->pos_id)->first();
+                    $bank_acc = BankAccounts::where('id', $withdrawPos->account_bank_id)->first();
                     if ($pos && $bank_acc) {
                         $price_bank = $bank_acc->balance - $price_withdraw_old;
                         $bank_acc = new BankAccountRepo();

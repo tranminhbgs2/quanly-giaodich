@@ -392,14 +392,14 @@ class MoneyComesBackRepo extends BaseRepo
             $res = MoneyComesBack::create($insert);
             // Xử lý cộng tiền máy Pos
             if ($res) {
-                $pos = Pos::where('id', $insert['pos_id'])->withTrashed()->first();
+                $pos = Pos::where('id', $insert['pos_id'])->first();
                 if ($pos) {
                     $pos_balance = $pos->price_pos + $insert['payment'];
                     $pos_repo = new PosRepo();
                     $pos_repo->updatePricePos($pos_balance, $pos->id, "CREATE_MONEY_COMES_BACK_" . $res->id);
                 }
                 if(isset($insert['agent_id']) && $insert['agent_id'] > 0){
-                    $agent = Agent::where('id', $insert['agent_id'])->withTrashed()->first();
+                    $agent = Agent::where('id', $insert['agent_id'])->first();
                     if ($agent) {
                         $agent_balance = $agent->balance + $insert['payment_agent'];
                         $agent_repo = new AgentRepo();
@@ -458,7 +458,7 @@ class MoneyComesBackRepo extends BaseRepo
                 'ip_address' => request()->ip()
             ]));
 
-            $pos = Pos::where('id', $params['pos_id'])->withTrashed()->first();
+            $pos = Pos::where('id', $params['pos_id'])->first();
             if ($pos) {
                 $pos_balance = $pos->price_pos + $balance_change;
                 $pos_repo = new PosRepo();
@@ -466,7 +466,7 @@ class MoneyComesBackRepo extends BaseRepo
             }
 
             if(isset($params['agent_id']) && $params['agent_id'] > 0){
-                $agent = Agent::where('id', $params['agent_id'])->withTrashed()->first();
+                $agent = Agent::where('id', $params['agent_id'])->first();
                 if ($agent) {
                     $agent_balance = $agent->balance + $balance_change;
                     $agent_repo = new AgentRepo();
@@ -480,7 +480,7 @@ class MoneyComesBackRepo extends BaseRepo
     public function delete($params)
     {
         $id = isset($params['id']) ? $params['id'] : null;
-        $moneyComesBack = MoneyComesBack::where('id', $id)->withTrashed()->first();
+        $moneyComesBack = MoneyComesBack::where('id', $id)->first();
 
         if ($moneyComesBack) {
             if ($moneyComesBack->status == Constants::USER_STATUS_DELETED) {
@@ -496,7 +496,7 @@ class MoneyComesBackRepo extends BaseRepo
 
                 if ($moneyComesBack->save()) {
                     // Xóa lô tiền về thì trừ đi tiền pos tồn
-                    $pos = Pos::where('id', $moneyComesBack->pos_id)->withTrashed()->first();
+                    $pos = Pos::where('id', $moneyComesBack->pos_id)->first();
                     if ($pos && $pos->price_pos >= $balance_change) {
                         $pos_balance = $pos->price_pos - $balance_change;
                         $pos_repo = new PosRepo();
@@ -577,9 +577,6 @@ class MoneyComesBackRepo extends BaseRepo
         $lo_number = isset($params['lo_number']) ? $params['lo_number'] : 0;
         $time_process = isset($params['time_process']) ? $params['time_process'] : 0;
         $tran = MoneyComesBack::where('lo_number', $lo_number)->where('time_process', $time_process);
-        if ($with_trashed) {
-            $tran->withTrashed();
-        }
         return $tran->first();
     }
 
@@ -743,7 +740,6 @@ class MoneyComesBackRepo extends BaseRepo
             ->whereNotNull('agent_id')
             ->where('created_at', '>=', $date_from)
             ->where('created_at', '<=', $date_to)
-            ->withTrashed()
             ->get();
 
 
@@ -812,5 +808,15 @@ class MoneyComesBackRepo extends BaseRepo
 
         // Trả về mảng gồm data và total
         return ['data' => $result, 'total' => $total];
+    }
+
+    public function ketToanLo($id, $time_process, $time_end)
+    {
+        $update = [
+            'time_process' => $time_process,
+            'time_end' => $time_end
+        ];
+
+        return MoneyComesBack::where('id', $id)->update($update);
     }
 }

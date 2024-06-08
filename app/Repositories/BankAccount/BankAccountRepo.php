@@ -247,7 +247,7 @@ class BankAccountRepo extends BaseRepo
 
     public function updateBalance($id, $balance, $action = "")
     {
-        $bank = BankAccounts::where('id', $id)->withTrashed()->first();
+        $bank = BankAccounts::where('id', $id)->first();
         // Lưu log qua event
         event(new ActionLogEvent([
             'actor_id' => auth()->user()->id,
@@ -271,14 +271,14 @@ class BankAccountRepo extends BaseRepo
         $dep = BankAccounts::where('account_name', $account_name)
             ->where('account_number', $account_number)
             ->where('bank_code', $bank_code)
-            ->withTrashed()->first();
+            ->first();
 
         return $dep;
     }
 
     public function getAccountFee()
     {
-        $dep = BankAccounts::where('type', 'FEE')->withTrashed()->first();
+        $dep = BankAccounts::where('type', 'FEE')->first();
 
         return $dep;
     }

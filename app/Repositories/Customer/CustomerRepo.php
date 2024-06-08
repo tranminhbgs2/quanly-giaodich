@@ -237,7 +237,6 @@ class CustomerRepo extends BaseRepo
 
             $id = isset($params['id']) ? $params['id'] : null;
             $user = User::where('id', $id)
-                ->withTrashed()
                 ->first();
 
         if ($user) {
@@ -412,6 +411,6 @@ class CustomerRepo extends BaseRepo
 
     public function getByEmail($email)
     {
-        return User::where('email', $email)->withTrashed()->first();
+        return User::where('email', $email)->first();
     }
 }

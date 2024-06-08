@@ -32,7 +32,7 @@ class StoreRequest extends FormRequest
             // 'fee' => ['required', 'numeric', 'min:0'],
             'total_price' => ['required', 'numeric', 'min:0'],
             // 'payment' => ['required', 'numeric', 'min:0'],
-            'time_end' => 'required|date_format:Y/m/d H:i:s',
+            'time_end' => 'date_format:Y/m/d H:i:s',
             'agent_id' => 'numeric|min:0',
         ];
 
@@ -72,9 +72,8 @@ class StoreRequest extends FormRequest
             // Check username
             $dep = MoneyComesBack::where('pos_id', $this->request->get('pos_id'))
                 ->where('lo_number', $this->request->get('lo_number'))
-                ->where('time_end', $this->request->get('time_end'))
-                ->withTrashed()->first();
-
+                ->first();
+            
             if ($dep) {
                 $validator->errors()->add('check_exist', 'Lô tiền về đã tồn tại');
             }

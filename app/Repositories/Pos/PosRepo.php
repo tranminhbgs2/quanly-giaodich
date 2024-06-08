@@ -134,7 +134,7 @@ class PosRepo extends BaseRepo
                 $update[$field] = $params[$field];
             }
         }
-        $pos = Pos::where('id', $id)->withTrashed()->first();
+        $pos = Pos::where('id', $id)->first();
         if (isset($params['price_pos']) && $params['price_pos'] != $pos->price_pos) {
             // Lưu log qua event
             event(new ActionLogEvent([
@@ -190,7 +190,7 @@ class PosRepo extends BaseRepo
     public function delete($params)
     {
         $id = isset($params['id']) ? $params['id'] : null;
-        $pos = Pos::where('id', $id)->withTrashed()->first();
+        $pos = Pos::where('id', $id)->first();
 
         if ($pos) {
             if ($pos->status == Constants::USER_STATUS_DELETED) {
@@ -305,7 +305,7 @@ class PosRepo extends BaseRepo
 
     public function updatePricePos ($price_pos, $id, $action = "")
     {
-        $pos = Pos::where('id', $id)->withTrashed()->first();
+        $pos = Pos::where('id', $id)->first();
         if (isset($price_pos)) {
             // Lưu log qua event
             event(new ActionLogEvent([
