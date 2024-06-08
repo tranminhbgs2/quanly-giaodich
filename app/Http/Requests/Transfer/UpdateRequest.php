@@ -85,27 +85,26 @@ class UpdateRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $bank_from = BankAccounts::where('id', $this->request->get('acc_bank_from_id'))->withTrashed()->first();
+            $bank_from = BankAccounts::where('id', $this->request->get('acc_bank_from_id'))->first();
             if (!$bank_from) {
                 $validator->errors()->add('acc_bank_from_id', 'Tài khoản chuyển không tồn tại');
             } elseif ($bank_from->type != $this->request->get('type_from')) {
                 $validator->errors()->add('acc_bank_from_id', 'Loại tài khoản đã chọn không khớp');
             }
-            $bank_to = BankAccounts::where('id', $this->request->get('acc_bank_to_id'))->withTrashed()->first();
+            $bank_to = BankAccounts::where('id', $this->request->get('acc_bank_to_id'))->first();
             if (!$bank_to) {
                 $validator->errors()->add('acc_bank_to_id', 'Tài khoản nhận không tồn tại');
             } elseif ($bank_to->type != $this->request->get('type_to')) {
                 $validator->errors()->add('acc_bank_to_id', 'Loại tài khoản đã chọn không khớp');
             }
-            // Check username
-            $dep = Transfer::
-            where('acc_bank_from_id', $this->request->get('acc_bank_from_id'))
-            ->where('acc_bank_to_id', $this->request->get('acc_bank_to_id'))
-            ->where('time_payment', $this->request->get('time_payment'))
-            ->withTrashed()->first();
-            if ($dep) {
-                if ($dep->status == Constants::USER_STATUS_DELETED) {
+
+            $transfer = Transfer::where('id', $this->request->get('id'))->first();
+            if ($transfer) {
+                if ($transfer->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Chuyển tiền đã bị xóa');
+                }
+                if ($transfer->type_from != $this->request->get('type_from') || $transfer->type_to != $this->request->get('type_to')) {
+                    $validator->errors()->add('type_from', 'Loại tài khoản đã chọn không khớp');
                 }
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy Chuyển tiền');
