@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\BankAccount;
 
+use App\Helpers\Constants;
 use App\Models\BankAccounts;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -94,8 +95,7 @@ class StoreRequest extends FormRequest
                     }
                     break;
                 case 'FEE':
-                    $fee = BankAccounts::where('type', 'FEE')->where('account_name', $this->request->get('account_name'))
-                    ->withTrashed()->first();
+                    $fee = BankAccounts::where('type', 'FEE')->where('status', Constants::USER_STATUS_ACTIVE)->first();
                     if ($fee) {
                         $validator->errors()->add('check_exist', 'Tài khoản phí đã tồn tại');
                     }

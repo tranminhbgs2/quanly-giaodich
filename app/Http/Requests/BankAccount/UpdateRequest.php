@@ -104,8 +104,7 @@ class UpdateRequest extends FormRequest
                     }
                     break;
                 case 'FEE':
-                    $fee = BankAccounts::where('type', 'FEE')->where('status', Constants::USER_STATUS_ACTIVE)
-                    ->withTrashed()->first();
+                    $fee = BankAccounts::where('type', 'FEE')->where('status', Constants::USER_STATUS_ACTIVE)->first();
                     if ($fee) {
                         $validator->errors()->add('check_exist', 'Tài khoản phí đã tồn tại');
                     }
