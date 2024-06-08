@@ -44,6 +44,7 @@ class User extends Model
         'issue_place',
         'department_id',
         'status',
+        'balance',
     ];
 
     /**
