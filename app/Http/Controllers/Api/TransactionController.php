@@ -74,8 +74,7 @@ class TransactionController extends Controller
                 "page_no" => intval($params['page_index']),
                 "page_size" => intval($params['page_size']),
                 "data" => $data,
-                'total' => $export,
-                'params' => $request->all()
+                'total' => $export
             ],
         ]);
     }

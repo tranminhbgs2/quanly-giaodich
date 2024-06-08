@@ -737,8 +737,8 @@ class MoneyComesBackRepo extends BaseRepo
 
     public function ReportDashboardAgent($params)
     {
-        $date_from = $params['agent_date_from'] ?? Carbon::now()->startOfDay();
-        $date_to = $params['agent_date_to'] ?? Carbon::now()->endOfDay();
+        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
         $query = MoneyComesBack::select()
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')

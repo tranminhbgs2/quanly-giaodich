@@ -310,8 +310,8 @@ class TransferRepo extends BaseRepo
     public function getTotalMaster($params)
     {
         $status = $params['status'] ?? 1;
-        $date_from = $params['agent_date_from'] ?? Carbon::now()->startOfDay();
-        $date_to = $params['agent_date_to'] ?? Carbon::now()->endOfDay();
+        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
 
         $query = Transfer::select();
 

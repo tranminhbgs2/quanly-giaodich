@@ -624,8 +624,8 @@ class TransactionRepo extends BaseRepo
 
     public function ReportDashboard($params)
     {
-        $date_from = $params['agent_date_from'] ?? Carbon::now()->startOfDay();
-        $date_to = $params['agent_date_to'] ?? Carbon::now()->endOfDay();
+        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
         $query = Transaction::select()
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->where('created_at', '>=', $date_from)
