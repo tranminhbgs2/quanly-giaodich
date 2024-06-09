@@ -760,7 +760,7 @@ class TransactionRepo extends BaseRepo
             'pos' => function ($sql) {
                 $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
             },
-        ]) 
+        ])
             ->where('hkd_id', $hkd_id)
             ->where('lo_number', $lo_number)
             ->where('status', Constants::USER_STATUS_ACTIVE);
@@ -774,6 +774,6 @@ class TransactionRepo extends BaseRepo
                 // Handle invalid date format
             }
         }
-        return $query->get();
+        return $query->get()->toArray();
     }
 }
