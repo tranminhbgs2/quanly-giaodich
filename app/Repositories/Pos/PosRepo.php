@@ -91,7 +91,12 @@ class PosRepo extends BaseRepo
             'created_by',
             'updated_by',
             'status',
-            'note'
+            'note',
+            'fee_visa',
+            'fee_master',
+            'fee_jcb',
+            'fee_amex',
+            'fee_napas',
         ];
 
         $insert = [];
@@ -124,7 +129,12 @@ class PosRepo extends BaseRepo
             'created_by',
             'updated_by',
             'status',
-            'note'
+            'note',
+            'fee_visa',
+            'fee_master',
+            'fee_jcb',
+            'fee_amex',
+            'fee_napas',
         ];
 
         $update = [];

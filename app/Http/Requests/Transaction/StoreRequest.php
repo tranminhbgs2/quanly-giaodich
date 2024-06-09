@@ -4,6 +4,7 @@ namespace App\Http\Requests\Transaction;
 
 use App\Helpers\Constants;
 use App\Models\BankAccounts;
+use App\Models\Pos;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -40,6 +41,8 @@ class StoreRequest extends FormRequest
             'price_fee' => ['required', 'numeric', 'min:0'],
             'price_transfer' => ['numeric', 'min:0'],
             'price_repair' => ['numeric', 'min:0'],
+            'type_card' => ['required_if:bank_code,VIETCOMBANK', 'in:VISA,MASTER,NAPAS,AMEX,JCB'],
+
 
         ];
 
@@ -105,11 +108,19 @@ class StoreRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             //     // Check username
-            //     $dep = Department::where('name', $this->request->get('name'))->withTrashed()->first();
+            $dep = Pos::where('id', $this->request->get('pos_id'))->first();
 
-            //     if ($dep) {
-            //         $validator->errors()->add('check_exist', 'Tên nhóm quyền đã tồn tại');
-            //     }
+            if ($dep) {
+                if ($dep->bank_code == "VIETCOMBANK") {
+                    if (empty($this->request->get('bank_code'))) {
+                        $validator->errors()->add('check_exist', 'Ngân hàng không được để trống');
+                    } else {
+                        if ($this->request->get('bank_code') == "VIETCOMBANK" && empty($this->request->get('type_card'))) {
+                            $validator->errors()->add('check_exist', 'Loại thẻ không được để trống');
+                        }
+                    }
+                }
+            }
 
             //     $dep_code = Department::where('code', $this->request->get('code'))->withTrashed()->first();
             //     if ($dep_code) {

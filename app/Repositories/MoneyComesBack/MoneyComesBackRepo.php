@@ -34,13 +34,13 @@ class MoneyComesBackRepo extends BaseRepo
                 $sql->select(['id', 'name']);
             },
             'agency' => function ($sql) {
-                $sql->select(['id', 'name']);
+                $sql->select(['id', 'name', 'balance']);
             },
             'user' => function ($sql) {
                 $sql->select(['id', 'status', 'username', 'email', 'fullname']);
             },
             'hkd' => function ($sql) {
-                $sql->select(['id', 'name']);
+                $sql->select(['id', 'name', 'balance']);
             }
         ]);
 
@@ -117,7 +117,7 @@ class MoneyComesBackRepo extends BaseRepo
                 $sql->select(['id', 'name']);
             },
             'agency' => function ($sql) {
-                $sql->select(['id', 'name']);
+                $sql->select(['id', 'name', 'balance']);
             },
             'user' => function ($sql) {
                 $sql->select(['id', 'status', 'username', 'email', 'fullname']);

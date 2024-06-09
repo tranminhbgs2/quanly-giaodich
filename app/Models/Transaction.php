@@ -36,6 +36,8 @@ class Transaction extends Model
         'note',
         'fee_paid',
         'hkd_id',
+        'bank_code',
+        'type_card',
     ];
 
     /**

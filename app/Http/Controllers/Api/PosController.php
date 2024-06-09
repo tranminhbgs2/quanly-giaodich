@@ -100,6 +100,11 @@ class PosController extends Controller
         $params['created_by'] = auth()->user()->id; // người tạo
         $params['updated_by'] = auth()->user()->id; // người cập nhật
         $params['note'] = request('note', null); // ghi chú
+        $params['fee_visa'] = floatval(request('fee_visa', 0)); // phí visa
+        $params['fee_master'] = floatval(request('fee_master', 0)); // phí master
+        $params['fee_jcb'] = floatval(request('fee_jcb', 0)); // phí jcb
+        $params['fee_amex'] = floatval(request('fee_amex', 0)); // phí amex
+        $params['fee_napas'] = floatval(request('fee_napas', 0)); // phí unionpay
 
         $params['code'] = strtoupper(request('name', null));
         $params['code'] = unsigned($params['code']);
@@ -144,6 +149,11 @@ class PosController extends Controller
             $params['price_pos'] = floatval(request('price_pos', 0)); // tiền tồn pos
             $params['updated_by'] = auth()->user()->id; // người cập nhật
             $params['note'] = request('note', null); // ghi chú
+            $params['fee_visa'] = floatval(request('fee_visa', 0)); // phí visa
+            $params['fee_master'] = floatval(request('fee_master', 0)); // phí master
+            $params['fee_jcb'] = floatval(request('fee_jcb', 0)); // phí jcb
+            $params['fee_amex'] = floatval(request('fee_amex', 0)); // phí amex
+            $params['fee_napas'] = floatval(request('fee_napas', 0)); // phí unionpay
 
             $params['code'] = strtoupper(request('name', null));
             $params['code'] = unsigned($params['code']);

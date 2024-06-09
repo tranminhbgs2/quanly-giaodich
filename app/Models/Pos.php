@@ -26,6 +26,11 @@ class Pos extends Model
         'created_by',
         'status',
         'note',
+        'fee_visa',
+        'fee_master',
+        'fee_jcb',
+        'fee_amex',
+        'fee_napas',
     ];
 
     /**

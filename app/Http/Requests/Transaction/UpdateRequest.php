@@ -4,6 +4,7 @@ namespace App\Http\Requests\Transaction;
 
 use App\Helpers\Constants;
 use App\Models\BankAccounts;
+use App\Models\Pos;
 use App\Models\Transaction;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -43,6 +44,7 @@ class UpdateRequest extends FormRequest
             'price_transfer' => ['numeric', 'min:0'],
             'price_repair' => ['numeric', 'min:0'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED],
+            'type_card' => ['required_if:bank_code,VIETCOMBANK', 'in:VISA,MASTER,NAPAS,AMEX,JCB'],
         ];
 
         return $rule;
@@ -66,6 +68,7 @@ class UpdateRequest extends FormRequest
             'profit' => 'Lợi nhuận',
             'price_repair' => 'Số tiền bù',
             'status' => 'Trạng thái',
+            'type_card' => 'Loại thẻ',
         ];
     }
 
@@ -101,6 +104,8 @@ class UpdateRequest extends FormRequest
             'status.integer' => 'Tham số status phải là số nguyên',
             'status.in' => 'Tham số status không hợp lệ',
             'fee.max' => 'Tham số fee tối đa phải là 99',
+            'type_card.required_if' => 'Truyền thiếu tham số type_card',
+            'type_card.in' => 'Tham số type_card không hợp lệ',
         ];
     }
 
@@ -111,9 +116,22 @@ class UpdateRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
+            $dep = Pos::where('id', $this->request->get('pos_id'))->first();
+
+            if ($dep) {
+                if ($dep->bank_code == "VIETCOMBANK") {
+                    if (empty($this->request->get('bank_code'))) {
+                        $validator->errors()->add('check_exist', 'Ngân hàng không được để trống');
+                    } else {
+                        if ($this->request->get('bank_code') == "VIETCOMBANK" && empty($this->request->get('type_card'))) {
+                            $validator->errors()->add('check_exist', 'Loại thẻ không được để trống');
+                        }
+                    }
+                }
+            }
             $dep = Transaction::where('id', $this->request->get('id'))->first();
             if ($dep) {
-                if ($dep->method != $this->request->get('method')){
+                if ($dep->method != $this->request->get('method')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi hình thức giao dịch');
                 }
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
@@ -123,16 +141,16 @@ class UpdateRequest extends FormRequest
                 $validator->errors()->add('check_exist', 'Không tìm thấy giao dịch khách lẻ');
             }
 
-            if (auth()->user()->account_type == "STAFF"){
+            if (auth()->user()->account_type == "STAFF") {
                 $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
-                if($dep){
-                    if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')){
+                if ($dep) {
+                    if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
                         $validator->errors()->add('check_exist', 'Số dư không đủ');
                     }
                 } else {
                     $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
                 }
-            } else if(auth()->user()->account_type == "SYSTEM") {
+            } else if (auth()->user()->account_type == "SYSTEM") {
                 $validator->errors()->add('check_exist', 'Chỉ nhân viên thực hiện giao dịch');
             }
         });

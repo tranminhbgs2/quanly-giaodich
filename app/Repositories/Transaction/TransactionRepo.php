@@ -448,6 +448,8 @@ class TransactionRepo extends BaseRepo
             'note',
             'fee_paid',
             'hkd_id',
+            'type_card',
+            'bank_code',
         ];
 
         $insert = [];
@@ -500,6 +502,8 @@ class TransactionRepo extends BaseRepo
             'note',
             'fee_paid',
             'hkd_id',
+            'type_card',
+            'bank_code'
         ];
 
         $update = [];
@@ -769,7 +773,7 @@ class TransactionRepo extends BaseRepo
         if($pos_id > 0) {
             $query->where('pos_id', $pos_id);
         }
-        
+
         if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
