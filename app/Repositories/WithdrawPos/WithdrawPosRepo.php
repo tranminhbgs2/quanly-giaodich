@@ -9,6 +9,7 @@ use App\Models\Pos;
 use App\Models\WithdrawPos;
 use App\Repositories\BankAccount\BankAccountRepo;
 use App\Repositories\BaseRepo;
+use App\Repositories\HoKinhDoanh\HoKinhDoanhRepo;
 use App\Repositories\Pos\PosRepo;
 use Carbon\Carbon;
 
@@ -181,19 +182,19 @@ class WithdrawPosRepo extends BaseRepo
             }
         }
 
-        if (!empty($insert['pos_id']) && !empty($insert['price_withdraw'])) {
+        if (!empty($insert['hkd_id']) && !empty($insert['price_withdraw'])) {
             $res = WithdrawPos::create($insert);
             if ($res) {
-                $pos = Pos::where('id', $insert['pos_id'])->first();
+                $hkd_repo = new HoKinhDoanhRepo();
+                $hkd = $hkd_repo->getById($insert['hkd_id']);
                 $bank_acc = BankAccounts::where('id', $insert['account_bank_id'])->first();
-                if ($pos && $bank_acc) {
+                if ($hkd && $bank_acc) {
                     $price_bank = $bank_acc->balance + $insert['price_withdraw'];
                     $bank_acc = new BankAccountRepo();
                     $bank_acc->updateBalance($insert['account_bank_id'], $price_bank, "WITHDRAWPOS_CREATE_" . $res->id);
 
-                    $price_pos = $pos->price_pos - $insert['price_withdraw'];
-                    $pos_repo = new PosRepo();
-                    $pos_repo->updatePricePos($price_pos, $pos->id, "WITHDRAWPOS_CREATE_" . $res->id);
+                    $balance = $hkd->balance - $insert['price_withdraw'];
+                    $hkd_repo->updateBalance($balance, $hkd->id, "WITHDRAWPOS_CREATE_" . $res->id);
                 }
             }
 
@@ -228,12 +229,12 @@ class WithdrawPosRepo extends BaseRepo
         $res = $pos_withdraw->update($update);
         if ($res) {
             if ($price_withdraw_old != $update['price_withdraw']) {
-                $pos = Pos::where('id', $update['pos_id'])->first();
-                if ($pos) {
+                $hkd_repo = new HoKinhDoanhRepo();
+                $hkd = $hkd_repo->getById($update['hkd_id']);
+                if ($hkd) {
                     // update số tiền máy pos
-                    $price_pos = $pos->price_pos - ($params['price_withdraw'] - $price_withdraw_old);
-                    $pos_repo = new PosRepo();
-                    $pos_repo->updatePricePos($price_pos, $pos->id, "WITHDRAWPOS_UPDATE_" . $id);
+                    $price_pos = $hkd->balance - ($params['price_withdraw'] - $price_withdraw_old);
+                    $hkd_repo->updateBalance($price_pos, $hkd->id, "WITHDRAWPOS_UPDATE_" . $id);
                 }
             }
             if ($bank_acc_id != $update['account_bank_id']) {
@@ -333,16 +334,16 @@ class WithdrawPosRepo extends BaseRepo
                 $withdrawPos->deleted_at = Carbon::now();
 
                 if ($withdrawPos->save()) {
-                    $pos = Pos::where('id', $withdrawPos->pos_id)->first();
+                    $hkd_repo = new HoKinhDoanhRepo();
+                    $hkd = $hkd_repo->getById($withdrawPos->hkd_id);
                     $bank_acc = BankAccounts::where('id', $withdrawPos->account_bank_id)->first();
-                    if ($pos && $bank_acc) {
+                    if ($hkd && $bank_acc) {
                         $price_bank = $bank_acc->balance - $price_withdraw_old;
                         $bank_acc = new BankAccountRepo();
                         $bank_acc->updateBalance($withdrawPos->account_bank_id, $price_bank, "WITHDRAWPOS_DELETE_" . $id);
 
-                        $price_pos = $pos->price_pos + $price_withdraw_old;
-                        $pos_repo = new PosRepo();
-                        $pos_repo->updatePricePos($price_pos, $pos->id, "WITHDRAWPOS_DELETE_" . $id);
+                        $price_pos = $hkd->balance + $price_withdraw_old;
+                        $hkd_repo->updateBalance($price_pos, $hkd->id, "WITHDRAWPOS_DELETE_" . $id);
                     }
                     return [
                         'code' => 200,

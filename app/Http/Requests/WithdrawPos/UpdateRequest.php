@@ -28,7 +28,7 @@ class UpdateRequest extends FormRequest
     {
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
-            'pos_id' => ['required', 'integer', 'min:1'],
+            'hkd_id' => ['required', 'integer', 'min:1'],
             'account_bank_id' => ['required', 'integer', 'min:1'],
             'time_payment' => ['date_format:Y/m/d H:i:s'],
             'price_withdraw' => ['required', 'numeric', 'min:0'],
@@ -42,7 +42,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'id' => 'ID',
-            'pos_id' => 'Máy Pos',
+            'hkd_id' => 'Hộ kinh doanh',
             'account_bank_id' => 'Tài khoản ngân hàng hưởng thụ',
             'time_payment' => 'Thời gian rút tiền',
             'price_withdraw' => 'Số tiền rút',
@@ -53,26 +53,12 @@ class UpdateRequest extends FormRequest
     public function messages()
     {
         return [
-            'id.required' => 'Truyền thiếu tham số id',
-            'id.integer' => 'Mã giao dịch phải là số nguyên dương',
-            'id.min' => 'Mã giao dịch phải là số nguyên dương, nhỏ nhất là 1',
-
-            'pos_id.required' => 'Truyền thiếu tham số máy pos',
-            'pos_id.integer' => 'Mã máy pos phải là số nguyên dương',
-            'pos_id.min' => 'Mã máy pos phải là số nguyên dương, nhỏ nhất là 1',
-
-            'account_bank_id.required' => 'Truyền thiếu tham số tài khoản ngân hàng hưởng thụ',
-            'account_bank_id.integer' => 'ID tài khoản ngân hàng hưởng thụ phải là số nguyên dương',
-            'account_bank_id.min' => 'ID tài khoản ngân hàng hưởng thụ phải là số nguyên dương, nhỏ nhất là 1',
-
-            'time_payment.date_format' => 'Thời gian rút tiền không đúng định dạng Y-m-d H:i:s',
-
-            'price_withdraw.required' => 'Truyền thiếu tham số số tiền rút',
-            'price_withdraw.numeric' => 'Số tiền rút phải là số',
-            'price_withdraw.min' => 'Số tiền rút phải lớn hơn hoặc bằng 0',
-
-            'status.integer' => 'Trạng thái phải là số nguyên',
-            'status.in' => 'Trạng thái không hợp lệ',
+            'required' => ':attribute không được để trống',
+            'integer' => ':attribute phải là số nguyên',
+            'min' => ':attribute phải lớn hơn hoặc bằng :min',
+            'numeric' => ':attribute phải là số',
+            'date_format' => ':attribute không đúng định dạng Y/m/d H:i:s',
+            'in' => ':attribute không hợp lệ',
         ];
     }
 

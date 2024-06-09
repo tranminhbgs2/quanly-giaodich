@@ -222,6 +222,7 @@ class TransactionController extends Controller
                     $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
                     $money_comes_back = [
                         'pos_id' => $params['pos_id'],
+                        'hkd_id' => $pos->hkd_id,
                         'lo_number' => $params['lo_number'],
                         'time_process' => $time_process,
                         'fee' => $params['original_fee'],
@@ -234,6 +235,7 @@ class TransactionController extends Controller
                 } else {
                     $money_comes_back = [
                         'pos_id' => $params['pos_id'],
+                        'hkd_id' => $pos->hkd_id,
                         'lo_number' => $params['lo_number'],
                         'time_process' => $time_process,
                         'fee' => $params['original_fee'],
@@ -372,6 +374,7 @@ class TransactionController extends Controller
                         }
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
+                            'hkd_id' => $pos->hkd_id,
                             'lo_number' => $params['lo_number'],
                             'time_process' => $time_process,
                             'fee' => $params['original_fee'],
@@ -384,6 +387,7 @@ class TransactionController extends Controller
                     } else {
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
+                            'hkd_id' => $pos->hkd_id,
                             'lo_number' => $params['lo_number'],
                             'time_process' => $time_process,
                             'fee' => $params['original_fee'],
@@ -394,7 +398,6 @@ class TransactionController extends Controller
                         ];
                         $this->money_comes_back_repo->store($money_comes_back);
                     }
-
 
                     //Xử lý trừ tiền của nhân viên
                     if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
@@ -467,6 +470,7 @@ class TransactionController extends Controller
                     }
                     $money_comes_back = [
                         'pos_id' => $tran->pos_id,
+                        'hkd_id' => $money_come->hkd_id,
                         'lo_number' => $tran->lo_number,
                         'time_process' => $time_process,
                         'fee' => $tran->original_fee,
@@ -477,6 +481,29 @@ class TransactionController extends Controller
                     ];
                     $this->money_comes_back_repo->update($money_comes_back, $money_come->id);
                 }
+
+                    //Xử lý trừ tiền của nhân viên
+                    if ($tran->method == 'ONLINE' || $tran->method == 'RUT_TIEN_MAT') {
+                        $user = $this->userRepo->getById(auth()->user()->id);
+                        $user_balance = $user->balance + $tran->price_transfer;
+                        $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "DELETE_TRANSACTION_" . $id);
+                        //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
+                        $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                        if ($bank_account) {
+                            $bank_account->balance += $tran->price_transfer;
+                            $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "DELETE_TRANSACTION_" . $id);
+                        }
+                    } else {
+                        $user = $this->userRepo->getById(auth()->user()->id);
+                        $user_balance = $user->balance + $tran->price_nop;
+                        $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "DELETE_TRANSACTION_" . $id);
+                        //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
+                        $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                        if ($bank_account) {
+                            $bank_account->balance += $tran->price_nop;
+                            $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "DELETE_TRANSACTION_" . $id);
+                        }
+                    }
             }
             $data = $this->tran_repo->delete(['id' => $id]);
         } else {

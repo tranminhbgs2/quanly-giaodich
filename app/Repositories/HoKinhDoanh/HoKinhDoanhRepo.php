@@ -2,6 +2,7 @@
 
 namespace App\Repositories\HoKinhDoanh;
 
+use App\Events\ActionLogEvent;
 use App\Models\HoKinhDoanh;
 use App\Helpers\Constants;
 use App\Repositories\BaseRepo;
@@ -198,5 +199,28 @@ class HoKinhDoanhRepo extends BaseRepo
     public function getAll()
     {
         return HoKinhDoanh::select('id', 'name')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+    }
+
+    public function updateBalance($price_pos, $id, $action = "")
+    {
+        $pos = HoKinhDoanh::where('id', $id)->first();
+        if (isset($price_pos)) {
+            // Lưu log qua event
+            event(new ActionLogEvent([
+                'actor_id' => auth()->user()->id,
+                'username' => auth()->user()->username,
+                'action' => 'UPDATE_BANLANCE_HKD',
+                'description' => $action . ' Cập nhật số tiền cho HKD ' . $pos->name . ' từ ' . $pos->balance . ' thành ' . $price_pos,
+                'data_new' => $price_pos,
+                'data_old' => $pos->price_pos,
+                'model' => 'HoKinhDoanh',
+                'table' => 'HoKinhDoanh',
+                'record_id' => $pos->id,
+                'ip_address' => request()->ip()
+            ]));
+            $params = ['balance' => $price_pos];
+            return $pos->update($params);
+        }
+
     }
 }

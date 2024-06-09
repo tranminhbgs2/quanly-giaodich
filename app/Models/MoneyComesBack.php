@@ -16,6 +16,7 @@ class MoneyComesBack extends Model
     protected $fillable = [
         'agent_id',
         'pos_id',
+        'hkd_id',
         'lo_number',
         'time_end',
         'time_process',
@@ -40,6 +41,11 @@ class MoneyComesBack extends Model
     public function pos()
     {
         return $this->belongsTo(Pos::class, 'pos_id', 'id');
+    }
+
+    public function hkd()
+    {
+        return $this->belongsTo(HoKinhDoanh::class, 'hkd_id', 'id');
     }
 
     public function user()

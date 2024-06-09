@@ -18,6 +18,7 @@ class HoKinhDoanh extends Model
         'phone',
         'address',
         'status',
+        'balance',
     ];
 
 }
