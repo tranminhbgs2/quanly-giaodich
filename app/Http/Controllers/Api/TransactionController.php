@@ -177,11 +177,13 @@ class TransactionController extends Controller
 
         $pos = $this->pos_repo->getById($params['pos_id'], false);
         $params['hkd_id'] = 0;
+        $fee_pos = 0;
 
         if ($pos) {
             $params['fee_cashback'] = $pos->fee_cashback;
             $params['original_fee'] = $pos->total_fee;
             $params['hkd_id'] = $pos->hkd_id;
+            $fee_pos = $pos->fee;
         }
 
         $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
@@ -235,7 +237,8 @@ class TransactionController extends Controller
                         'created_by' => auth()->user()->id,
                         'status' => Constants::USER_STATUS_ACTIVE,
                     ];
-                    $this->money_comes_back_repo->update($money_comes_back, $money_come->id);
+                    $price_rut = ($params['price_rut'] - ($fee_pos * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
+                    $this->money_comes_back_repo->update($money_comes_back, $money_come->id, $price_rut);
                 } else {
                     $money_comes_back = [
                         'pos_id' => $params['pos_id'],
@@ -339,11 +342,13 @@ class TransactionController extends Controller
             $tran_old = $this->tran_repo->getById($params['id'], false);
 
             $pos = $this->pos_repo->getById($params['pos_id'], false);
-
+            $params['hkd_id'] = 0;
+            $fee_pos = 0;
             if ($pos) {
                 $params['fee_cashback'] = $pos->fee_cashback;
                 $params['original_fee'] = $pos->total_fee;
                 $params['hkd_id'] = $pos->hkd_id;
+                $fee_pos = $pos->fee;
             }
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
             $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
@@ -389,7 +394,8 @@ class TransactionController extends Controller
                             'created_by' => auth()->user()->id,
                             'status' => $money_come->status,
                         ];
-                        $this->money_comes_back_repo->update($money_comes_back, $money_come->id);
+                        $price_rut = ($params['price_rut'] - ($fee_pos * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
+                        $this->money_comes_back_repo->update($money_comes_back, $money_come->id, $price_rut);
                     } else {
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
@@ -485,7 +491,12 @@ class TransactionController extends Controller
                         'created_by' => auth()->user()->id,
                         'status' => $money_come->status,
                     ];
-                    $this->money_comes_back_repo->update($money_comes_back, $money_come->id);
+                    $pos = $this->pos_repo->getById($tran->pos_id, false);
+                    $price_rut = 0;
+                    if ($pos) {
+                        $price_rut = ($tran->price_rut - ($pos->fee * $tran->price_rut) / 100)*(-1);
+                    }
+                    $this->money_comes_back_repo->update($money_comes_back, $money_come->id, $price_rut);
                 }
 
                     //Xử lý trừ tiền của nhân viên
