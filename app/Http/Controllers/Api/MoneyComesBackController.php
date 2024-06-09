@@ -211,6 +211,7 @@ class MoneyComesBackController extends Controller
         if ($params['agent_id'] > 0) {
             $pos = $this->pos_repo->getById($params['pos_id']);
             if ($pos) {
+                $params['hkd_id'] = $pos->hkd_id;
                 $activeAgents = $pos->activeByAgentsDate($params['agent_id']);
                 if ($activeAgents) {
                     $params['fee'] = $pos->total_fee;
@@ -279,6 +280,7 @@ class MoneyComesBackController extends Controller
             if ($params['agent_id'] > 0) {
                 $pos = $this->pos_repo->getById($params['pos_id']);
                 if ($pos) {
+                    $params['hkd_id'] = $pos->hkd_id;
                     $activeAgents = $pos->activeByAgentsDate($params['agent_id']);
                     if ($activeAgents) {
                         $params['fee'] = $pos->total_fee;

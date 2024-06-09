@@ -457,6 +457,9 @@ class MoneyComesBackRepo extends BaseRepo
         }
         $old_money = MoneyComesBack::where('id', $id)->first();
         $balance_change = $params['payment'] - $old_money->payment;
+        if ($total_price_hkd == 0) {
+            $total_price_hkd = $params['total_price'] - $old_money->total_price;
+        }
         $res = MoneyComesBack::where('id', $id)->update($update);
         // Xử lý cộng tiền máy Pos
         if ($res) {
