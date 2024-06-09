@@ -193,7 +193,7 @@ class TransactionController extends Controller
             } else {
                 $time_process = date('Y-m-d');
             }
-            $money_comeb = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+            $money_comeb = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
             if ($money_comeb && !empty($money_comeb->time_end)) {
                 return response()->json([
                     'code' => 400,
@@ -220,7 +220,7 @@ class TransactionController extends Controller
                 } else {
                     $time_process = date('Y-m-d');
                 }
-                $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+                $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
                 if ($money_come) {
                     $total_price = $money_come->total_price + $params['price_rut'];
                     $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
@@ -326,7 +326,7 @@ class TransactionController extends Controller
                 } else {
                     $time_process = date('Y-m-d');
                 }
-                $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+                $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'],'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
                 if ($money_come && !empty($money_come->time_end)) {
                     return response()->json([
                         'code' => 400,
@@ -367,7 +367,7 @@ class TransactionController extends Controller
                     } else {
                         $time_process = date('Y-m-d');
                     }
-                    $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+                    $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'],'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
                     if ($money_come) {
                         if ($tran->lo_number > 0) {
                             // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
@@ -463,7 +463,7 @@ class TransactionController extends Controller
             $tran = $this->tran_repo->getById($id, false);
             if ($tran->status != Constants::USER_STATUS_DELETED && $tran->lo_number > 0) {
                 $time_process = date('Y-m-d', strtotime($tran->time_payment));
-                $money_come = $this->money_comes_back_repo->getByLoTime(['lo_number' => $tran->lo_number, 'time_process' => $time_process]);
+                $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran->pos_id, 'lo_number' => $tran->lo_number, 'time_process' => $time_process]);
                 if ($money_come) {
                     if ($tran->lo_number > 0) {
                         // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
