@@ -128,4 +128,47 @@ class SettingController extends Controller
             'data' => $data
         ]);
     }
+
+
+    /**
+     * API lấy danh sách hình thức thanh toán
+     * URL: {{url}}/api/v1/dropdown/hinh-thuc
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getTypeCard()
+    {
+        $data = [
+            0 => [
+                'id' => 1,
+                'name' => 'Visa',
+                'code' => 'VISA'
+            ],
+            1 => [
+                'id' => 2,
+                'name' => 'Master',
+                'code' => 'MASTER'
+            ],
+            2 => [
+                'id' => 3,
+                'name' => 'JCB',
+                'code' => 'JCB'
+            ],
+            3 => [
+                'id' => 4,
+                'name' => 'Napas',
+                'code' => 'NAPAS'
+            ],
+            4 => [
+                'id' => 5,
+                'name' => 'AMEX',
+                'code' => 'AMEX'
+            ],
+        ];
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách loại thẻ',
+            'data' => $data
+        ]);
+    }
 }
