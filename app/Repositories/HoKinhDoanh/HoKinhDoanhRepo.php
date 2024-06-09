@@ -60,7 +60,7 @@ class HoKinhDoanhRepo extends BaseRepo
             }
         }
 
-        $query->orderBy('id', 'DESC');
+        $query->orderBy('balance', 'DESC');
 
         return $query->get()->toArray();
     }
