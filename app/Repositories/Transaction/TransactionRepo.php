@@ -34,6 +34,7 @@ class TransactionRepo extends BaseRepo
         $category_id = $params['category_id'] ?? 0;
         $lo_number = $params['lo_number'] ?? 0;
         $created_by = $params['created_by'] ?? 0;
+        $hkd_id = $params['hkd_id'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
         $method = $params['method'] ?? null;
         $status_fee = $params['status_fee'] ?? 1; // 1: tất cả, 2: chưa thanh toán, 3: đã thanh toán. chưa thanh toán khi fee_paid < price_fee, đã thanh toán khi fee_paid = price_fee
@@ -84,6 +85,10 @@ class TransactionRepo extends BaseRepo
 
         if ($lo_number > 0) {
             $query->where('lo_number', $lo_number);
+        }
+
+        if ($hkd_id > 0) {
+            $query->where('hkd_id', $hkd_id);
         }
 
         if ($status > 0) {
@@ -235,6 +240,7 @@ class TransactionRepo extends BaseRepo
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
         $pos_id = $params['pos_id'] ?? 0;
+        $hkd_id = $params['hkd_id'] ?? 0;
         $category_id = $params['category_id'] ?? 0;
         $lo_number = $params['lo_number'] ?? 0;
         $created_by = $params['created_by'] ?? 0;
@@ -271,6 +277,10 @@ class TransactionRepo extends BaseRepo
 
         if ($category_id > 0) {
             $query->where('category_id', $category_id);
+        }
+
+        if ($hkd_id > 0) {
+            $query->where('hkd_id', $hkd_id);
         }
 
         if ($lo_number > 0) {

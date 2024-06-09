@@ -55,6 +55,7 @@ class TransactionController extends Controller
         $params['pos_id'] = request('pos_id', 0);
         $params['category_id'] = request('category_id', 0);
         $params['lo_number'] = request('lo_number', 0);
+        $params['hkd_id'] = request('hkd_id', 0);
         $params['created_by'] = auth()->user()->id;
         $params['account_type'] = auth()->user()->account_type;
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
