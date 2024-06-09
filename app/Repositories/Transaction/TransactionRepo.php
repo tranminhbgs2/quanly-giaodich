@@ -46,6 +46,9 @@ class TransactionRepo extends BaseRepo
             'pos' => function ($sql) {
                 $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
             },
+            'hkd' => function ($sql) {
+                $sql->select(['id', 'name', 'balance']);
+            },
         ]);
 
         if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {

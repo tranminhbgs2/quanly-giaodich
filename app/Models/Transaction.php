@@ -57,6 +57,12 @@ class Transaction extends Model
     {
         return $this->belongsTo(Pos::class, 'pos_id', 'id');
     }
+
+    public function hkd()
+    {
+        return $this->belongsTo(HoKinhDoanh::class, 'hkd_id', 'id');
+    }
+    
     public function getMethodNameAttribute()
     {
         $name = '';
