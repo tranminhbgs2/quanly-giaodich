@@ -763,10 +763,13 @@ class TransactionRepo extends BaseRepo
             },
         ])
             ->where('hkd_id', $hkd_id)
-            ->where('pos_id', $pos_id)
             ->where('lo_number', $lo_number)
             ->where('status', Constants::USER_STATUS_ACTIVE);
 
+        if($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+        
         if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
