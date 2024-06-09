@@ -38,7 +38,7 @@ class CustomerRepo extends BaseRepo
         $query = User::select([
                 'id', 'username',
                 'fullname', 'email', 'phone',
-                'display_name', 'status', 'last_login', 'department_id as group_id',
+                'display_name', 'status', 'last_login', 'department_id as group_id', 'balance',
             ]);
 
             $query->with([
@@ -189,6 +189,7 @@ class CustomerRepo extends BaseRepo
                 'last_login',
                 'department_id',
                 'status',
+                'balance',
             ])
                 ->where('id', $id);
             $user->with([

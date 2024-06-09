@@ -259,7 +259,7 @@ class UserRepo extends BaseRepo
     }
     public function getAllStaff()
     {
-        return User::select('id', 'fullname', 'status')->where('status', Constants::USER_STATUS_ACTIVE)->where('account_type', 'STAFF')->orderBy('id', 'DESC')->get()->toArray();
+        return User::select('id', 'fullname', 'status', 'balance')->where('status', Constants::USER_STATUS_ACTIVE)->where('account_type', 'STAFF')->orderBy('id', 'DESC')->get()->toArray();
     }
 
     public function updateBalance($id, $balance, $action)
