@@ -25,7 +25,7 @@ Route::group(['prefix' => 'dropdown'], function (){
         Route::get('/action-by-func/{func_id}', 'PositionController@getAllByFunc');
         Route::get('/type-transfer', 'SettingController@getTypeTransfer');
         Route::get('/staff', 'UserController@getAllStaff');
-        Route::get('/type-card', 'UserController@getTypeCard');
+        Route::get('/type-card', 'SettingController@getTypeCard');
     });
 
 });
