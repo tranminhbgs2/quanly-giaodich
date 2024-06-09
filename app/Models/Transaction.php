@@ -35,6 +35,7 @@ class Transaction extends Model
         'fee_cashback',
         'note',
         'fee_paid',
+        'hkd_id',
     ];
 
     /**

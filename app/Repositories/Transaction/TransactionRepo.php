@@ -427,7 +427,6 @@ class TransactionRepo extends BaseRepo
             'price_rut',
             'fee',
             'price_fee',
-            'fee_paid',
             'price_transfer',
             'profit',
             'price_repair',
@@ -436,7 +435,9 @@ class TransactionRepo extends BaseRepo
             'created_by',
             'original_fee',
             'fee_cashback',
-            'note'
+            'note',
+            'fee_paid',
+            'hkd_id',
         ];
 
         $insert = [];
@@ -488,6 +489,7 @@ class TransactionRepo extends BaseRepo
             'fee_cashback',
             'note',
             'fee_paid',
+            'hkd_id',
         ];
 
         $update = [];
@@ -734,4 +736,27 @@ class TransactionRepo extends BaseRepo
         return ['data' => $result, 'total' => $total];
     }
 
+    public function getAllByHkd($param)
+    {
+        $hkd_id = $param['hkd_id'] ?? 0;
+        $lo_number = $param['lo_number'] ?? 0;
+        $date_from = $param['date_from'] ?? null;
+        $date_to = $param['date_to'] ?? null;
+
+        $query = Transaction::select()
+            ->where('hkd_id', $hkd_id)
+            ->where('lo_number', $lo_number)
+            ->where('status', Constants::USER_STATUS_ACTIVE);
+
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_payment', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+        return $query->get();
+    }
 }

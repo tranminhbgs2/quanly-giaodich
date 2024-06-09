@@ -18,6 +18,7 @@ Route::group(['prefix' => 'transaction'], function (){
         Route::get('/cashback', 'MoneyComesBackController@getListingCashBack');
         Route::post('/chart-dashboard', 'TransactionController@ChartDashboard');
         Route::get('/restore-fee/{id}', 'TransactionController@RestoreFee');
+        Route::get('/get-all-by-hkd', 'TransactionController@GetAllHkd');
     });
 
 });
