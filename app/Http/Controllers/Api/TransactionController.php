@@ -207,7 +207,7 @@ class TransactionController extends Controller
             $params['price_nop'] = 0;
             $params['fee_paid'] = $params['price_fee'];
         } else {
-            $params['price_nop'] = $params['price_rut'];
+            // $params['price_nop'] = $params['price_rut'];
             $params['fee_paid'] = 0;
             $params['price_transfer'] = 0;
         }
