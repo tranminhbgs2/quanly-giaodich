@@ -175,10 +175,12 @@ class TransactionController extends Controller
         $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
         $pos = $this->pos_repo->getById($params['pos_id'], false);
+        $params['hkd_id'] = 0;
 
         if ($pos) {
             $params['fee_cashback'] = $pos->fee_cashback;
             $params['original_fee'] = $pos->total_fee;
+            $params['hkd_id'] = $pos->hkd_id;
         }
 
         $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
@@ -222,7 +224,7 @@ class TransactionController extends Controller
                     $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
                     $money_comes_back = [
                         'pos_id' => $params['pos_id'],
-                        'hkd_id' => $pos->hkd_id,
+                        'hkd_id' => $params['hkd_id'],
                         'lo_number' => $params['lo_number'],
                         'time_process' => $time_process,
                         'fee' => $params['original_fee'],
@@ -235,7 +237,7 @@ class TransactionController extends Controller
                 } else {
                     $money_comes_back = [
                         'pos_id' => $params['pos_id'],
-                        'hkd_id' => $pos->hkd_id,
+                        'hkd_id' => $params['hkd_id'],
                         'lo_number' => $params['lo_number'],
                         'time_process' => $time_process,
                         'fee' => $params['original_fee'],
@@ -339,6 +341,7 @@ class TransactionController extends Controller
             if ($pos) {
                 $params['fee_cashback'] = $pos->fee_cashback;
                 $params['original_fee'] = $pos->total_fee;
+                $params['hkd_id'] = $pos->hkd_id;
             }
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
             $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
@@ -374,7 +377,7 @@ class TransactionController extends Controller
                         }
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
-                            'hkd_id' => $pos->hkd_id,
+                            'hkd_id' => $params['hkd_id'],
                             'lo_number' => $params['lo_number'],
                             'time_process' => $time_process,
                             'fee' => $params['original_fee'],
@@ -387,7 +390,7 @@ class TransactionController extends Controller
                     } else {
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
-                            'hkd_id' => $pos->hkd_id,
+                            'hkd_id' => $params['hkd_id'],
                             'lo_number' => $params['lo_number'],
                             'time_process' => $time_process,
                             'fee' => $params['original_fee'],
