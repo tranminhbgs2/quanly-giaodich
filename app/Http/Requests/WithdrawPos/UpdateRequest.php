@@ -3,6 +3,7 @@
 namespace App\Http\Requests\WithdrawPos;
 
 use App\Helpers\Constants;
+use App\Models\WithdrawPos;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -69,14 +70,14 @@ class UpdateRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
-            // $dep = Categories::where('id', $this->request->get('id'))->withTrashed()->first();
-            // if ($dep) {
-            //     if ($dep->status == Constants::USER_STATUS_DELETED) {
-            //         $validator->errors()->add('check_exist', 'Danh mục đã bị xóa');
-            //     }
-            // } else {
-            //     $validator->errors()->add('check_exist', 'Không tìm thấy danh mục');
-            // }
+            $dep = WithdrawPos::where('id', $this->request->get('id'))->first();
+            if ($dep) {
+                if ($dep->status == Constants::USER_STATUS_DELETED) {
+                    $validator->errors()->add('check_exist', 'Rút tiền đã bị xóa');
+                }
+            } else {
+                $validator->errors()->add('check_exist', 'Không tìm thấy GD rút tiền');
+            }
 
             // // Check theo email
             // if ($this->request->get('name')) {

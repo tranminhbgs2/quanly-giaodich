@@ -131,7 +131,7 @@ class WithdrawPosController extends Controller
         $params['id'] = request('id', null);
         if ($params['id']) {
 
-            $params['hkd_id'] = request('name', 0); // ngân hàng
+            $params['hkd_id'] = request('hkd_id', 0); // ngân hàng
             $params['account_bank_id'] = request('account_bank_id', 0); // hình thức
             $params['time_withdraw'] = request('time_withdraw', null); // máy pos
             $params['pos_id'] = request('pos_id', 0); // phí
