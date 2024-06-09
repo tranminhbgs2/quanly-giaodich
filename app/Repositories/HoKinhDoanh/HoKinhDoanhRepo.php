@@ -72,7 +72,8 @@ class HoKinhDoanhRepo extends BaseRepo
             'surrogate',
             'phone',
             'address',
-            'status'
+            'status',
+            'balance'
         ];
 
         $insert = [];
@@ -96,7 +97,8 @@ class HoKinhDoanhRepo extends BaseRepo
             'surrogate',
             'phone',
             'address',
-            'status'
+            'status',
+            'balance'
         ];
 
         $update = [];

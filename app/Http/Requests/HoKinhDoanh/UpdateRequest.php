@@ -31,7 +31,7 @@ class UpdateRequest extends FormRequest
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
             'name' => ['required'],
-            'phone' => ['numeric', 'digits:10'],
+            // 'phone' => ['numeric', 'digits:10'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];
 
@@ -42,7 +42,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => 'Tên hộ kinh doanh',
-            'phone' => 'Số điện thoại',
+            // 'phone' => 'Số điện thoại',
             'status' => 'Trạng thái',
         ];
     }
@@ -51,8 +51,8 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name.required' => 'Truyền thiếu tham số name',
-            'phone.numeric' => 'Tham số phone phải là số',
-            'phone.digits' => "Tham số phone phải có :digits chữ số",
+            // 'phone.numeric' => 'Tham số phone phải là số',
+            // 'phone.digits' => "Tham số phone phải có :digits chữ số",
             'status.integer' => 'Tham số status phải là số nguyên',
         ];
     }
@@ -73,9 +73,9 @@ class UpdateRequest extends FormRequest
                 $validator->errors()->add('check_exist', 'Không tìm thấy hộ kinh doanh');
             }
 
-            if (! validateMobile($this->request->get('phone'))) {
-                $validator->errors()->add('check_exist', 'Số điện thoại không đúng định dạng (09x/9x/849x)');
-            }
+            // if (! validateMobile($this->request->get('phone'))) {
+            //     $validator->errors()->add('check_exist', 'Số điện thoại không đúng định dạng (09x/9x/849x)');
+            // }
         });
 
     }

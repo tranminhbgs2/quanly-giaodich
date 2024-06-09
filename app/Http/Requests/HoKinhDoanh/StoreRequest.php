@@ -29,7 +29,7 @@ class StoreRequest extends FormRequest
         $rule = [
             'name' => ['required'],
             // 'surrogate' => ['required'],
-            'phone' => ['numeric', 'digits:10'],
+            // 'phone' => ['numeric', 'digits:10'],
 
         ];
 
@@ -40,7 +40,7 @@ class StoreRequest extends FormRequest
     {
         return [
             'name' => 'Tên hộ kinh doanh',
-            'phone' => 'Số điện thoại',
+            // 'phone' => 'Số điện thoại',
 
         ];
     }
@@ -49,8 +49,8 @@ class StoreRequest extends FormRequest
     {
         return [
             'name.required' => 'Truyền thiếu tham số name',
-            'phone.numeric' => 'Tham số phone phải là số',
-            'phone.digits' => "Tham số phone phải có :digits chữ số",
+            // 'phone.numeric' => 'Tham số phone phải là số',
+            // 'phone.digits' => "Tham số phone phải có :digits chữ số",
         ];
     }
 
@@ -66,9 +66,9 @@ class StoreRequest extends FormRequest
             if ($dep) {
                 $validator->errors()->add('check_exist', 'Tên hộ kinh doanh đã tồn tại');
             }
-            if (! validateMobile($this->request->get('phone'))) {
-                $validator->errors()->add('check_exist', 'Số điện thoại không đúng định dạng (09x/9x/849x)');
-            }
+            // if (! validateMobile($this->request->get('phone'))) {
+            //     $validator->errors()->add('check_exist', 'Số điện thoại không đúng định dạng (09x/9x/849x)');
+            // }
         });
     }
 
