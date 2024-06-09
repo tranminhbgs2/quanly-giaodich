@@ -694,6 +694,7 @@ class TransactionController extends Controller
         $params['keyword'] = request('keyword', null);
         $params['hkd_id'] = request('hkd_id', 0);
         $params['lo_number'] = request('lo_number', 0);
+        $params['pos_id'] = request('pos_id', 0);
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
 

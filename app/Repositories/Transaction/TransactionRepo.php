@@ -750,6 +750,7 @@ class TransactionRepo extends BaseRepo
     {
         $hkd_id = $param['hkd_id'] ?? 0;
         $lo_number = $param['lo_number'] ?? 0;
+        $pos_id = $param['pos_id'] ?? 0;
         $date_from = $param['date_from'] ?? null;
         $date_to = $param['date_to'] ?? null;
 
@@ -762,6 +763,7 @@ class TransactionRepo extends BaseRepo
             },
         ])
             ->where('hkd_id', $hkd_id)
+            ->where('pos_id', $pos_id)
             ->where('lo_number', $lo_number)
             ->where('status', Constants::USER_STATUS_ACTIVE);
 
