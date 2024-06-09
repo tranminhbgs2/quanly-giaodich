@@ -47,6 +47,7 @@ class MoneyComesBackController extends Controller
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
         $params['pos_id'] = request('pos_id', 0);
+        $params['hkd_id'] = request('hkd_id', 0);
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
