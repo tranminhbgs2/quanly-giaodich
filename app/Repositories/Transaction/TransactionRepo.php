@@ -753,7 +753,14 @@ class TransactionRepo extends BaseRepo
         $date_from = $param['date_from'] ?? null;
         $date_to = $param['date_to'] ?? null;
 
-        $query = Transaction::select()
+        $query = Transaction::select()->with([
+            'category' => function ($sql) {
+                $sql->select(['id', 'name', 'code']);
+            },
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
+            },
+        ]) 
             ->where('hkd_id', $hkd_id)
             ->where('lo_number', $lo_number)
             ->where('status', Constants::USER_STATUS_ACTIVE);
