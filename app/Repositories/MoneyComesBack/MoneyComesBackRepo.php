@@ -241,7 +241,7 @@ class MoneyComesBackRepo extends BaseRepo
                 $pos = $group->first()->pos;
                 $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
                 $total_price_rut = $group->sum('total_price');
-                $total_payment_cashback = $total_price_rut * $pos->fee_cashback / 100;
+                $total_payment_cashback = intval($total_price_rut * $pos->fee_cashback / 100);
 
                 return [
                     'pos_id' => $pos->id,
