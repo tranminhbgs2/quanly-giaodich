@@ -44,7 +44,7 @@ class TransactionRepo extends BaseRepo
                 $sql->select(['id', 'name', 'code']);
             },
             'pos' => function ($sql) {
-                $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
+                $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback', 'bank_code']);
             },
             'hkd' => function ($sql) {
                 $sql->select(['id', 'name', 'balance']);
