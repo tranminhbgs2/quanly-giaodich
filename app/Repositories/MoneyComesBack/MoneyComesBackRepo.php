@@ -417,7 +417,7 @@ class MoneyComesBackRepo extends BaseRepo
                 if (isset($insert['agent_id']) && $insert['agent_id'] > 0) {
                     $agent = Agent::where('id', $insert['agent_id'])->first();
                     if ($agent) {
-                        $agent_balance = $agent->balance + $insert['payment_agent'];
+                        $agent_balance = $agent->balance - $insert['payment_agent'];
                         $agent_repo = new AgentRepo();
                         $agent_repo->updateBalance($agent->id, $agent_balance, "CREATE_MONEY_COMES_BACK_" . $res->id);
                     }
@@ -456,10 +456,7 @@ class MoneyComesBackRepo extends BaseRepo
             }
         }
         $old_money = MoneyComesBack::where('id', $id)->first();
-        $balance_change = $params['payment'] - $old_money->payment;
-        if ($total_price_hkd == 0) {
-            $total_price_hkd = $params['total_price'] - $old_money->total_price;
-        }
+        $balance_change =  $old_money->payment_agent - $params['payment'];
         $res = MoneyComesBack::where('id', $id)->update($update);
         // Xử lý cộng tiền máy Pos
         if ($res) {
@@ -533,14 +530,14 @@ class MoneyComesBackRepo extends BaseRepo
                 if ($params['agent_id'] != $old_money->agent_id) {
                     $agent_old = Agent::where('id', $old_money->agent_id)->first();
                     if ($agent_old) {
-                        $agent_balance = $agent_old->balance - $old_money->payment_agent;
+                        $agent_balance = $agent_old->balance + $old_money->payment_agent;
                         $agent_repo = new AgentRepo();
                         $agent_repo->updateBalance($agent_old->id, $agent_balance, "UPDATE_MONEY_COMES_BACK_" . $id);
                     }
 
                     $agent = Agent::where('id', $params['agent_id'])->first();
                     if ($agent) {
-                        $agent_balance = $agent->balance + $params['payment_agent'];
+                        $agent_balance = $agent->balance - $params['payment_agent'];
                         $agent_repo = new AgentRepo();
                         $agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_MONEY_COMES_BACK_" . $id);
                     }
