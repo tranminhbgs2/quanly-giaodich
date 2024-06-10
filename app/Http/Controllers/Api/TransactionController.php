@@ -174,7 +174,7 @@ class TransactionController extends Controller
         $params['note'] = request('note', null); // số lô
         $params['type_card'] = request('type_card', null); // số lô
         $params['bank_code'] = request('bank_code', null); // số lô
-        if($params['time_payment']){
+        if ($params['time_payment']) {
             $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
         }
         $params['hkd_id'] = 0;
@@ -224,17 +224,16 @@ class TransactionController extends Controller
             }
         }
 
-        if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
-            $params['price_nop'] = 0;
-            $params['fee_paid'] = $params['price_fee'];
-        } else {
-            // $params['price_nop'] = $params['price_rut'];
-            $params['fee_paid'] = 0;
-            $params['price_transfer'] = 0;
-        }
-
-        if($params['lo_number'] <= 0 && $params['pos_id'] == 0){
+        if ($params['lo_number'] <= 0 && $params['pos_id'] == 0) {
             $params['status'] = Constants::USER_STATUS_DRAFT;
+        } else {
+            if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
+                $params['price_nop'] = 0;
+                $params['fee_paid'] = $params['price_fee'];
+            } else {
+                $params['fee_paid'] = 0;
+                $params['price_transfer'] = 0;
+            }
         }
 
         $resutl = $this->tran_repo->store($params);
@@ -368,33 +367,26 @@ class TransactionController extends Controller
 
             $pos = $this->pos_repo->getById($params['pos_id'], false);
             $params['hkd_id'] = 0;
-            $fee_pos = 0;
             if ($pos) {
                 $params['fee_cashback'] = $pos->fee_cashback;
                 $params['original_fee'] = $pos->total_fee;
                 $params['hkd_id'] = $pos->hkd_id;
-                $fee_pos = $pos->fee;
                 if ($pos->bank_code == "VIETCOMBANK"  && $params['bank_code'] == "VIETCOMBANK") {
                     switch ($params['type_card']) {
                         case 'JCB':
                             $params['original_fee'] = $pos->fee_jcb + $pos->fee_cashback;
-                            $fee_pos = $pos->fee_jcb;
                             break;
                         case 'VISA':
                             $params['original_fee'] = $pos->fee_visa + $pos->fee_cashback;
-                            $fee_pos = $pos->fee_visa;
                             break;
                         case 'MASTER':
                             $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
-                            $fee_pos = $pos->fee_master;
                             break;
                         case 'NAPAS':
                             $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
-                            $fee_pos = $pos->fee_napas;
                             break;
                         case 'AMEX':
                             $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
-                            $fee_pos = $pos->fee_amex;
                             break;
                     }
                 }
@@ -407,7 +399,6 @@ class TransactionController extends Controller
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['price_fee'];
             } else {
-                // $params['price_nop'] = $params['price_rut'];
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
             }

@@ -29,11 +29,11 @@ class StoreRequest extends FormRequest
         $rule = [
             'pos_id' => ['required', 'numeric', 'min:1'],
             'lo_number' => ['required', 'numeric', 'min:1'],
-            // 'fee' => ['required', 'numeric', 'min:0'],
             'total_price' => ['required', 'numeric', 'min:0'],
             // 'payment' => ['required', 'numeric', 'min:0'],
             'time_end' => 'date_format:Y/m/d H:i:s',
             'agent_id' => 'numeric|min:0',
+            'fee_agent' => 'required_if:agent_id,>,0|numeric|min:0',
         ];
 
         return $rule;
@@ -48,6 +48,8 @@ class StoreRequest extends FormRequest
             'total_price' => 'Tổng tiền xử lý',
             'payment' => 'Thành tiền',
             'time_end' => 'Thời gian kết toán',
+            'agent_id' => 'ID đại lý',
+            'fee_agent' => 'Phí đại lý',
         ];
     }
 
@@ -60,6 +62,7 @@ class StoreRequest extends FormRequest
             'date_format' => ':attribute không đúng định dạng Y/m/d H:i:s',
             'agent_id.numeric' => 'ID đại lý phải là số',
             'agent_id.min' => 'ID đại lý phải lớn hơn 0',
+            'fee_agent.required_if' => 'Phí đại lý không được để trống',
         ];
     }
 
@@ -73,7 +76,7 @@ class StoreRequest extends FormRequest
             $dep = MoneyComesBack::where('pos_id', $this->request->get('pos_id'))
                 ->where('lo_number', $this->request->get('lo_number'))
                 ->first();
-            
+
             if ($dep) {
                 $validator->errors()->add('check_exist', 'Lô tiền về đã tồn tại');
             }

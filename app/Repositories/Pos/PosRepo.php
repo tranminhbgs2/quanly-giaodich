@@ -289,9 +289,6 @@ class PosRepo extends BaseRepo
             'hokinhdoanh' => function ($sql) {
                 $sql->select(['id', 'name']);
             },
-            'activeAgents' => function ($sql) {
-                $sql->select(['agency.id', 'agency.name', 'agency.phone', 'agent_pos.pos_id', 'agent_pos.fee'])->first();
-            },
         ]);
 
         if ($with_trashed) {

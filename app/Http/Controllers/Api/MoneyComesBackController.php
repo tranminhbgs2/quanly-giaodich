@@ -196,6 +196,7 @@ class MoneyComesBackController extends Controller
         $params['lo_number'] = strtoupper(request('lo_number', null)); // hình thức
         $params['pos_id'] = request('pos_id', 0); // máy pos
         $params['fee'] = floatval(request('fee', 0)); // phí
+        $params['fee_agent'] = floatval(request('fee_agent', 0)); // phí
         $params['total_price'] = floatval(request('total_price', 0)); // tổng tiền xử lý
         $params['payment'] = floatval(request('payment', 0)); // thành tiền
         $params['status'] = request('status', Constants::USER_STATUS_LOCKED); // trạng thái
@@ -207,28 +208,21 @@ class MoneyComesBackController extends Controller
             $params['time_end'] = str_replace('/', '-', $params['time_end']);
             $params['time_process'] = date('Y-m-d', strtotime($params['time_end']));
         }
-
         if ($params['agent_id'] > 0) {
+            if ($params['fee_agent'] > 0) {
+                $params['payment_agent'] = $params['total_price'] - $params['fee_agent'] * $params['total_price'] / 100;
+            } else {
+                $params['payment_agent'] = 0;
+            }
             $pos = $this->pos_repo->getById($params['pos_id']);
             if ($pos) {
                 $params['hkd_id'] = $pos->hkd_id;
-                $activeAgents = $pos->activeByAgentsDate($params['agent_id']);
-                if ($activeAgents) {
-                    $params['fee'] = $pos->total_fee;
-                    $params['fee_agent'] = $activeAgents->fee;
-                    $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
-                    $params['payment'] = $params['total_price'] - $params['fee']*$params['total_price']/100;
-                } else {
-                    return response()->json([
-                        'code' => 400,
-                        'error' => 'Máy POS không thuộc đại lý này',
-                        'data' => $activeAgents
-                    ]);
-                }
+                $params['fee'] = $pos->total_fee;
+                $params['payment'] = $params['total_price'] - $params['fee'] * $params['total_price'] / 100;
             } else {
                 return response()->json([
                     'code' => 400,
-                    'error' => 'Máy POS không thuộc đại lý này',
+                    'error' => 'Không tìm thấy máy POS',
                     'data' => null
                 ]);
             }
@@ -279,31 +273,25 @@ class MoneyComesBackController extends Controller
                 $params['time_process'] = date('Y-m-d', strtotime($params['time_end']));
             }
             if ($params['agent_id'] > 0) {
+                if ($params['fee_agent'] > 0) {
+                    $params['payment_agent'] = $params['total_price'] - $params['fee_agent'] * $params['total_price'] / 100;
+                } else {
+                    $params['payment_agent'] = 0;
+                }
                 $pos = $this->pos_repo->getById($params['pos_id']);
                 if ($pos) {
                     $params['hkd_id'] = $pos->hkd_id;
-                    $activeAgents = $pos->activeByAgentsDate($params['agent_id']);
-                    if ($activeAgents) {
-                        $params['fee'] = $pos->total_fee;
-                        $params['fee_agent'] = $activeAgents->fee;
-                        $params['payment_agent'] = $params['total_price'] - $params['fee_agent']*$params['total_price']/100;
-                        $params['payment'] = $params['total_price'] - $params['fee']*$params['total_price']/100;
-                    } else {
-                        return response()->json([
-                            'code' => 400,
-                            'error' => 'Máy POS không thuộc đại lý này',
-                            'data' => $activeAgents
-                        ]);
-                    }
+                    $params['fee'] = $pos->total_fee;
+                    $params['payment'] = $params['total_price'] - $params['fee'] * $params['total_price'] / 100;
                 } else {
                     return response()->json([
                         'code' => 400,
-                        'error' => 'Máy POS không thuộc đại lý này',
+                        'error' => 'Không tìm thấy máy POS',
                         'data' => null
                     ]);
                 }
             }
-        $params['time_end'] = null;
+            $params['time_end'] = null;
             $resutl = $this->money_repo->update($params, $params['id']);
 
             if ($resutl) {
