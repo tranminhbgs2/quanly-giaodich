@@ -33,7 +33,7 @@ class UpdateRequest extends FormRequest
             // 'fee' => ['required', 'numeric', 'min:0'],
             'total_price' => ['required', 'numeric', 'min:0'],
             // 'payment' => ['required', 'numeric', 'min:0'],
-            'time_end' => 'date_format:Y/m/d H:i:s',
+            'time_end' => 'date_format:Y/m/d',
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED],
         ];
 
@@ -48,7 +48,7 @@ class UpdateRequest extends FormRequest
             'fee' => 'Phí gốc máy pos',
             'total_price' => 'Tổng tiền xử lý',
             'payment' => 'Thành tiền',
-            'time_end' => 'Thời gian kết toán',
+            'time_end' => 'Thời gian xử lý',
             'status' => 'Trạng thái',
         ];
     }
@@ -59,7 +59,7 @@ class UpdateRequest extends FormRequest
             'required' => ':attribute không được để trống',
             'numeric' => ':attribute phải là số',
             'min' => ':attribute phải lớn hơn :min',
-            'date_format' => ':attribute không đúng định dạng Y/m/d H:i:s',
+            'date_format' => ':attribute không đúng định dạng Y/m/d',
             'in' => ':attribute không hợp lệ',
         ];
     }
