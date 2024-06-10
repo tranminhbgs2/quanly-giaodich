@@ -478,30 +478,30 @@ class MoneyComesBackRepo extends BaseRepo
                 'ip_address' => request()->ip()
             ]));
 
-            if($params['pos_id'] != $old_money->pos_id){
+            if ($params['pos_id'] != $old_money->pos_id) {
                 $pos_old = Pos::where('id', $old_money->pos_id)->first();
                 if ($pos_old) {
-                    $pos_balance = $pos_old->price_pos - $old_money->payment;
+                    $pos_balance = $pos_old->price_pos - ($old_money->total_price - ($pos_old->total_fee * $old_money->total_price) / 100);
                     $pos_repo = new PosRepo();
                     $pos_repo->updatePricePos($pos_balance, $pos_old->id, "UPDATE_MONEY_COMES_BACK_" . $id);
                 }
 
                 $pos = Pos::where('id', $params['pos_id'])->first();
                 if ($pos) {
-                    $pos_balance = $pos->price_pos + $params['payment'];
+                    $pos_balance = $pos->price_pos + ($params['total_price'] - ($pos->total_fee * $params['total_price']) / 100);
                     $pos_repo = new PosRepo();
                     $pos_repo->updatePricePos($pos_balance, $pos->id, "UPDATE_MONEY_COMES_BACK_" . $id);
                 }
             } else {
                 $pos = Pos::where('id', $params['pos_id'])->first();
                 if ($pos) {
-                    $pos_balance = $pos->price_pos + $balance_change;
+                    $pos_balance = $pos->price_pos - ($old_money->total_price - ($pos->total_fee * $old_money->total_price) / 100) + ($params['total_price'] - ($pos->total_fee * $params['total_price']) / 100);
                     $pos_repo = new PosRepo();
                     $pos_repo->updatePricePos($pos_balance, $pos->id, "UPDATE_MONEY_COMES_BACK_" . $id);
                 }
             }
 
-            if($params['hkd_id'] != $old_money->hkd_id){
+            if ($params['hkd_id'] != $old_money->hkd_id) {
                 $hkd_repo = new HoKinhDoanhRepo();
                 $hkd_old = $hkd_repo->getById($old_money->hkd_id);
                 $pos_old = Pos::where('id', $old_money->pos_id)->first();
@@ -530,7 +530,7 @@ class MoneyComesBackRepo extends BaseRepo
             }
 
             if (isset($params['agent_id']) && $params['agent_id'] > 0) {
-                if($params['agent_id'] != $old_money->agent_id){
+                if ($params['agent_id'] != $old_money->agent_id) {
                     $agent_old = Agent::where('id', $old_money->agent_id)->first();
                     if ($agent_old) {
                         $agent_balance = $agent_old->balance - $old_money->payment_agent;
@@ -552,6 +552,72 @@ class MoneyComesBackRepo extends BaseRepo
                         $agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_MONEY_COMES_BACK_" . $id);
                     }
                 }
+            }
+        }
+        return $res;
+    }
+
+
+    public function updateKL($params, $id, $total_price_hkd = 0, $type = "CREATED")
+    {
+        $fillable = [
+            'pos_id',
+            'hkd_id',
+            'lo_number',
+            'time_end',
+            'time_process', // 'time_process' => 'date_format:Y/m/d'
+            'created_by',
+            'fee',
+            'total_price',
+            'payment',
+            'balance',
+            'status',
+            'fee_agent',
+            'payment_agent',
+        ];
+
+        $update = [];
+
+        foreach ($fillable as $field) {
+            if (isset($params[$field])) {
+                $update[$field] = $params[$field];
+            }
+        }
+        $old_money = MoneyComesBack::where('id', $id)->first();
+
+        $res = MoneyComesBack::where('id', $id)->update($update);
+        // Xử lý cộng tiền máy Pos
+        if ($res) {
+            // Lưu log qua event
+            event(new ActionLogEvent([
+                'actor_id' => auth()->user()->id,
+                'username' => auth()->user()->username,
+                'action' => 'UPDATE_BANLANCE_MONEY_COMES_BACK',
+                'description' => 'Cập nhật số tiền lô tiền về KL ' . $old_money->lo_number . ' từ ' . $old_money->payment . ' thành ' . $params['payment'],
+                'data_new' => $old_money->payment,
+                'data_old' => $params['payment'],
+                'model' => 'MoneyComesBack',
+                'table' => 'money_comes_back',
+                'record_id' => $id,
+                'ip_address' => request()->ip()
+            ]));
+
+
+            $pos = Pos::where('id', $params['pos_id'])->first();
+            if ($pos) {
+                $pos_balance = $pos->price_pos + $total_price_hkd;
+                $pos_repo = new PosRepo();
+                $pos_repo->updatePricePos($pos_balance, $pos->id, "UPDATE_KL_MONEY_COMES_BACK_" . $id);
+            }
+
+
+            $hkd_repo = new HoKinhDoanhRepo();
+            $hkd = $hkd_repo->getById($params['hkd_id']);
+            $pos = Pos::where('id', $params['pos_id'])->first();
+            if ($hkd) {
+                $hkd_balance = $hkd->balance + $total_price_hkd;
+                $hkd_repo = new HoKinhDoanhRepo();
+                $hkd_repo->updateBalance($hkd_balance, $hkd->id, "UPDATE_KL_MONEY_COMES_BACK_" . $id);
             }
         }
         return $res;

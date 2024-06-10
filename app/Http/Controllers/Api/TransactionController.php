@@ -185,28 +185,22 @@ class TransactionController extends Controller
             $params['fee_cashback'] = $pos->fee_cashback;
             $params['original_fee'] = $pos->total_fee;
             $params['hkd_id'] = $pos->hkd_id;
-            $fee_pos = $pos->fee;
             if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIETCOMBANK") {
                 switch ($params['type_card']) {
                     case 'JCB':
                         $params['original_fee'] = $pos->fee_jcb + $pos->fee_cashback;
-                        $fee_pos = $pos->fee_jcb;
                         break;
                     case 'VISA':
                         $params['original_fee'] = $pos->fee_visa + $pos->fee_cashback;
-                        $fee_pos = $pos->fee_visa;
                         break;
                     case 'MASTER':
                         $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
-                        $fee_pos = $pos->fee_master;
                         break;
                     case 'NAPAS':
                         $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
-                        $fee_pos = $pos->fee_napas;
                         break;
                     case 'AMEX':
                         $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
-                        $fee_pos = $pos->fee_amex;
                         break;
                 }
             }
@@ -263,8 +257,8 @@ class TransactionController extends Controller
                         'created_by' => auth()->user()->id,
                         'status' => Constants::USER_STATUS_ACTIVE,
                     ];
-                    $price_rut = ($params['price_rut'] - ($fee_pos * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
-                    $this->money_comes_back_repo->update($money_comes_back, $money_come->id, $price_rut);
+                    $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
+                    $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, "CREATED");
                 } else {
                     $money_comes_back = [
                         'pos_id' => $params['pos_id'],
@@ -329,7 +323,6 @@ class TransactionController extends Controller
     {
         $params['id'] = request('id', null);
         if ($params['id']) {
-            $tran = $this->tran_repo->getById($params['id'], false);
 
             $params['bank_card'] = request('bank_card', null);
             $params['method'] = request('method', null);
@@ -426,14 +419,16 @@ class TransactionController extends Controller
                     }
                     $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
                     if ($money_come) {
-                        if ($tran->lo_number > 0) {
+                        if ($tran_old->lo_number > 0) {
                             // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
-                            $total_price = $money_come->total_price + $params['price_rut'] - $tran->price_rut;
-                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran->price_rut - $tran->price_fee);
+                            $total_price = $money_come->total_price + $params['price_rut'] - $tran_old->price_rut;
+                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran_old->price_rut - $tran_old->price_fee);
+                            $price_rut = ($params['price_rut'] - ($fee_pos * $params['price_rut']) / 100) - ($tran_old->price_rut - ($fee_pos * $tran_old->price_rut) / 100); // Tính số tiền cộng cho HKD
                         } else {
                             // Chưa có lần nào cộng
                             $total_price = $money_come->total_price + $params['price_rut'];
                             $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
+                            $price_rut = ($params['price_rut'] - ($fee_pos * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
                         }
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
@@ -446,8 +441,7 @@ class TransactionController extends Controller
                             'created_by' => auth()->user()->id,
                             'status' => $money_come->status,
                         ];
-                        $price_rut = ($params['price_rut'] - ($fee_pos * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
-                        $this->money_comes_back_repo->update($money_comes_back, $money_come->id, $price_rut);
+                        $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, "UPDATED");
                     } else {
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
@@ -462,28 +456,28 @@ class TransactionController extends Controller
                         ];
                         $this->money_comes_back_repo->store($money_comes_back);
                     }
+                }
 
-                    //Xử lý trừ tiền của nhân viên
-                    if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
-                        $user = $this->userRepo->getById(auth()->user()->id);
-                        $user_balance = $user->balance + $tran_old->price_transfer - $params['price_transfer'];
-                        $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
-                        //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
-                        $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
-                        if ($bank_account) {
-                            $bank_account->balance += $tran_old->price_transfer - $params['price_transfer'];
-                            $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
-                        }
-                    } else {
-                        $user = $this->userRepo->getById(auth()->user()->id);
-                        $user_balance = $user->balance + $tran_old->price_nop - $params['price_nop'];
-                        $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
-                        //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
-                        $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
-                        if ($bank_account) {
-                            $bank_account->balance += $tran_old->price_nop - $params['price_nop'];
-                            $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
-                        }
+                //Xử lý trừ tiền của nhân viên
+                if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
+                    $user = $this->userRepo->getById(auth()->user()->id);
+                    $user_balance = $user->balance + $tran_old->price_transfer - $params['price_transfer'];
+                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
+                    //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
+                    $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                    if ($bank_account) {
+                        $bank_account->balance += $tran_old->price_transfer - $params['price_transfer'];
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
+                    }
+                } else {
+                    $user = $this->userRepo->getById(auth()->user()->id);
+                    $user_balance = $user->balance + $tran_old->price_nop - $params['price_nop'];
+                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
+                    //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
+                    $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                    if ($bank_account) {
+                        $bank_account->balance += $tran_old->price_nop - $params['price_nop'];
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
                     }
                 }
                 return response()->json([
