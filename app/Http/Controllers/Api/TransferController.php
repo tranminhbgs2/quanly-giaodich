@@ -116,6 +116,7 @@ class TransferController extends Controller
         $params['bank_from'] = $bank_from->bank_code;
         $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
 
+
         if ($bank_from->balance < $params['price']) {
             return response()->json([
                 'code' => 400,
@@ -155,15 +156,15 @@ class TransferController extends Controller
                 $agent_balance = $agent->balance - $params['price'];
                 $this->agent_repo->updateBalance($agent->id, $agent_balance, "CREATED_TRANSFER_" . $resutl->id);
             }
-            if ($params['type_to'] == "STAFF") {
-                $user = $this->userRepo->getById(auth()->user()->id);
+            if ($params['type_to'] == "STAFF" && $bank_to->type == "STAFF") {
+                $user = $this->userRepo->getById($bank_to->staff_id);
                 $user_balance = $user->balance + $params['price'];
-                $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATED_TRANSFER_" . $resutl->id);
+                $this->userRepo->updateBalance($bank_to->staff_id, $user_balance, "CREATED_TRANSFER_" . $resutl->id);
             }
-            if ($params['type_from'] == "STAFF") {
-                $user = $this->userRepo->getById(auth()->user()->id);
+            if ($params['type_from'] == "STAFF" && $bank_from->type == "STAFF") {
+                $user = $this->userRepo->getById($bank_from->staff_id);
                 $user_balance = $user->balance - $params['price'];
-                $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATED_TRANSFER_" . $resutl->id);
+                $this->userRepo->updateBalance($bank_from->staff_id, $user_balance, "CREATED_TRANSFER_" . $resutl->id);
             }
             return response()->json([
                 'code' => 200,
