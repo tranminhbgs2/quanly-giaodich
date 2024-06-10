@@ -202,7 +202,7 @@ class TransactionRepo extends BaseRepo
                     'pos_id' => $pos->id,
                     'date' => $date,
                     'total_price_rut' => $total_price_rut,
-                    'total_payment_cashback' => (int)$total_payment_cashback,
+                    'total_payment_cashback' => round($total_payment_cashback),
                     'pos' => [
                         'id' => $pos->id,
                         'name' => $pos->name,
