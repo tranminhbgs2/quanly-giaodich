@@ -364,7 +364,9 @@ class TransactionController extends Controller
             }
 
             $tran_old = $this->tran_repo->getById($params['id'], false);
-
+            if($tran_old->status == Constants::USER_STATUS_DRAFT){
+                $params['status'] = Constants::USER_STATUS_ACTIVE;
+            }
             $pos = $this->pos_repo->getById($params['pos_id'], false);
             $params['hkd_id'] = 0;
             if ($pos) {

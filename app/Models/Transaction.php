@@ -62,7 +62,7 @@ class Transaction extends Model
     {
         return $this->belongsTo(HoKinhDoanh::class, 'hkd_id', 'id');
     }
-    
+
     public function getMethodNameAttribute()
     {
         $name = '';
@@ -92,7 +92,7 @@ class Transaction extends Model
 
     public function getStatusFeeAttribute()
     {
-        if ($this->fee_paid == $this->price_fee) {
+        if ($this->fee_paid == $this->price_fee && $this->status != 4) {
             return true;
         }
         return false;
