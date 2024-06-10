@@ -214,7 +214,7 @@ class HoKinhDoanhRepo extends BaseRepo
                 'action' => 'UPDATE_BANLANCE_HKD',
                 'description' => $action . ' Cập nhật số tiền cho HKD ' . $pos->name . ' từ ' . $pos->balance . ' thành ' . $price_pos,
                 'data_new' => $price_pos,
-                'data_old' => $pos->price_pos,
+                'data_old' => $pos->balance,
                 'model' => 'HoKinhDoanh',
                 'table' => 'HoKinhDoanh',
                 'record_id' => $pos->id,
