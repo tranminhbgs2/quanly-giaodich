@@ -194,7 +194,7 @@ class TransactionRepo extends BaseRepo
             })
             ->map(function ($group) {
                 $pos = $group->first()->pos;
-                $date = Carbon::parse($group->first()->time_payment)->format('Y-m-d');
+                $date = Carbon::parse($group->first()->time_payment)->format('d/m/Y');
                 $total_price_rut = $group->sum('price_rut');
                 $total_payment_cashback = intval($total_price_rut * $pos->fee_cashback / 100);
 
