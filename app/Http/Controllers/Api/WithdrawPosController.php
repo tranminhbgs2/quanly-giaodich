@@ -216,4 +216,17 @@ class WithdrawPosController extends Controller
             'data' => null
         ]);
     }
+
+
+
+    public function getAll()
+    {
+        $hkd_id = request('hkd_id', null);
+        $data = $this->cate_repo->getAll($hkd_id);
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách rút tiền',
+            'data' => $data
+        ]);
+    }
 }

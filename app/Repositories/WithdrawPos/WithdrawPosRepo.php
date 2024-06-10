@@ -374,4 +374,29 @@ class WithdrawPosRepo extends BaseRepo
 
         return WithdrawPos::where('id', $id)->update($update);
     }
+
+
+    public function getAll($hkd_id = null)
+    {
+        $query = WithdrawPos::select()->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name', 'fee', 'total_fee', 'fee_cashback']);
+            },
+            'hokinhdoanh' => function ($sql) {
+                $sql->select(['id', 'name', 'surrogate']);
+            },
+            'accountBank' => function ($sql) {
+                $sql->select(['id', 'account_number', 'bank_code', 'account_name']);
+            },
+            'createdBy' => function ($sql) {
+                $sql->select(['id', 'username', 'email', 'fullname']);
+            },
+        ]);;
+
+        if ($hkd_id) {
+            $query->where('hkd_id', $hkd_id);
+        }
+
+        return $query->orderBy('id', 'DESC')->get()->toArray();
+    }
 }

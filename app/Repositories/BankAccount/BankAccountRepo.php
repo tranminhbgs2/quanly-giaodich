@@ -234,12 +234,16 @@ class BankAccountRepo extends BaseRepo
         return BankAccounts::where('id', $id)->update($update);
     }
 
-    public function getAll($type = null)
+    public function getAll($type = null, $agent_id = null)
     {
         $query = BankAccounts::select('id', 'bank_code', 'account_name', 'account_number', 'type')->where('status', Constants::USER_STATUS_ACTIVE);
 
         if ($type) {
             $query->where('type', $type);
+        }
+
+        if ($agent_id) {
+            $query->where('agent_id', $agent_id);
         }
 
         return $query->orderBy('id', 'DESC')->get()->toArray();

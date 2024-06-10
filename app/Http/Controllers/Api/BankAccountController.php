@@ -249,7 +249,8 @@ class BankAccountController extends Controller
     public function getAll()
     {
         $type = request('type', null);
-        $data = $this->bankacc_repo->getAll($type);
+        $agent_id = request('agent_id', null);
+        $data = $this->bankacc_repo->getAll($type, $agent_id);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách Tài khoản hưởng thụ',

@@ -13,6 +13,7 @@ Route::group(['prefix' => 'withdraw-pos'], function (){
         Route::post('/update', 'WithdrawPosController@update');
         Route::get('/delete/{id}', 'WithdrawPosController@delete');
         Route::post('/change-status', 'WithdrawPosController@changeStatus');
+        Route::get('/get-all', 'WithdrawPosController@getAll');
     });
 
 });
