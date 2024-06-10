@@ -29,16 +29,15 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         $rule = [
-            'bank_card' => ['required'],
             'method' => ['required', 'in:DAO_HAN,RUT_TIEN_MAT,ONLINE'],
-            'category_id' => ['required', 'integer', 'min:1'],
-            'pos_id' => ['required', 'integer', 'min:1'],
-            'fee' => ['required', 'numeric', 'min:0', 'max:99'],
+            'category_id' => ['integer', 'min:0'],
+            'pos_id' => ['integer', 'min:0'],
+            'fee' => ['numeric', 'min:0', 'max:99'],
             'time_payment' => ['date_format:Y/m/d H:i:s'],
             'customer_name' => ['required'],
-            'price_nop' => ['required', 'numeric', 'min:0'],
-            'price_rut' => ['required', 'numeric', 'min:0'],
-            'price_fee' => ['required', 'numeric', 'min:0'],
+            'price_nop' => ['numeric', 'min:0'],
+            'price_rut' => ['numeric', 'min:0'],
+            'price_fee' => ['numeric', 'min:0'],
             'price_transfer' => ['numeric', 'min:0'],
             'price_repair' => ['numeric', 'min:0'],
             'type_card' => ['required_if:bank_code,VIETCOMBANK', 'in:VISA,MASTER,NAPAS,AMEX,JCB'],
@@ -52,52 +51,32 @@ class StoreRequest extends FormRequest
     public function attributes()
     {
         return [
-            'bank_card' => 'Ngân hàng',
-            'method' => 'Hình thức',
+            'bank_card' => 'Số thẻ',
+            'method' => 'Phương thức',
             'category_id' => 'Danh mục',
-            'pos_id' => 'Máy Pos',
+            'pos_id' => 'Máy POS',
             'fee' => 'Phí',
             'time_payment' => 'Thời gian thanh toán',
             'customer_name' => 'Tên khách hàng',
             'price_nop' => 'Số tiền nộp',
             'price_rut' => 'Số tiền rút',
-            'price_fee' => 'Số tiền phí',
+            'price_fee' => 'Phí rút',
             'price_transfer' => 'Số tiền chuyển',
-            'price_repair' => 'Số tiền bù',
+            'price_repair' => 'Số tiền sửa',
+            'type_card' => 'Loại thẻ',
         ];
     }
 
     public function messages()
     {
         return [
-            'bank_card.required' => 'Truyền thiếu tham số bank_card',
-            'method.required' => 'Truyền thiếu tham số method',
-            'category_id.required' => 'Truyền thiếu tham số category_id',
-            'category_id.integer' => 'Tham số category_id phải là số nguyên',
-            'category_id.min' => "Tham số category_id tối thiểu phải là :min",
-            'pos_id.required' => 'Truyền thiếu tham số pos_id',
-            'pos_id.integer' => 'Tham số pos_id phải là số nguyên',
-            'pos_id.min' => "Tham số pos_id tối thiểu phải là :min",
-            'fee.required' => 'Truyền thiếu tham số fee',
-            'fee.numeric' => 'Tham số fee phải là số',
-            'fee.min' => "Tham số fee tối thiểu phải là :min",
-            'time_payment.date_format' => 'Tham số time_payment không đúng định dạng Y/m/d H:i:s',
-            'customer_name.required' => 'Truyền thiếu tham số customer_name',
-            'price_nop.required' => 'Truyền thiếu tham số price_nop',
-            'price_nop.numeric' => 'Tham số price_nop phải là số',
-            'price_nop.min' => "Tham số price_nop tối thiểu phải là :min",
-            'price_rut.required' => 'Truyền thiếu tham số price_rut',
-            'price_rut.numeric' => 'Tham số price_rut phải là số',
-            'price_rut.min' => "Tham số price_rut tối thiểu phải là :min",
-            'price_fee.required' => 'Truyền thiếu tham số price_fee',
-            'price_fee.numeric' => 'Tham số price_fee phải là số',
-            'price_fee.min' => "Tham số price_fee tối thiểu phải là :min",
-            'price_transfer.numeric' => 'Tham số price_transfer phải là số',
-            'price_transfer.min' => "Tham số price_transfer tối thiểu phải là :min",
-            'price_repair.numeric' => 'Tham số price_repair phải là số',
-            'price_repair.min' => "Tham số price_repair tối thiểu phải là :min",
-            'fee.max' => 'Tham số fee tối đa phải là :max',
-
+            'required' => ':attribute không được để trống',
+            'in' => ':attribute không hợp lệ',
+            'numeric' => ':attribute phải là số',
+            'min' => ':attribute không được nhỏ hơn :min',
+            'max' => ':attribute không được lớn hơn :max',
+            'date_format' => ':attribute không đúng định dạng Y/m/d H:i:s',
+            'required_if' => ':attribute không được để trống',
         ];
     }
 

@@ -56,6 +56,7 @@ class Constants
     const USER_STATUS_ACTIVE = 1;
     const USER_STATUS_LOCKED = 2;
     const USER_STATUS_DELETED = 3;
+    const USER_STATUS_DRAFT = 4;
 
     const SCHOOL_STATUS_NEW = 0;
     const SCHOOL_STATUS_ACTIVE = 1;

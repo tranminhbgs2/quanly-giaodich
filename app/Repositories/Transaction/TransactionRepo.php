@@ -466,7 +466,7 @@ class TransactionRepo extends BaseRepo
         }
 
         // Tạo mới đối tượng và lưu thông tin nếu có đủ dữ liệu
-        if (!empty($insert['category_id']) && !empty($insert['pos_id']) && !empty($insert['customer_name'])) {
+        if (!empty($insert['customer_name'])) {
             return Transaction::create($insert);
         }
 

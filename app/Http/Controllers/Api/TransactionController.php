@@ -159,7 +159,7 @@ class TransactionController extends Controller
         $params['category_id'] = request('category_id', 0); // danh mục
         $params['pos_id'] = request('pos_id', 0); // máy pos
         $params['fee'] = floatval(request('fee', 0)); // phí
-        $params['original_fee'] = floatval(request('original_fee', 0)); // phí gốc
+        $params['original_fee'] = floatval(request('original_fee', 0)); // phí tổng
         $params['time_payment'] = request('time_payment', null); // thời gian thanh toán
         $params['customer_name'] = request('customer_name', null); // tên khách hàng
         $params['price_nop'] = floatval(request('price_nop', 0)); // số tiền nộp
@@ -174,15 +174,14 @@ class TransactionController extends Controller
         $params['note'] = request('note', null); // số lô
         $params['type_card'] = request('type_card', null); // số lô
         $params['bank_code'] = request('bank_code', null); // số lô
-
-        $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
-
-        $pos = $this->pos_repo->getById($params['pos_id'], false);
+        if($params['time_payment']){
+            $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
+        }
         $params['hkd_id'] = 0;
-        $fee_pos = 0;
+        $pos = $this->pos_repo->getById($params['pos_id'], false);
 
         if ($pos) {
-            $params['fee_cashback'] = $pos->fee_cashback;
+            $params['fee_cashback'] = $pos->fee_cashback; // phí hoàn
             $params['original_fee'] = $pos->total_fee;
             $params['hkd_id'] = $pos->hkd_id;
             if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIETCOMBANK") {
@@ -233,10 +232,15 @@ class TransactionController extends Controller
             $params['fee_paid'] = 0;
             $params['price_transfer'] = 0;
         }
+
+        if($params['lo_number'] <= 0 && $params['pos_id'] == 0){
+            $params['status'] = Constants::USER_STATUS_DRAFT;
+        }
+
         $resutl = $this->tran_repo->store($params);
 
         if ($resutl) {
-            if ($params['lo_number'] > 0) {
+            if ($params['lo_number'] > 0 && $params['pos_id'] > 0) {
                 if ($params['time_payment']) {
                     $time_process = date('Y-m-d', strtotime($params['time_payment']));
                 } else {
