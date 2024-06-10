@@ -261,6 +261,7 @@ class MoneyComesBackController extends Controller
             $params['lo_number'] = strtoupper(request('lo_number', null)); // hình thức
             $params['pos_id'] = request('pos_id', 0); // máy pos
             $params['fee'] = floatval(request('fee', 0)); // phí
+            $params['fee_agent'] = floatval(request('fee_agent', 0)); // phí
             $params['total_price'] = floatval(request('total_price', 0)); // phí
             $params['payment'] = floatval(request('payment', 0)); // phí
             $params['status'] = request('status', Constants::USER_STATUS_LOCKED); // trạng thái
