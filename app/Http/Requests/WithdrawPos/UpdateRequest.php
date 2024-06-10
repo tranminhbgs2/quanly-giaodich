@@ -75,6 +75,9 @@ class UpdateRequest extends FormRequest
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Rút tiền đã bị xóa');
                 }
+                if ($dep->hkd_id != $this->request->get('hkd_id')) {
+                    $validator->errors()->add('check_exist', 'Không được thay đổi hộ kinh doanh');
+                }
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy GD rút tiền');
             }
