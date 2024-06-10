@@ -423,12 +423,12 @@ class TransactionController extends Controller
                             // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
                             $total_price = $money_come->total_price + $params['price_rut'] - $tran_old->price_rut;
                             $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran_old->price_rut - $tran_old->price_fee);
-                            $price_rut = ($params['price_rut'] - ($fee_pos * $params['price_rut']) / 100) - ($tran_old->price_rut - ($fee_pos * $tran_old->price_rut) / 100); // Tính số tiền cộng cho HKD
+                            $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100) - ($tran_old->price_rut - ($params['original_fee'] * $tran_old->price_rut) / 100); // Tính số tiền cộng cho HKD
                         } else {
                             // Chưa có lần nào cộng
                             $total_price = $money_come->total_price + $params['price_rut'];
                             $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
-                            $price_rut = ($params['price_rut'] - ($fee_pos * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
+                            $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
                         }
                         $money_comes_back = [
                             'pos_id' => $params['pos_id'],
