@@ -53,6 +53,11 @@ class Transaction extends Model
         return $this->belongsTo(User::class, 'customer_id', 'id');
     }
 
+    public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
+
     public function pos()
     {
         return $this->belongsTo(Pos::class, 'pos_id', 'id');
