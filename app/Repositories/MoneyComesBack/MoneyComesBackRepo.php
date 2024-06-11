@@ -896,6 +896,9 @@ class MoneyComesBackRepo extends BaseRepo
     {
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
         $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
+
+        $date_from = Carbon::parse($date_from)->startOfDay();
+        $date_to = Carbon::parse($date_to)->endOfDay();
         $query = MoneyComesBack::select()
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
@@ -922,6 +925,9 @@ class MoneyComesBackRepo extends BaseRepo
     {
         $date_from = Carbon::parse($params['date_from'])->startOfDay();
         $date_to = Carbon::parse($params['date_to'])->endOfDay();
+
+        $date_from = Carbon::parse($date_from)->startOfDay();
+        $date_to = Carbon::parse($date_to)->endOfDay();
 
         // Tạo một đối tượng Collection mới chứa các ngày trong khoảng thời gian đã chỉ định
         $date_range = collect();
@@ -975,7 +981,8 @@ class MoneyComesBackRepo extends BaseRepo
     {
         $update = [
             'time_process' => $time_process,
-            'time_end' => $time_end
+            'time_end' => $time_end,
+            'status' => Constants::USER_STATUS_ACTIVE
         ];
 
         return MoneyComesBack::where('id', $id)->update($update);
