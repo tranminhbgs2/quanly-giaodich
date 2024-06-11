@@ -44,7 +44,6 @@ class UpdateRequest extends FormRequest
             'price_transfer' => ['numeric', 'min:0'],
             'price_repair' => ['numeric', 'min:0'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED],
-            'type_card' => ['required_if:bank_code,VIETCOMBANK', 'in:VISA,MASTER,NAPAS,AMEX,JCB'],
         ];
 
         return $rule;
