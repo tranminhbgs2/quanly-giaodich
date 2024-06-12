@@ -48,12 +48,17 @@ class TransferController extends Controller
         $params['date_from'] = request('date_from', null);
         $params['date_to'] = request('date_to', null);
         $params['account_type'] = auth()->user()->account_type;
+        $params['type_to'] = request('type_to', null);
+        $params['type_from'] = request('type_from', null);
+        $params['id_from'] = request('id_from', 0);
+        $params['id_to'] = request('id_to', 0);
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
 
         $data = $this->cate_repo->getListing($params, false);
         $total = $this->cate_repo->getListing($params, true);
+        $export = $this->cate_repo->getTotal($params, false);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách chuyển tiền',
@@ -62,7 +67,8 @@ class TransferController extends Controller
                 "total_page" => ceil($total / $params['page_size']),
                 "page_no" => intval($params['page_index']),
                 "page_size" => intval($params['page_size']),
-                "data" => $data
+                "data" => $data,
+                "total" => $export
             ],
         ]);
     }
