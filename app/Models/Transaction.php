@@ -97,7 +97,7 @@ class Transaction extends Model
 
     public function getStatusFeeAttribute()
     {
-        if ($this->fee_paid == $this->price_fee && $this->status != 4) {
+        if ($this->fee_paid == $this->price_fee && $this->status != 4 && $this->price_fee > 0) {
             return true;
         }
         return false;
