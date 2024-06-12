@@ -665,8 +665,7 @@ class TransactionRepo extends BaseRepo
         });
 
         return $total;
-    }
-    public function topStaffTransaction($params)
+    }public function topStaffTransaction($params)
     {
         // Set default date range if not provided
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
@@ -676,17 +675,19 @@ class TransactionRepo extends BaseRepo
         $date_to = Carbon::parse($date_to)->endOfDay();
 
         // Query to get transactions within the date range and group by 'created_by'
-        $transactions = Transaction::select(['created_by', 'price_rut', 'price_nop', 'profit', 'price_transfer', 'original_fee'])
+        $transactionsQuery = Transaction::select(['created_by', 'price_rut', 'price_nop', 'profit', 'price_transfer', 'original_fee'])
             ->with([
-                'createdBy' => function ($sql) {
-                    $sql->select(['id', 'fullname', 'balance']);
+                'createdBy' => function ($query) {
+                    $query->select(['id', 'fullname', 'balance']);
                 }
             ])
             ->where('status', Constants::USER_STATUS_ACTIVE);
-        if (isset($params['created_by']) && $params['account_type'] == 'STAFF') {
-            $transactions->where('created_by', $params['created_by']);
+
+        if (isset($params['created_by']) && $params['account_type'] === 'STAFF') {
+            $transactionsQuery->where('created_by', $params['created_by']);
         }
-            $transactions->whereBetween('created_at', [$date_from, $date_to])
+
+        $transactions = $transactionsQuery->whereBetween('created_at', [$date_from, $date_to])
             ->get()
             ->groupBy('created_by');
 
@@ -700,13 +701,13 @@ class TransactionRepo extends BaseRepo
 
             $createdBy = $group->first()->createdBy;
 
-            //tính tổng tiền mà staff đã được chuyển khoản từ transferRepo
+            // Calculate the total amount transferred to the staff from transferRepo
             $query_transfer = Transfer::select()
-            ->where('status', Constants::USER_STATUS_ACTIVE)
-            ->where('to_agent_id', $createdBy->id)
-            ->where('type_to', "STAFF")
-            ->whereBetween('created_at', [$date_from, $date_to])
-            ->get();
+                ->where('status', Constants::USER_STATUS_ACTIVE)
+                ->where('to_agent_id', $createdBy->id)
+                ->where('type_to', 'STAFF')
+                ->whereBetween('created_at', [$date_from, $date_to])
+                ->get();
             $total_mester_transfer = $query_transfer->sum('price');
 
             return [
@@ -720,7 +721,7 @@ class TransactionRepo extends BaseRepo
             ];
         });
 
-        // Sort by total price rutted and take the all
+        // Sort by total price rutted and return all results
         $topStaff = $staffTransactions->sortByDesc('total_price_rut')->values();
 
         return $topStaff;
