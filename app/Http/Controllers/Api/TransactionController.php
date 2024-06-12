@@ -205,8 +205,10 @@ class TransactionController extends Controller
             }
         }
 
-        $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
-        $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100; // lợi nhuận
+        if ($params['price_fee'] == 0) {
+            $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
+        }
+        $params['profit'] = $params['price_fee'] - ($params['original_fee'] * $params['price_rut'] / 100); // lợi nhuận
 
         if ($params['lo_number'] > 0) {
             if ($params['time_payment']) {
@@ -288,6 +290,11 @@ class TransactionController extends Controller
                         $bank_account->balance -= $params['price_transfer'];
                         $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "CREATE_TRANSACTION_" . $resutl->id);
                     }
+                    $bank_account = $this->bankAccountRepo->getAccountFee();
+                    if ($bank_account) {
+                        $bank_account->balance += $params['fee_paid'];
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $resutl->id);
+                    }
                 } else {
                     $user = $this->userRepo->getById(auth()->user()->id);
                     $user_balance = $user->balance - $params['price_nop'];
@@ -364,7 +371,7 @@ class TransactionController extends Controller
             }
 
             $tran_old = $this->tran_repo->getById($params['id'], false);
-            if($tran_old->status == Constants::USER_STATUS_DRAFT){
+            if ($tran_old->status == Constants::USER_STATUS_DRAFT) {
                 $params['status'] = Constants::USER_STATUS_ACTIVE;
             }
             $pos = $this->pos_repo->getById($params['pos_id'], false);
@@ -393,8 +400,11 @@ class TransactionController extends Controller
                     }
                 }
             }
-            $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
-            $params['profit'] = ($params['fee'] - $params['original_fee']) * $params['price_rut'] / 100;
+
+            if ($params['price_fee'] == 0) {
+                $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
+            }
+            $params['profit'] = $params['price_fee']  -$params['original_fee'] * $params['price_rut'] / 100;
 
 
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
@@ -465,6 +475,12 @@ class TransactionController extends Controller
                     if ($bank_account) {
                         $bank_account->balance += $tran_old->price_transfer - $params['price_transfer'];
                         $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
+                    }
+
+                    $bank_account = $this->bankAccountRepo->getAccountFee();
+                    if ($bank_account) {
+                        $bank_account->balance += $params['fee_paid'];
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $resutl->id);
                     }
                 } else {
                     $user = $this->userRepo->getById(auth()->user()->id);
@@ -562,6 +578,14 @@ class TransactionController extends Controller
                     if ($bank_account) {
                         $bank_account->balance += $tran->price_nop;
                         $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "DELETE_TRANSACTION_" . $id);
+                    }
+                }
+
+                if ($tran->fee_paid > 0) {
+                    $bank_account = $this->bankAccountRepo->getAccountFee();
+                    if ($bank_account) {
+                        $bank_account->balance -= $tran->fee_paid;
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "DELETE_TRANSACTION_" . $tran->id);
                     }
                 }
             }
