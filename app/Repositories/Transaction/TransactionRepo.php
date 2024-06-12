@@ -303,14 +303,17 @@ class TransactionRepo extends BaseRepo
             $query->where('method', $method);
         }
 
+        $total_fee_paid = $query->sum('fee_paid');
+        $price_fee = $query->sum('price_fee');
         // Tính tổng của từng trường cần thiết
         $total = [
             'price_nop' => $query->sum('price_nop'),
             'price_rut' => $query->sum('price_rut'),
-            'price_fee' => $query->sum('price_fee'),
+            'price_fee' => $price_fee,
             'price_transfer' => $query->sum('price_transfer'),
             'profit' => $query->sum('profit'),
-            'price_repair' => $query->sum('price_repair')
+            'price_repair' => $query->sum('price_repair'),
+            'total_fee_paid' => $price_fee - $total_fee_paid,
         ];
 
         return $total;
