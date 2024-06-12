@@ -92,6 +92,19 @@ class User extends Model
         return $value;
     }
 
+    public function getPhoneAttribute($value)
+    {
+        if ($value) {
+            //kiểm tra 2 số đầu nếu = 84 thì đổi thành 0
+            if (substr($value, 0, 2) == '84') {
+                $value = '0' . substr($value, 2);
+            }
+            return $value;
+        }
+
+        return $value;
+    }
+
     public function getIssueDateAttribute($value)
     {
         if ($value) {

@@ -19,6 +19,7 @@ Route::group(['prefix' => 'transaction'], function (){
         Route::post('/chart-dashboard', 'TransactionController@ChartDashboard');
         Route::get('/restore-fee/{id}', 'TransactionController@RestoreFee');
         Route::get('/get-all-by-hkd', 'TransactionController@GetAllHkd');
+        Route::get('/get-top-staff', 'TransactionController@GetTopStaff');
     });
 
 });

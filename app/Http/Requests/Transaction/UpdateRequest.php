@@ -43,8 +43,7 @@ class UpdateRequest extends FormRequest
             'price_fee' => ['required', 'numeric', 'min:0'],
             'price_transfer' => ['numeric', 'min:0'],
             'price_repair' => ['numeric', 'min:0'],
-            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED],
-            'type_card' => ['required_if:bank_code,VIETCOMBANK', 'in:VISA,MASTER,NAPAS,AMEX,JCB'],
+            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED. ',' . Constants::USER_STATUS_DRAFT],
         ];
 
         return $rule;
@@ -134,10 +133,10 @@ class UpdateRequest extends FormRequest
                 if ($dep->method != $this->request->get('method')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi hình thức giao dịch');
                 }
-                if ($dep->pos_id != $this->request->get('pos_id')) {
+                if ($dep->pos_id > 0 && $dep->pos_id != $this->request->get('pos_id')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi Máy POS');
                 }
-                if ($dep->lo_number != $this->request->get('lo_number')) {
+                if ($dep->lo_number > 0 && $dep->lo_number != $this->request->get('lo_number')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi Số Lô');
                 }
                 if ($dep->status == Constants::USER_STATUS_DELETED) {

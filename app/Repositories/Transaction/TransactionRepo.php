@@ -645,6 +645,8 @@ class TransactionRepo extends BaseRepo
     {
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
         $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
+        $date_from = Carbon::parse($date_from)->startOfDay();
+        $date_to = Carbon::parse($date_to)->endOfDay();
         $query = Transaction::select()
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->where('created_at', '>=', $date_from)
@@ -664,36 +666,49 @@ class TransactionRepo extends BaseRepo
 
         return $total;
     }
-
-    public function topStaffTransaction()
+    public function topStaffTransaction($params)
     {
-        // Lấy ra top 5 nhân viên có sản lượng giao dịch cao nhất theo khoảng thời gian truyền vào: gồm các trường dữ liệu trả về: id, tên nhân viên, tổng sản lượng giao dịch, tổng lợi nhuận, tổng tiền chuyển khoản, số tiền đã sử dụng, số tiền còn lại
-        $query = Transaction::select(['created_by', 'customer_name', 'price_rut', 'profit', 'price_transfer'])
-            ->where('status', Constants::USER_STATUS_ACTIVE)
-            ->where('created_at', '>=', Carbon::now()->startOfDay())
-            ->where('created_at', '<=', Carbon::now()->endOfDay())
-            ->get()
-            ->groupBy('created_by')
-            ->map(function ($group) {
-                $total_price_rut = $group->sum('price_rut');
-                $total_profit = $group->sum('profit');
-                $total_price_transfer = $group->sum('price_transfer');
-                $total_price_used = $group->sum(function ($transaction) {
-                    return $transaction->price_rut - $transaction->price_rut * $transaction->original_fee / 100;
-                });
+        // Set default date range if not provided
+        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
 
-                return [
-                    'id' => $group->first()->created_by,
-                    'name' => $group->first()->customer_name,
-                    'total_price_rut' => $total_price_rut,
-                    'total_profit' => round($total_profit, 2),
-                    'total_price_transfer' => $total_price_transfer,
-                    'total_price_used' => $total_price_used
-                ];
-            })
-            ->sortByDesc('total_price_rut')
-            ->take(5)
-            ->values();
+        $date_from = Carbon::parse($date_from)->startOfDay();
+        $date_to = Carbon::parse($date_to)->endOfDay();
+
+        // Query to get transactions within the date range and group by 'created_by'
+        $transactions = Transaction::select(['created_by', 'price_rut', 'profit', 'price_transfer', 'original_fee'])
+            ->with([
+                'createdBy' => function ($sql) {
+                    $sql->select(['id', 'fullname', 'balance']);
+                }
+            ])
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->whereBetween('created_at', [$date_from, $date_to])
+            ->get()
+            ->groupBy('created_by');
+
+        // Map the grouped transactions to calculate the required fields
+        $staffTransactions = $transactions->map(function ($group) {
+            $total_price_rut = $group->sum('price_rut');
+            $total_profit = $group->sum('profit');
+            $total_price_transfer = $group->sum('price_transfer');
+
+            $createdBy = $group->first()->createdBy;
+
+            return [
+                'id' => $createdBy->id,
+                'name' => $createdBy->fullname,
+                'total_price_rut' => $total_price_rut,
+                'total_profit' => round($total_profit, 2),
+                'total_price_transfer' => $total_price_transfer,
+                'user_balance' => $createdBy->balance
+            ];
+        });
+
+        // Sort by total price rutted and take the top 5
+        $topStaff = $staffTransactions->sortByDesc('total_price_rut')->take(5)->values();
+
+        return $topStaff;
     }
 
     public function changeFeePaid($fee_paid, $id)
@@ -773,7 +788,7 @@ class TransactionRepo extends BaseRepo
             ->where('lo_number', $lo_number)
             ->where('status', Constants::USER_STATUS_ACTIVE);
 
-        if($pos_id > 0) {
+        if ($pos_id > 0) {
             $query->where('pos_id', $pos_id);
         }
 

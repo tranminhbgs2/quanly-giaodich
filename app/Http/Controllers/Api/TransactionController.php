@@ -762,4 +762,20 @@ class TransactionController extends Controller
             'data' => $data,
         ]);
     }
+
+    public function GetTopStaff()
+    {
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
+
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
+
+        $data = $this->tran_repo->topStaffTransaction($params);
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách top nhân viên',
+            'data' => $data,
+        ]);
+    }
 }
