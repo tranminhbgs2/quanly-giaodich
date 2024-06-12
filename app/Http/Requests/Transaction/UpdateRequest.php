@@ -43,7 +43,7 @@ class UpdateRequest extends FormRequest
             'price_fee' => ['required', 'numeric', 'min:0'],
             'price_transfer' => ['numeric', 'min:0'],
             'price_repair' => ['numeric', 'min:0'],
-            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED],
+            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED. ',' . Constants::USER_STATUS_DRAFT],
         ];
 
         return $rule;
