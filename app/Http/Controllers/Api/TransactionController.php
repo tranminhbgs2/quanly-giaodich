@@ -288,6 +288,11 @@ class TransactionController extends Controller
                         $bank_account->balance -= $params['price_transfer'];
                         $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "CREATE_TRANSACTION_" . $resutl->id);
                     }
+                    $bank_account = $this->bankAccountRepo->getAccountFee();
+                    if ($bank_account) {
+                        $bank_account->balance += $params['fee_paid'];
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $resutl->id);
+                    }
                 } else {
                     $user = $this->userRepo->getById(auth()->user()->id);
                     $user_balance = $user->balance - $params['price_nop'];
@@ -465,6 +470,12 @@ class TransactionController extends Controller
                     if ($bank_account) {
                         $bank_account->balance += $tran_old->price_transfer - $params['price_transfer'];
                         $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
+                    }
+                    
+                    $bank_account = $this->bankAccountRepo->getAccountFee();
+                    if ($bank_account) {
+                        $bank_account->balance += $params['fee_paid'];
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $resutl->id);
                     }
                 } else {
                     $user = $this->userRepo->getById(auth()->user()->id);
