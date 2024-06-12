@@ -575,6 +575,14 @@ class TransactionController extends Controller
                         $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "DELETE_TRANSACTION_" . $id);
                     }
                 }
+
+                if($tran->fee_paid > 0) {
+                    $bank_account = $this->bankAccountRepo->getAccountFee();
+                    if ($bank_account) {
+                        $bank_account->balance -= $tran->fee_paid;
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "DELETE_TRANSACTION_" . $tran->id);
+                    }
+                }
             }
             $data = $this->tran_repo->delete(['id' => $id]);
         } else {
