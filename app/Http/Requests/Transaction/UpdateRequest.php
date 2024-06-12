@@ -133,10 +133,10 @@ class UpdateRequest extends FormRequest
                 if ($dep->method != $this->request->get('method')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi hình thức giao dịch');
                 }
-                if ($dep->pos_id != $this->request->get('pos_id')) {
+                if ($dep->pos_id > 0 && $dep->pos_id != $this->request->get('pos_id')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi Máy POS');
                 }
-                if ($dep->lo_number != $this->request->get('lo_number')) {
+                if ($dep->lo_number > 0 && $dep->lo_number != $this->request->get('lo_number')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi Số Lô');
                 }
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
