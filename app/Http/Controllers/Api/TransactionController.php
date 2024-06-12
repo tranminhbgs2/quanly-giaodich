@@ -480,7 +480,7 @@ class TransactionController extends Controller
                     $bank_account = $this->bankAccountRepo->getAccountFee();
                     if ($bank_account) {
                         $bank_account->balance += $params['fee_paid'];
-                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $resutl->id);
+                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $params['id']);
                     }
                 } else {
                     $user = $this->userRepo->getById(auth()->user()->id);
