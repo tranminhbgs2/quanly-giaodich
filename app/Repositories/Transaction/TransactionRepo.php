@@ -4,6 +4,7 @@ namespace App\Repositories\Transaction;
 
 use App\Helpers\Constants;
 use App\Models\Transaction;
+use App\Models\Transfer;
 use App\Repositories\BaseRepo;
 use Carbon\Carbon;
 
@@ -688,12 +689,23 @@ class TransactionRepo extends BaseRepo
             ->groupBy('created_by');
 
         // Map the grouped transactions to calculate the required fields
-        $staffTransactions = $transactions->map(function ($group) {
+        $staffTransactions = $transactions->map(function ($group) use ($date_from, $date_to) {
             $total_price_rut = $group->sum('price_rut');
             $total_profit = $group->sum('profit');
-            $total_price_transfer = $group->sum('price_transfer');
+            $price_transfer = $group->sum('price_transfer');
+            $price_nop = $group->sum('price_nop');
+            $total_price_transfer = $price_transfer + $price_nop;
 
             $createdBy = $group->first()->createdBy;
+
+            //tính tổng tiền mà staff đã được chuyển khoản từ transferRepo
+            $query_transfer = Transfer::select()
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->where('to_agent_id', $createdBy->id)
+            ->where('type_to', "STAFF")
+            ->whereBetween('created_at', [$date_from, $date_to])
+            ->get();
+            $total_mester_transfer = $query_transfer->sum('price');
 
             return [
                 'id' => $createdBy->id,
@@ -701,12 +713,13 @@ class TransactionRepo extends BaseRepo
                 'total_price_rut' => $total_price_rut,
                 'total_profit' => round($total_profit, 2),
                 'total_price_transfer' => $total_price_transfer,
-                'user_balance' => $createdBy->balance
+                'user_balance' => $createdBy->balance,
+                'total_mester_transfer' => $total_mester_transfer
             ];
         });
 
-        // Sort by total price rutted and take the top 5
-        $topStaff = $staffTransactions->sortByDesc('total_price_rut')->take(5)->values();
+        // Sort by total price rutted and take the all
+        $topStaff = $staffTransactions->sortByDesc('total_price_rut')->values();
 
         return $topStaff;
     }

@@ -128,36 +128,37 @@ class UpdateRequest extends FormRequest
                     }
                 }
             }
-            $dep = Transaction::where('id', $this->request->get('id'))->first();
-            if ($dep) {
-                if ($dep->method != $this->request->get('method')) {
+            $trans = Transaction::where('id', $this->request->get('id'))->first();
+            if ($trans) {
+                if ($trans->method != $this->request->get('method')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi hình thức giao dịch');
                 }
-                if ($dep->pos_id > 0 && $dep->pos_id != $this->request->get('pos_id')) {
+                if ($trans->pos_id > 0 && $trans->pos_id != $this->request->get('pos_id')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi Máy POS');
                 }
-                if ($dep->lo_number > 0 && $dep->lo_number != $this->request->get('lo_number')) {
+                if ($trans->lo_number > 0 && $trans->lo_number != $this->request->get('lo_number')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi Số Lô');
                 }
-                if ($dep->status == Constants::USER_STATUS_DELETED) {
+                if ($trans->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
+                }
+                if (auth()->user()->account_type == "STAFF") {
+                    $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                    if ($dep) {
+                        if (($dep->balance + $trans->price_nop) < $this->request->get('price_nop') || ($dep->balance + $trans->price_transfer) < $this->request->get('price_transfer')) {
+                            $validator->errors()->add('check_exist', 'Số dư không đủ');
+                        }
+                    } else {
+                        $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
+                    }
+                } else if (auth()->user()->account_type == "SYSTEM") {
+                    $validator->errors()->add('check_exist', 'Chỉ nhân viên thực hiện giao dịch');
                 }
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy giao dịch khách lẻ');
             }
 
-            if (auth()->user()->account_type == "STAFF") {
-                $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
-                if ($dep) {
-                    if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
-                        $validator->errors()->add('check_exist', 'Số dư không đủ');
-                    }
-                } else {
-                    $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
-                }
-            } else if (auth()->user()->account_type == "SYSTEM") {
-                $validator->errors()->add('check_exist', 'Chỉ nhân viên thực hiện giao dịch');
-            }
+
         });
     }
 
