@@ -11,7 +11,7 @@ class Transaction extends Model
     use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_TRANSACTION;
     public $timestamps = true;
-    protected $appends = ['method_name', 'status_fee', 'fee_remain'];
+    protected $appends = ['method_name', 'fee_remain'];
 
     protected $fillable = [
         'category_id',
@@ -38,6 +38,7 @@ class Transaction extends Model
         'hkd_id',
         'bank_code',
         'type_card',
+        'status_fee',
     ];
 
     /**
@@ -93,14 +94,6 @@ class Transaction extends Model
             return $this->total_price_rut * $pos->fee_cashback / 100;
         }
         return 0;
-    }
-
-    public function getStatusFeeAttribute()
-    {
-        if ($this->fee_paid == $this->price_fee && $this->status != 4 && $this->price_fee > 0) {
-            return true;
-        }
-        return false;
     }
 
     public function getFeeRemainAttribute()

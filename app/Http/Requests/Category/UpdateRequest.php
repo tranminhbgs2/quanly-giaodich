@@ -30,7 +30,6 @@ class UpdateRequest extends FormRequest
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
             'name' => ['required'],
-            'code' => ['required'],
             'fee' => ['required', 'numeric', 'min:0', 'max:99'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];

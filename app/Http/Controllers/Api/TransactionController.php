@@ -56,13 +56,17 @@ class TransactionController extends Controller
         $params['category_id'] = request('category_id', 0);
         $params['lo_number'] = request('lo_number', 0);
         $params['hkd_id'] = request('hkd_id', 0);
-        $params['created_by'] = auth()->user()->id;
+        $params['created_by'] = request('created_by', 0);
         $params['account_type'] = auth()->user()->account_type;
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
         $params['method'] = request('method', null);
         $params['status_fee'] = request('status_fee', 1);
 
+        if ($params['account_type'] == 'STAFF') {
+            $params['created_by'] = auth()->user()->id;
+        }
+        
         $data = $this->tran_repo->getListing($params, false);
         $total = $this->tran_repo->getListing($params, true);
         $export = $this->tran_repo->getTotal($params); //số liệu báo cáo
@@ -794,7 +798,8 @@ class TransactionController extends Controller
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
-
+        $params['account_type'] = auth()->user()->account_type;
+        $params['created_by'] = auth()->user()->id;
         $data = $this->tran_repo->topStaffTransaction($params);
         return response()->json([
             'code' => 200,

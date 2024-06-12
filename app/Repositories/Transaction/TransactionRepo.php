@@ -52,14 +52,12 @@ class TransactionRepo extends BaseRepo
             },
         ]);
 
-        if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
+        if ($account_type == Constants::ACCOUNT_TYPE_STAFF || $created_by > 0) {
             $query->where('created_by', $created_by);
         }
 
-        if ($status_fee == 2) {
-            $query->whereRaw('transactions.fee_paid < transactions.price_fee');
-        } elseif ($status_fee == 3) {
-            $query->whereRaw('fee_paid >= price_fee');
+        if ($status_fee > 1) {
+            $query->where('status_fee', $status_fee);
         }
 
         if (!empty($keyword)) {
@@ -254,10 +252,6 @@ class TransactionRepo extends BaseRepo
 
         $query = Transaction::select();
 
-        if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
-            $query->where('created_by', $created_by);
-        }
-
         if (!empty($keyword)) {
             $keyword = translateKeyWord($keyword);
             $query->where(function ($sub_sql) use ($keyword) {
@@ -291,10 +285,12 @@ class TransactionRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
-        if ($status_fee == 2) {
-            $query->whereRaw('transactions.fee_paid < transactions.price_fee');
-        } elseif ($status_fee == 3) {
-            $query->whereRaw('fee_paid >= price_fee');
+        if ($account_type == Constants::ACCOUNT_TYPE_STAFF || $created_by > 0) {
+            $query->where('created_by', $created_by);
+        }
+
+        if ($status_fee > 1) {
+            $query->where('status_fee', $status_fee);
         }
 
         if ($status > 0) {
@@ -683,8 +679,11 @@ class TransactionRepo extends BaseRepo
                     $sql->select(['id', 'fullname', 'balance']);
                 }
             ])
-            ->where('status', Constants::USER_STATUS_ACTIVE)
-            ->whereBetween('created_at', [$date_from, $date_to])
+            ->where('status', Constants::USER_STATUS_ACTIVE);
+        if (isset($params['created_by']) && $params['account_type'] == 'STAFF') {
+            $transactions->where('created_by', $params['created_by']);
+        }
+            $transactions->whereBetween('created_at', [$date_from, $date_to])
             ->get()
             ->groupBy('created_by');
 
@@ -728,7 +727,12 @@ class TransactionRepo extends BaseRepo
     {
         $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
         $fee_paid_new = $tran->fee_paid + $fee_paid;
-        $update = ['fee_paid' => $fee_paid_new];
+        if ($fee_paid_new == $tran->price_fee) {
+            $status_fee = 3;
+        } else {
+            $status_fee = 2;
+        }
+        $update = ['fee_paid' => $fee_paid_new, 'status_fee' => $status_fee];
 
         return $tran->update($update);
     }

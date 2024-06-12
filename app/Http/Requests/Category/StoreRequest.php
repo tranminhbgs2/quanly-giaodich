@@ -29,7 +29,6 @@ class StoreRequest extends FormRequest
     {
         $rule = [
             'name' => ['required'],
-            'code' => ['required'],
             'fee' => ['required', 'numeric', 'min:0', 'max:99'],
 
         ];
