@@ -70,7 +70,7 @@ class PaymentFeeRequest extends FormRequest
                 if($dep->status_fee == 3){
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã thanh toán hết phí');
                 }
-                if(($dep->type == "DAO_HAN" && $dep->price_fee - $dep->fee_paid) < $this->request->get('fee_paid') && $dep->status_fee == 2){
+                if(($dep->method == "DAO_HAN" && $dep->price_fee - $dep->fee_paid) < $this->request->get('fee_paid') && $dep->status_fee == 2){
                     $validator->errors()->add('check_exist', 'Phí thanh toán không được lớn hơn phí còn lại');
                 }
             } else {
