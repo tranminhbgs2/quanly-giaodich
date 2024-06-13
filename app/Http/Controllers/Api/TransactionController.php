@@ -669,6 +669,11 @@ class TransactionController extends Controller
     {
         $id = request('id', null);
         $fee_paid = request('fee_paid', 0);
+        $tran_detail = $this->tran_repo->getById($id);
+        if($tran_detail->type)
+        if ($tran_detail->type == 'ONLINE' || $tran_detail->type == 'RUT_TIEN_MAT') {
+            $fee_paid = 0;
+        }
         $tran = $this->tran_repo->changeFeePaid($fee_paid, $id);
 
         if ($tran) {
