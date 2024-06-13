@@ -75,7 +75,7 @@ class CategoryRepo extends BaseRepo
             }
         }
 
-        if (!empty($insert['code']) && !empty($insert['name'])) {
+        if (!empty($insert['name'])) {
             return Categories::create($insert) ? true : false;
         }
 
