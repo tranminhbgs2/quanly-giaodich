@@ -31,7 +31,7 @@ class StoreRequest extends FormRequest
             'lo_number' => ['required', 'numeric', 'min:1'],
             'total_price' => ['required', 'numeric', 'min:0'],
             // 'payment' => ['required', 'numeric', 'min:0'],
-            'time_end' => 'date_format:Y/m/d',
+            'time_end' => 'date_format:Y/m/d H:i:s',
             'agent_id' => 'numeric|min:0',
             'fee_agent' => 'required_if:agent_id,>,0|numeric|min:0',
         ];
@@ -59,7 +59,7 @@ class StoreRequest extends FormRequest
             'required' => ':attribute không được để trống',
             'numeric' => ':attribute phải là số',
             'min' => ':attribute phải lớn hơn :min',
-            'date_format' => ':attribute không đúng định dạng Y/m/d',
+            'date_format' => ':attribute không đúng định dạng Y/m/d H:i:s',
             'agent_id.numeric' => 'ID đại lý phải là số',
             'agent_id.min' => 'ID đại lý phải lớn hơn 0',
             'fee_agent.required_if' => 'Phí đại lý không được để trống',

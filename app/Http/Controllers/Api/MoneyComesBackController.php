@@ -227,7 +227,7 @@ class MoneyComesBackController extends Controller
                 ]);
             }
         }
-        $params['time_end'] = null;
+
         $resutl = $this->money_repo->store($params);
 
         if ($resutl) {
@@ -292,7 +292,7 @@ class MoneyComesBackController extends Controller
                     ]);
                 }
             }
-            $params['time_end'] = null;
+            
             $resutl = $this->money_repo->update($params, $params['id']);
 
             if ($resutl) {
