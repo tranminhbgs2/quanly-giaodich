@@ -722,7 +722,8 @@ class TransactionRepo extends BaseRepo
                 'total_profit' => round($total_profit, 2),
                 'total_price_transfer' => $total_price_transfer,
                 'user_balance' => $createdBy->balance,
-                'total_mester_transfer' => $total_mester_transfer
+                'total_mester_transfer' => $total_mester_transfer,
+                'transactions' => $group->values() // Return the transactions in the group
             ];
         });
 
