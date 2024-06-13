@@ -44,4 +44,36 @@ class Transfer extends Model
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
+
+    public function fromAgent()
+    {
+        return $this->belongsTo(Agent::class, 'from_agent_id', 'id');
+    }
+
+    public function toAgent()
+    {
+        return $this->belongsTo(Agent::class, 'to_agent_id', 'id');
+    }
+
+    public function fromUser()
+    {
+        return $this->belongsTo(User::class, 'from_agent_id', 'id');
+    }
+
+    public function toUser()
+    {
+        return $this->belongsTo(User::class, 'to_agent_id', 'id');
+    }
+
+    // Accessor for the sender
+    public function getFromEntityAttribute()
+    {
+        return $this->type_from == 'AGENCY' ? $this->fromAgent : $this->fromUser;
+    }
+
+    // Accessor for the receiver
+    public function getToEntityAttribute()
+    {
+        return $this->type_to == 'AGENCY' ? $this->toAgent : $this->toUser;
+    }
 }
