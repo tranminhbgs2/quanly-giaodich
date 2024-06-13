@@ -64,18 +64,33 @@ class PaymentFeeRequest extends FormRequest
             // Check tồn tại
             $dep = Transaction::where('id', $this->request->get('id'))->withTrashed()->first();
             if ($dep) {
-                if ($dep->status == Constants::USER_STATUS_DELETED) {
-                    $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
-                }
-                if($dep->status_fee == 3){
-                    $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã thanh toán hết phí');
-                }
-                if($dep->method == "DAO_HAN" && ($dep->price_fee - $dep->fee_paid) < $this->request->get('fee_paid') && $dep->status_fee == 2){
-                    $validator->errors()->add('check_exist', 'Phí thanh toán không được lớn hơn phí còn lại');
+                if ($dep->status_fee == 3) {
+                    $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã thanh toán phí');
+                } else {
+                    if ($dep->status == Constants::USER_STATUS_DELETED) {
+                        $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
+                    }
+                    if ($dep->status_fee == 3) {
+                        $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã thanh toán hết phí');
+                    }
+                    if ($dep->method == "DAO_HAN" && ($dep->price_fee - $dep->fee_paid) < $this->request->get('fee_paid') && $dep->status_fee == 2) {
+                        $validator->errors()->add('check_exist', 'Phí thanh toán không được lớn hơn phí còn lại');
+                    }
+                    if ($dep->method != "DAO_HAN") {
+                        $dep_bank = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                        if ($dep_bank) {
+                            if ($dep_bank->balance < $dep->price_transfer) {
+                                $validator->errors()->add('check_exist', 'Số dư không đủ');
+                            }
+                        } else {
+                            $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
+                        }
+                    }
                 }
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy giao dịch khách lẻ');
             }
+
 
             // Check tài khoản nhận phí
             $bank_account = BankAccounts::Where('type', 'FEE')->withTrashed()->first();

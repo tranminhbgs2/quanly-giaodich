@@ -66,7 +66,7 @@ class TransactionController extends Controller
         if ($params['account_type'] == 'STAFF') {
             $params['created_by'] = auth()->user()->id;
         }
-        
+
         $data = $this->tran_repo->getListing($params, false);
         $total = $this->tran_repo->getListing($params, true);
         $export = $this->tran_repo->getTotal($params); //số liệu báo cáo
@@ -409,7 +409,7 @@ class TransactionController extends Controller
             if ($params['price_fee'] == 0) {
                 $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
             }
-            $params['profit'] = $params['price_fee']  -$params['original_fee'] * $params['price_rut'] / 100;
+            $params['profit'] = $params['price_fee']  - $params['original_fee'] * $params['price_rut'] / 100;
 
 
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
@@ -676,11 +676,24 @@ class TransactionController extends Controller
         $tran = $this->tran_repo->changeFeePaid($fee_paid, $id);
 
         if ($tran) {
-            //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
-            $bank_account = $this->bankAccountRepo->getAccountFee();
-            if ($bank_account) {
-                $bank_account->balance += $fee_paid;
-                $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $id);
+            if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT') {
+                // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
+                $user = $this->userRepo->getById(auth()->user()->id);
+                $user_balance = $user->balance - $tran->price_transfer;
+                $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "PAYMENT_FEE_TRANSACTION_" . $tran->id);
+
+                $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                if ($bank_account) {
+                    $bank_account->balance -= $tran->price_transfer;
+                    $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $tran->id);
+                }
+            } else {
+                //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
+                $bank_account = $this->bankAccountRepo->getAccountFee();
+                if ($bank_account) {
+                    $bank_account->balance += $fee_paid;
+                    $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $id);
+                }
             }
             return response()->json([
                 'code' => 200,
@@ -744,24 +757,38 @@ class TransactionController extends Controller
         $tran_fee = $this->tran_repo->getById($id, false);
         $fee_paid = 0;
         $fee_paid_balance = 0;
-        if ($tran_fee && $tran_fee->fee_paid > 0) {
-            $fee_paid = $tran_fee->fee_paid * (-1);
-            $fee_paid_balance = $tran_fee->fee_paid;
-        } else {
+        if ($tran_fee || $tran_fee->status_fee == 2){
             return response()->json([
                 'code' => 400,
                 'error' => 'Không tìm thấy giao dịch hoặc phí đã được hoàn',
                 'data' => null,
             ]);
         }
+        if ($tran_fee && $tran_fee->fee_paid > 0 && $tran_fee->method == 'DAO_HAN') {
+            $fee_paid = $tran_fee->fee_paid * (-1);
+            $fee_paid_balance = $tran_fee->fee_paid;
+        }
         $tran = $this->tran_repo->changeFeePaid($fee_paid, $id);
 
         if ($tran) {
-            //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
-            $bank_account = $this->bankAccountRepo->getAccountFee();
-            if ($bank_account) {
-                $bank_account->balance -= $fee_paid_balance;
-                $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "RESTORE_FEE_TRANSACTION_" . $id);
+            if ($tran_fee->method == 'ONLINE' || $tran_fee->method == 'RUT_TIEN_MAT') {
+                // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
+                $user = $this->userRepo->getById(auth()->user()->id);
+                $user_balance = $user->balance + $tran_fee->price_transfer;
+                $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "RESTORE_FEE_TRANSACTION_" . $tran->id);
+
+                $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                if ($bank_account) {
+                    $bank_account->balance += $tran_fee->price_transfer;
+                    $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "RESTORE_FEE_TRANSACTION_" . $tran->id);
+                }
+            } else {
+                //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
+                $bank_account = $this->bankAccountRepo->getAccountFee();
+                if ($bank_account) {
+                    $bank_account->balance -= $fee_paid_balance;
+                    $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "RESTORE_FEE_TRANSACTION_" . $id);
+                }
             }
             return response()->json([
                 'code' => 200,

@@ -43,7 +43,7 @@ class UpdateRequest extends FormRequest
             'price_fee' => ['required', 'numeric', 'min:0'],
             'price_transfer' => ['numeric', 'min:0'],
             'price_repair' => ['numeric', 'min:0'],
-            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED. ',' . Constants::USER_STATUS_DRAFT],
+            'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED . ',' . Constants::USER_STATUS_DRAFT],
         ];
 
         return $rule;
@@ -143,13 +143,15 @@ class UpdateRequest extends FormRequest
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
                 }
                 if (auth()->user()->account_type == "STAFF") {
-                    $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
-                    if ($dep) {
-                        if (($dep->balance + $trans->price_nop) < $this->request->get('price_nop') || ($dep->balance + $trans->price_transfer) < $this->request->get('price_transfer')) {
-                            $validator->errors()->add('check_exist', 'Số dư không đủ');
+                    if ($this->request->get('method') == "DAO_HAN") {
+                        $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                        if ($dep) {
+                            if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
+                                $validator->errors()->add('check_exist', 'Số dư không đủ');
+                            }
+                        } else {
+                            $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
                         }
-                    } else {
-                        $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
                     }
                 } else if (auth()->user()->account_type == "SYSTEM") {
                     $validator->errors()->add('check_exist', 'Chỉ nhân viên thực hiện giao dịch');
@@ -157,8 +159,6 @@ class UpdateRequest extends FormRequest
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy giao dịch khách lẻ');
             }
-
-
         });
     }
 

@@ -107,13 +107,15 @@ class StoreRequest extends FormRequest
             //     }
             // });
             if (auth()->user()->account_type == "STAFF") {
-                $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
-                if ($dep) {
-                    if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
-                        $validator->errors()->add('check_exist', 'Số dư không đủ');
+                if ($this->request->get('method') == "DAO_HAN") {
+                    $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                    if ($dep) {
+                        if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
+                            $validator->errors()->add('check_exist', 'Số dư không đủ');
+                        }
+                    } else {
+                        $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
                     }
-                } else {
-                    $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
                 }
             } else if (auth()->user()->account_type == "SYSTEM") {
                 $validator
