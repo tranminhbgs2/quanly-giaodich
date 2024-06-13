@@ -665,7 +665,8 @@ class TransactionRepo extends BaseRepo
         });
 
         return $total;
-    }public function topStaffTransaction($params)
+    }
+    public function topStaffTransaction($params)
     {
         // Set default date range if not provided
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
@@ -695,11 +696,15 @@ class TransactionRepo extends BaseRepo
         $staffTransactions = $transactions->map(function ($group) use ($date_from, $date_to) {
             $total_price_rut = $group->sum('price_rut');
             $total_profit = $group->sum('profit');
-            $price_transfer = $group->sum('price_transfer');
             $price_nop = $group->sum('price_nop');
-            $total_price_transfer = $price_transfer + $price_nop;
 
             $createdBy = $group->first()->createdBy;
+            // Add condition to filter records for price_transfer
+            $price_transfer = $group->filter(function ($transaction) {
+                return $transaction->status_fee == 3;
+            })->sum('price_transfer');
+
+            $total_price_transfer = $price_transfer + $price_nop;
 
             // Calculate the total amount transferred to the staff from transferRepo
             $query_transfer = Transfer::select()
@@ -727,7 +732,7 @@ class TransactionRepo extends BaseRepo
         return $topStaff;
     }
 
-    public function changeFeePaid($fee_paid, $id, $type="")
+    public function changeFeePaid($fee_paid, $id, $type = "")
     {
         $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
         $fee_paid_new = $tran->fee_paid + $fee_paid;
@@ -737,7 +742,7 @@ class TransactionRepo extends BaseRepo
             $status_fee = 2;
         }
         //danh cho quy lại các action
-        if($type == "RESTORE"){
+        if ($type == "RESTORE") {
             $status_fee = 2;
         }
         $update = ['fee_paid' => $fee_paid_new, 'status_fee' => $status_fee];
