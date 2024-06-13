@@ -727,7 +727,7 @@ class TransactionController extends Controller
         $tran_fee = $this->tran_repo->getById($id, false);
         $fee_paid = 0;
         $fee_paid_balance = 0;
-        if ($tran_fee || $tran_fee->status_fee == 2){
+        if ( $tran_fee->status_fee == 2){
             return response()->json([
                 'code' => 400,
                 'error' => 'Không tìm thấy giao dịch hoặc phí đã được hoàn',
