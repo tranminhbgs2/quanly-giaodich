@@ -303,20 +303,27 @@ class TransactionRepo extends BaseRepo
             $query->where('method', $method);
         }
 
-        $total_fee_paid = $query->sum('fee_paid');
-        $price_fee = $query->sum('price_fee');
+        // Fetch all transactions to perform conditional sum operations
+        $transactions = $query->get();
+
+        // Sum the fields based on status_fee condition
+        $price_transfer = $transactions->where('status_fee', 3)->sum('price_transfer');
+        $price_nop = $transactions->sum('price_nop');
+
+        $total_fee_paid = $transactions->sum('fee_paid');
+        $price_fee = $transactions->sum('price_fee');
+
         // Tính tổng của từng trường cần thiết
         $total = [
-            'price_nop' => $query->sum('price_nop'),
-            'price_rut' => $query->sum('price_rut'),
+            'price_nop' => $price_nop,
+            'price_rut' => $transactions->sum('price_rut'),
             'price_fee' => $price_fee,
-            'price_transfer' => $query->sum('price_transfer'),
-            'profit' => $query->sum('profit'),
-            'price_repair' => $query->sum('price_repair'),
+            'price_transfer' => $price_transfer,
+            'profit' => $transactions->sum('profit'),
+            'price_repair' => $transactions->sum('price_repair'),
             'total_fee_paid' => $price_fee - $total_fee_paid,
         ];
-
-        return $total;
+        return $total
     }
 
     /**
