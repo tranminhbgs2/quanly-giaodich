@@ -245,10 +245,14 @@ class TransferController extends Controller
 
             if ($bank_from->type == "AGENCY") {
                 $params['from_agent_id'] = $bank_from->agent_id;
+            } else if ($bank_from->type == "STAFF") {
+                $params['from_agent_id'] = $bank_from->staff_id;
             }
-
+    
             if ($bank_to->type == "AGENCY") {
                 $params['to_agent_id'] = $bank_to->agent_id;
+            } else if ($bank_to->type == "STAFF") {
+                $params['to_agent_id'] = $bank_to->staff_id;
             }
 
             $resutl = $this->cate_repo->update($params, $params['id']);
