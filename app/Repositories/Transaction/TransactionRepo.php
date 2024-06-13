@@ -676,7 +676,7 @@ class TransactionRepo extends BaseRepo
         $date_to = Carbon::parse($date_to)->endOfDay();
 
         // Query to get transactions within the date range and group by 'created_by'
-        $transactionsQuery = Transaction::select(['created_by', 'price_rut', 'price_nop', 'profit', 'price_transfer', 'original_fee'])
+        $transactionsQuery = Transaction::select(['created_by', 'price_rut', 'price_nop', 'profit', 'price_transfer', 'original_fee', 'status_fee'])
             ->with([
                 'createdBy' => function ($query) {
                     $query->select(['id', 'fullname', 'balance']);
