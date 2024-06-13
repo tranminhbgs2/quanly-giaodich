@@ -67,7 +67,7 @@ class PaymentFeeRequest extends FormRequest
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
                 }
-                if($dep->price_fee == $dep->fee_paid){
+                if($dep->status_fee == 3){
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã thanh toán hết phí');
                 }
                 if(($dep->price_fee - $dep->fee_paid) < $this->request->get('fee_paid')){
