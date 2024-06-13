@@ -133,12 +133,12 @@ class UpdateRequest extends FormRequest
                 if ($trans->method != $this->request->get('method')) {
                     $validator->errors()->add('check_exist', 'Không thể thay đổi hình thức giao dịch');
                 }
-                if ($trans->pos_id > 0 && $trans->pos_id != $this->request->get('pos_id')) {
-                    $validator->errors()->add('check_exist', 'Không thể thay đổi Máy POS');
-                }
-                if ($trans->lo_number > 0 && $trans->lo_number != $this->request->get('lo_number')) {
-                    $validator->errors()->add('check_exist', 'Không thể thay đổi Số Lô');
-                }
+                // if ($trans->pos_id > 0 && $trans->pos_id != $this->request->get('pos_id')) {
+                //     $validator->errors()->add('check_exist', 'Không thể thay đổi Máy POS');
+                // }
+                // if ($trans->lo_number > 0 && $trans->lo_number != $this->request->get('lo_number')) {
+                //     $validator->errors()->add('check_exist', 'Không thể thay đổi Số Lô');
+                // }
                 if ($trans->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
                 }

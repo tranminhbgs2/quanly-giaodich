@@ -20,6 +20,18 @@ class StoreRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_duplicate' => $this->input('is_duplicate', false),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
@@ -34,6 +46,8 @@ class StoreRequest extends FormRequest
             'time_end' => 'date_format:Y/m/d H:i:s',
             'agent_id' => 'numeric|min:0',
             'fee_agent' => 'required_if:agent_id,>,0|numeric|min:0',
+            'is_duplicate' => 'boolean',
+
         ];
 
         return $rule;
@@ -63,6 +77,7 @@ class StoreRequest extends FormRequest
             'agent_id.numeric' => 'ID đại lý phải là số',
             'agent_id.min' => 'ID đại lý phải lớn hơn 0',
             'fee_agent.required_if' => 'Phí đại lý không được để trống',
+
         ];
     }
 
@@ -73,12 +88,14 @@ class StoreRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check username
-            $dep = MoneyComesBack::where('pos_id', $this->request->get('pos_id'))
-                ->where('lo_number', $this->request->get('lo_number'))
-                ->first();
+            if($this->request->has('is_duplicate') == false){
+                $dep = MoneyComesBack::where('pos_id', $this->request->get('pos_id'))
+                    ->where('lo_number', $this->request->get('lo_number'))
+                    ->first();
 
-            if ($dep) {
-                $validator->errors()->add('check_exist', 'Lô tiền về đã tồn tại');
+                if ($dep) {
+                    $validator->errors()->add('check_exist', 'Lô tiền về đã tồn tại');
+                }
             }
         });
     }

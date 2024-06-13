@@ -361,6 +361,7 @@ class TransactionController extends Controller
             }
 
             $tran_old = $this->tran_repo->getById($params['id'], false);
+
             if ($tran_old->status == Constants::USER_STATUS_DRAFT) {
                 $params['status'] = Constants::USER_STATUS_ACTIVE;
             }
@@ -414,44 +415,67 @@ class TransactionController extends Controller
                     } else {
                         $time_process = date('Y-m-d');
                     }
-                    $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
-                    if ($money_come) {
-                        if ($tran_old->lo_number > 0) {
-                            // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
-                            $total_price = $money_come->total_price + $params['price_rut'] - $tran_old->price_rut;
-                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran_old->price_rut - $tran_old->price_fee);
-                            $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100) - ($tran_old->price_rut - ($params['original_fee'] * $tran_old->price_rut) / 100); // Tính số tiền cộng cho HKD
-                        } else {
-                            // Chưa có lần nào cộng
-                            $total_price = $money_come->total_price + $params['price_rut'];
-                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
-                            $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
-                        }
-                        $money_comes_back = [
-                            'pos_id' => $params['pos_id'],
-                            'hkd_id' => $params['hkd_id'],
-                            'lo_number' => $params['lo_number'],
-                            'time_process' => $time_process,
-                            'fee' => $params['original_fee'],
-                            'total_price' => $total_price,
-                            'payment' => $payment,
-                            'created_by' => auth()->user()->id,
-                            'status' => $money_come->status,
-                        ];
-                        $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, "UPDATED");
+                    if ($tran_old->time_payment) {
+                        $time_process_old = date('Y-m-d', strtotime($tran_old->time_payment));
                     } else {
-                        $money_comes_back = [
-                            'pos_id' => $params['pos_id'],
-                            'hkd_id' => $params['hkd_id'],
-                            'lo_number' => $params['lo_number'],
-                            'time_process' => $time_process,
-                            'fee' => $params['original_fee'],
-                            'total_price' => $params['price_rut'],
-                            'payment' => ($params['price_rut'] - $params['price_fee']),
-                            'created_by' => auth()->user()->id,
-                            'status' => Constants::USER_STATUS_LOCKED,
-                        ];
-                        $this->money_comes_back_repo->store($money_comes_back);
+                        $time_process_old = date('Y-m-d');
+                    }
+                    if ($tran_old->pos_id != $params['pos_id']) {
+                        $money_come_old = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $tran_old->lo_number, 'time_process' => $time_process_old]);
+                        $money_come_new = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $tran_old->lo_number, 'time_process' => $time_process]);
+                        if ($money_come_old) {
+                            // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
+                            $total_price = $money_come_old->total_price - $tran_old->price_rut;
+                            $payment = $money_come_old->payment - ($tran_old->price_rut - $tran_old->price_fee);
+                            $money_comes_back = [
+                                'pos_id' => $tran_old->pos_id,
+                                'hkd_id' => $money_come_old->hkd_id,
+                                'lo_number' => $tran_old->lo_number,
+                                'time_process' => $time_process,
+                                'fee' => $tran_old->original_fee,
+                                'total_price' => $total_price,
+                                'payment' => $payment,
+                                'created_by' => auth()->user()->id,
+                                'status' => $money_come_old->status,
+                            ];
+                            $pos = $this->pos_repo->getById($tran_old->pos_id, false);
+                            $price_rut = 0;
+                            if ($pos) {
+                                $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
+                            }
+                            $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
+                        }
+                        $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
+                    } elseif ($tran_old->lo_number != $params['lo_number']) {
+                        $money_come_old = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $tran_old->lo_number, 'time_process' => $time_process_old]);
+                        $money_come_new = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+                        if ($money_come_old) {
+                            // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
+                            $total_price = $money_come_old->total_price - $tran_old->price_rut;
+                            $payment = $money_come_old->payment - ($tran_old->price_rut - $tran_old->price_fee);
+                            $money_comes_back = [
+                                'pos_id' => $tran_old->pos_id,
+                                'hkd_id' => $money_come_old->hkd_id,
+                                'lo_number' => $tran_old->lo_number,
+                                'time_process' => $time_process,
+                                'fee' => $tran_old->original_fee,
+                                'total_price' => $total_price,
+                                'payment' => $payment,
+                                'created_by' => auth()->user()->id,
+                                'status' => $money_come_old->status,
+                            ];
+                            $pos = $this->pos_repo->getById($tran_old->pos_id, false);
+                            $price_rut = 0;
+                            if ($pos) {
+                                $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
+                            }
+                            $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
+                        }
+                        $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
+                    } else {
+                        $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+
+                        $this->CreateMoneyComesBack($money_come, $tran_old, $params, $time_process);
                     }
                 }
 
@@ -504,15 +528,9 @@ class TransactionController extends Controller
                 $time_process = date('Y-m-d', strtotime($tran->time_payment));
                 $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran->pos_id, 'lo_number' => $tran->lo_number, 'time_process' => $time_process]);
                 if ($money_come) {
-                    if ($tran->lo_number > 0) {
-                        // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
-                        $total_price = $money_come->total_price + $tran->price_rut - $tran->price_rut;
-                        $payment = $money_come->payment + ($tran->price_rut - $tran->price_fee) - ($tran->price_rut - $tran->price_fee);
-                    } else {
-                        // Chưa có lần nào cộng
-                        $total_price = $money_come->total_price + $tran->price_rut;
-                        $payment = $money_come->payment + ($tran->price_rut - $tran->price_fee);
-                    }
+                    // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
+                    $total_price = $money_come->total_price - $tran->price_rut;
+                    $payment = $money_come->payment - ($tran->price_rut - $tran->price_fee);
                     $money_comes_back = [
                         'pos_id' => $tran->pos_id,
                         'hkd_id' => $money_come->hkd_id,
@@ -529,7 +547,7 @@ class TransactionController extends Controller
                     if ($pos) {
                         $price_rut = ($tran->price_rut - ($pos->fee * $tran->price_rut) / 100) * (-1);
                     }
-                    $this->money_comes_back_repo->update($money_comes_back, $money_come->id, $price_rut);
+                    $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, 'DELETED');
                 }
 
                 //Xử lý trừ tiền của nhân viên
@@ -727,7 +745,7 @@ class TransactionController extends Controller
         $tran_fee = $this->tran_repo->getById($id, false);
         $fee_paid = 0;
         $fee_paid_balance = 0;
-        if ( $tran_fee->status_fee == 2){
+        if ($tran_fee->status_fee == 2) {
             return response()->json([
                 'code' => 400,
                 'error' => 'Không tìm thấy giao dịch hoặc phí đã được hoàn',
@@ -808,5 +826,47 @@ class TransactionController extends Controller
             'error' => 'Danh sách top nhân viên',
             'data' => $data,
         ]);
+    }
+
+    private function CreateMoneyComesBack($money_come, $tran_old, $params, $time_process, $type = "UPDATED")
+    {
+        if ($money_come) {
+            if ($tran_old->lo_number > 0 && $type == "UPDATED") {
+                // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
+                $total_price = $money_come->total_price + $params['price_rut'] - $tran_old->price_rut;
+                $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran_old->price_rut - $tran_old->price_fee);
+                $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100) - ($tran_old->price_rut - ($params['original_fee'] * $tran_old->price_rut) / 100); // Tính số tiền cộng cho HKD
+            } else {
+                // Chưa có lần nào cộng
+                $total_price = $money_come->total_price + $params['price_rut'];
+                $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']);
+                $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
+            }
+            $money_comes_back = [
+                'pos_id' => $params['pos_id'],
+                'hkd_id' => $params['hkd_id'],
+                'lo_number' => $params['lo_number'],
+                'time_process' => $time_process,
+                'fee' => $params['original_fee'],
+                'total_price' => $total_price,
+                'payment' => $payment,
+                'created_by' => auth()->user()->id,
+                'status' => $money_come->status,
+            ];
+            $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, "UPDATED");
+        } else {
+            $money_comes_back = [
+                'pos_id' => $params['pos_id'],
+                'hkd_id' => $params['hkd_id'],
+                'lo_number' => $params['lo_number'],
+                'time_process' => $time_process,
+                'fee' => $params['original_fee'],
+                'total_price' => $params['price_rut'],
+                'payment' => ($params['price_rut'] - $params['price_fee']),
+                'created_by' => auth()->user()->id,
+                'status' => Constants::USER_STATUS_LOCKED,
+            ];
+            $this->money_comes_back_repo->store($money_comes_back);
+        }
     }
 }
