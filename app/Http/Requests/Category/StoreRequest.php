@@ -72,10 +72,6 @@ class StoreRequest extends FormRequest
                 $validator->errors()->add('check_exist', 'Tên danh mục đã tồn tại');
             }
 
-            $dep_code = Categories::where('code', $this->request->get('code'))->withTrashed()->first();
-            if ($dep_code) {
-                $validator->errors()->add('check_exist', 'Mã danh mục đã tồn tại');
-            }
         });
     }
 

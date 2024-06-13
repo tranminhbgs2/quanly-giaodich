@@ -88,18 +88,6 @@ class UpdateRequest extends FormRequest
                     $validator->errors()->add('check_exist', 'Tên danh mục đã được đăng ký');
                 }
             }
-
-            // Check theo identifier
-            if ($this->request->get('code')) {
-                $user = Categories::where('code', $this->request->get('code'))
-                    ->whereNotIn('id', [$this->request->get('id')])
-                    ->whereNotNull('code')
-                    ->withTrashed()
-                    ->first();
-                if ($user) {
-                    $validator->errors()->add('check_exist', 'Mã danh mục đã được đăng ký');
-                }
-            }
         });
     }
 
