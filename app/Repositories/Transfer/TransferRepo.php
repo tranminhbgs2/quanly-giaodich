@@ -210,6 +210,8 @@ class TransferRepo extends BaseRepo
             'created_by',
             'price',
             'status',
+            'from_agent_id',
+            'to_agent_id',
         ];
 
         $insert = [];
@@ -243,6 +245,8 @@ class TransferRepo extends BaseRepo
             'created_by',
             'price',
             'status',
+            'from_agent_id',
+            'to_agent_id',
         ];
 
         $update = [];
