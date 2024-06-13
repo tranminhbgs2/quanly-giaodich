@@ -11,6 +11,7 @@ class Transfer extends Model
     use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_TRANSFERS;
     public $timestamps = true;
+    protected $appends = ['from_name', 'to_name'];
     protected $fillable = [
         'acc_bank_from_id',
         'acc_number_from',
@@ -82,9 +83,9 @@ class Transfer extends Model
     {
         switch ($this->type_to) {
             case 'AGENCY':
-                return 'ĐL-'. optional($this->fromAgent)->name;
+                return 'ĐL-'. optional($this->toAgent)->name;
             case 'STAFF':
-                return 'NV-'.optional($this->fromUser)->fullname;
+                return 'NV-'.optional($this->toUser)->fullname;
             default:
                 return null;
         }
