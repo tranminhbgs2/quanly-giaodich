@@ -65,25 +65,26 @@ class Transfer extends Model
         return $this->belongsTo(User::class, 'to_agent_id', 'id');
     }
 
-    public function getFromEntityAttribute()
+
+    public function getFromNameAttribute()
     {
         switch ($this->type_from) {
             case 'AGENCY':
-                return $this->fromAgent;
+                return 'ĐL-'. optional($this->fromAgent)->name;
             case 'STAFF':
-                return $this->fromUser;
+                return 'NV-'.optional($this->fromUser)->fullname;
             default:
                 return null;
         }
     }
 
-    public function getToEntityAttribute()
+    public function getToNameAttribute()
     {
         switch ($this->type_to) {
             case 'AGENCY':
-                return $this->toAgent;
+                return 'ĐL-'. optional($this->fromAgent)->name;
             case 'STAFF':
-                return $this->toUser;
+                return 'NV-'.optional($this->fromUser)->fullname;
             default:
                 return null;
         }

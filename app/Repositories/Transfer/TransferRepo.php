@@ -48,10 +48,10 @@ class TransferRepo extends BaseRepo
                 $sql->select(['id', 'name']); // Adjust the columns as needed
             },
             'fromUser' => function ($sql) {
-                $sql->select(['id', 'username', 'email', 'fullname']); // Adjust the columns as needed
+                $sql->select(['id', 'username', 'email', 'fullname', 'status']); // Adjust the columns as needed
             },
             'toUser' => function ($sql) {
-                $sql->select(['id', 'username', 'email', 'fullname']); // Adjust the columns as needed
+                $sql->select(['id', 'username', 'email', 'fullname', 'status']); // Adjust the columns as needed
             },
         ]);
 
