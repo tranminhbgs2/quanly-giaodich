@@ -146,7 +146,7 @@ class UpdateRequest extends FormRequest
                     if ($this->request->get('method') == "DAO_HAN") {
                         $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
                         if ($dep) {
-                            if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
+                            if ($dep->balance < ($this->request->get('price_nop') - $dep->price_nop) || $dep->balance < ($this->request->get('price_transfer') - $dep->price_transfer)) {
                                 $validator->errors()->add('check_exist', 'Số dư không đủ');
                             }
                         } else {
