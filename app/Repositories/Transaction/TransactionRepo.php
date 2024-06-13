@@ -323,7 +323,8 @@ class TransactionRepo extends BaseRepo
             'price_repair' => $transactions->sum('price_repair'),
             'total_fee_paid' => $price_fee - $total_fee_paid,
         ];
-        return $total
+        return $total;
+        
     }
 
     /**
