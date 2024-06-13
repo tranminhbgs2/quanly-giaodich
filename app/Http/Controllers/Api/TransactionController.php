@@ -649,12 +649,12 @@ class TransactionController extends Controller
             if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT') {
                 // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
                 $user = $this->userRepo->getById(auth()->user()->id);
-                $user_balance = $user->balance - $tran->price_transfer;
+                $user_balance = $user->balance - $tran_detail->price_transfer;
                 $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "PAYMENT_FEE_TRANSACTION_" . $tran->id);
 
                 $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
                 if ($bank_account) {
-                    $bank_account->balance -= $tran->price_transfer;
+                    $bank_account->balance -= $tran_detail->price_transfer;
                     $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $tran->id);
                 }
             } else {
