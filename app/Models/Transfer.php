@@ -74,6 +74,8 @@ class Transfer extends Model
                 return 'ĐL-'. optional($this->fromAgent)->name;
             case 'STAFF':
                 return 'NV-'.optional($this->fromUser)->fullname;
+            case 'MASTER':
+                return 'Nguồn';
             default:
                 return null;
         }
@@ -86,6 +88,8 @@ class Transfer extends Model
                 return 'ĐL-'. optional($this->toAgent)->name;
             case 'STAFF':
                 return 'NV-'.optional($this->toUser)->fullname;
+            case 'MASTER':
+                return 'Nguồn';
             default:
                 return null;
         }
