@@ -745,12 +745,12 @@ class TransactionController extends Controller
                 // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
                 $user = $this->userRepo->getById(auth()->user()->id);
                 $user_balance = $user->balance + $tran_fee->price_transfer;
-                $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "RESTORE_FEE_TRANSACTION_" . $tran->id);
+                $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "RESTORE_FEE_TRANSACTION_" . $tran_fee->id);
 
                 $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
                 if ($bank_account) {
                     $bank_account->balance += $tran_fee->price_transfer;
-                    $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "RESTORE_FEE_TRANSACTION_" . $tran->id);
+                    $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "RESTORE_FEE_TRANSACTION_" . $tran_fee->id);
                 }
             } else {
                 //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
