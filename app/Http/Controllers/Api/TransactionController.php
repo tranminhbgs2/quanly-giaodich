@@ -738,7 +738,7 @@ class TransactionController extends Controller
             $fee_paid = $tran_fee->fee_paid * (-1);
             $fee_paid_balance = $tran_fee->fee_paid;
         }
-        $tran = $this->tran_repo->changeFeePaid($fee_paid, $id);
+        $tran = $this->tran_repo->changeFeePaid($fee_paid, $id, "RESTORE");
 
         if ($tran) {
             if ($tran_fee->method == 'ONLINE' || $tran_fee->method == 'RUT_TIEN_MAT') {
