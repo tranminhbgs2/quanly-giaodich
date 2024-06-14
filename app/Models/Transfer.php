@@ -11,7 +11,12 @@ class Transfer extends Model
     use SoftDeletes; // Thêm dòng này để sử dụng Soft Deletes
     protected $table = Constants::TABLE_TRANSFERS;
     public $timestamps = true;
-    protected $appends = ['from_name', 'to_name'];
+    protected $appends = [
+        'from_name', 'to_name', 'staff_to',
+        'staff_from',
+        'agent_from',
+        'agent_to'
+    ];
     protected $fillable = [
         'acc_bank_from_id',
         'acc_number_from',
@@ -71,9 +76,9 @@ class Transfer extends Model
     {
         switch ($this->type_from) {
             case 'AGENCY':
-                return 'ĐL-'. optional($this->fromAgent)->name;
+                return 'ĐL-' . optional($this->fromAgent)->name;
             case 'STAFF':
-                return 'NV-'.optional($this->fromUser)->fullname;
+                return 'NV-' . optional($this->fromUser)->fullname;
             case 'MASTER':
                 return 'Nguồn';
             default:
@@ -85,13 +90,33 @@ class Transfer extends Model
     {
         switch ($this->type_to) {
             case 'AGENCY':
-                return 'ĐL-'. optional($this->toAgent)->name;
+                return 'ĐL-' . optional($this->toAgent)->name;
             case 'STAFF':
-                return 'NV-'.optional($this->toUser)->fullname;
+                return 'NV-' . optional($this->toUser)->fullname;
             case 'MASTER':
                 return 'Nguồn';
             default:
                 return null;
         }
+    }
+
+    public function getStaffToAttribute()
+    {
+        return optional($this->toUser)->id;
+    }
+
+    public function getStaffFromAttribute()
+    {
+        return optional($this->fromUser)->id;
+    }
+
+    public function getAgentFromAttribute()
+    {
+        return optional($this->fromAgent)->id;
+    }
+
+    public function getAgentToAttribute()
+    {
+        return optional($this->toAgent)->id;
     }
 }
