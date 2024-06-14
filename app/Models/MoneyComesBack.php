@@ -58,6 +58,12 @@ class MoneyComesBack extends Model
         return $this->payment - $this->payment_agent;
     }
 
+    public function getTimeEndAttribute()
+    {
+        //format time_end to Y/m/d H:i:s
+        return date('Y/m/d H:i:s', strtotime($this->attributes['time_end']));
+    }
+
     public function getStatusKetToanAttribute()
     {
         if (!empty($this->time_end) ) {

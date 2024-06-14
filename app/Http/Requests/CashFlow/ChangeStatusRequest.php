@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Requests\Agent;
+namespace App\Http\Requests\CashFlow;
 
 use App\Helpers\Constants;
-use App\Models\Agent;
+use App\Models\CashFlow;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -61,13 +61,13 @@ class ChangeStatusRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // Check tồn tại
-            $dep = Agent::where('id', $this->request->get('id'))->withTrashed()->first();
+            $dep = CashFlow::where('id', $this->request->get('id'))->withTrashed()->first();
             if ($dep) {
                 if ($dep->status == Constants::USER_STATUS_DELETED) {
-                    $validator->errors()->add('check_exist', 'Đại lý đã bị xóa');
+                    $validator->errors()->add('check_exist', 'Dòng tiền đã bị xóa');
                 }
             } else {
-                $validator->errors()->add('check_exist', 'Không tìm thấy đại lý');
+                $validator->errors()->add('check_exist', 'Không tìm thấy dòng tiền');
             }
         });
     }

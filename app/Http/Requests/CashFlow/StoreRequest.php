@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Agent;
+namespace App\Http\Requests\CashFlow;
 
-use App\Helpers\Constants;
-use App\Models\Agent;
+use App\Models\CashFlow;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class ChangeStatusRequest extends FormRequest
+class StoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,8 +27,11 @@ class ChangeStatusRequest extends FormRequest
     public function rules()
     {
         $rule = [
-            'id' => ['required', 'integer', 'min:1'],
-            'status' => ['required', 'integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
+            'type' => ['required'],
+            'time_payment' => ['date_format:Y/m/d H:i:s'],
+            // 'surrogate' => ['required'],
+            // 'phone' => ['numeric', 'digits:10'],
+
         ];
 
         return $rule;
@@ -38,19 +40,17 @@ class ChangeStatusRequest extends FormRequest
     public function attributes()
     {
         return [
-            'status' => 'Trạng thái',
+            'type' => 'Loại',
+            'time_payment' => 'Thời gian thanh toán',
+
         ];
     }
 
     public function messages()
     {
         return [
-            'id.required' => 'Truyền thiếu tham số id',
-            'id.integer' => 'Mã giao dịch phải là số nguyên dương',
-            'id.min' => 'Mã giao dịch phải là số nguyên dương, nhỏ nhất là 1',
-
-            'status.integer' => 'Trạng thái phải là số nguyên',
-            'status.in' => 'Trạng thái không hợp lệ',
+            'type.required' => 'Truyền thiếu tham số name',
+            'time_payment.date_format' => 'Định dạng ngày tháng không hợp lệ',
         ];
     }
 
@@ -60,15 +60,7 @@ class ChangeStatusRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Check tồn tại
-            $dep = Agent::where('id', $this->request->get('id'))->withTrashed()->first();
-            if ($dep) {
-                if ($dep->status == Constants::USER_STATUS_DELETED) {
-                    $validator->errors()->add('check_exist', 'Đại lý đã bị xóa');
-                }
-            } else {
-                $validator->errors()->add('check_exist', 'Không tìm thấy đại lý');
-            }
+
         });
     }
 

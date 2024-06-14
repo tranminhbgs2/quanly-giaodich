@@ -36,6 +36,7 @@ class Constants
     const TABLE_HO_KINH_DOANH = 'ho_kinh_doanh';
     const TABLE_CATEGORIES = 'categories';
     const TABLE_BANK_ACCOUNTS = 'bank_accounts';
+    const TABLE_CASH_FLOW = 'cash_flow';
 
 
 
