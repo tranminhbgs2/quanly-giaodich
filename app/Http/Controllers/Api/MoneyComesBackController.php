@@ -94,11 +94,6 @@ class MoneyComesBackController extends Controller
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
 
         $params_transfer['agent_id'] = $params['agent_id'];
-        // $params_transfer['agent_date_from'] = request('agent_date_from', null);
-        // $params_transfer['agent_date_to'] = request('agent_date_to', null);
-
-        $params_transfer['date_from'] = str_replace('/', '-', $params['date_from']);
-        $params_transfer['date_to'] = str_replace('/', '-', $params['date_to']);
 
         $data = $this->money_repo->getListingAgent($params, false, true);
         $total = $this->money_repo->getListingAgent($params, true, true);
@@ -410,5 +405,81 @@ class MoneyComesBackController extends Controller
             'error' => 'Danh sách top đại lý',
             'data' => $data
         ]);
+    }
+    public function getAllAgency()
+    {
+        $params['keyword'] = request('keyword', null);
+        $params['status'] = request('status', -1);
+        $params['lo_number'] = request('lo_number', 0);
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
+        $params['pos_id'] = request('pos_id', 0);
+        $params['agent_id'] = request('agent_id', 0);
+
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
+
+        $data = $this->money_repo->getListingAllAgent($params);
+        $data_agent = $this->transfer_repo->getListAgent($params);
+
+        // Merge $data and $data_agent
+        $mergedData = $this->mergeDataArrays($data, $data_agent);
+
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách đại lý',
+            'total' => [
+                'total_doi_ung' => count($data),
+                'total_transfer' => count($data_agent)
+            ],
+            'data' => $mergedData,
+        ]);
+    }
+
+    /**
+     * Merge two arrays into one with the length of the longest array
+     *
+     * @param array $data
+     * @param array $data_agent
+     * @return array
+     */
+    private function mergeDataArrays(array $data, array $data_agent)
+    {
+        // Specify the fields you want to merge from $data_agent
+        $fieldsToMerge = ['type_to', 'to_agent_id', 'id', 'price'];
+
+        // Determine the length of the longest array
+        $maxLength = max(count($data), count($data_agent));
+        $merged = [];
+
+        for ($i = 0; $i < $maxLength; $i++) {
+            $mergedItem = [];
+
+            // If the $data array has an item at this index, merge it
+            if (isset($data[$i])) {
+                $mergedItem['doi_ung'] = $data[$i];
+            } else {
+                $mergedItem['doi_ung'] = [];
+            }
+
+            // If the $data_agent array has an item at this index, merge the specific fields
+            if (isset($data_agent[$i])) {
+                $arr_agent = [];
+                foreach ($fieldsToMerge as $field) {
+                    if (isset($data_agent[$i][$field])) {
+                        if ($field == 'to_agent_id') {
+                            $arr_agent['agent_id'] = $data_agent[$i][$field];
+                        } else {
+                            $arr_agent[$field] = $data_agent[$i][$field];
+                        }
+                    }
+                }
+                $mergedItem['transfer'] = $arr_agent;
+            }
+
+            $merged[] = $mergedItem;
+        }
+
+        return $merged;
     }
 }

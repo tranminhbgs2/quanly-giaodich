@@ -1039,4 +1039,70 @@ class MoneyComesBackRepo extends BaseRepo
 
         return $query;
     }
+
+
+
+    public function getListingAllAgent($params, $is_counting = false, $is_agent = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $lo_number = $params['lo_number'] ?? 0;
+        $status = $params['status'] ?? -1;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $pos_id = $params['pos_id'] ?? 0;
+        $agent_id = $params['agent_id'] ?? 0;
+
+        $query = MoneyComesBack::select()->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name', 'bank_code']);
+            },
+            'agency' => function ($sql) {
+                $sql->select(['id', 'name', 'balance']);
+            },
+            'user' => function ($sql) {
+                $sql->select(['id', 'status', 'username', 'email', 'fullname']);
+            }
+        ]);
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('created_at', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        $query->whereNotNull('agent_id');
+        if ($agent_id > 0) {
+            $query->where('agent_id', $agent_id);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        $query->orderBy('id', 'DESC');
+
+        return $query->get()->toArray();
+    }
+
 }

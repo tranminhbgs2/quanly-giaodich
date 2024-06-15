@@ -456,4 +456,43 @@ class TransferRepo extends BaseRepo
 
         return $total;
     }
+
+    /**
+     * Hàm lấy tổng số giao dịch
+     *
+     * @param $params
+     * @return array
+     */
+    public function getListAgent($params)
+    {
+        $status = $params['status'] ?? -1;
+        $date_from = $params['agent_date_from'] ?? null;
+        $date_to = $params['agent_date_to'] ?? null;
+        $agent_id = $params['agent_id'] ?? 0;
+
+        $query = Transfer::select();
+
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_payment', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+        $query->where('type_to', "AGENCY");
+
+        if ($agent_id > 0) {
+            $query->where('to_agent_id', $agent_id);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', Constants::USER_STATUS_ACTIVE);
+        }
+
+        return $query->get()->toArray();
+    }
 }
