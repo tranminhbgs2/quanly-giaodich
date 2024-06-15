@@ -639,7 +639,7 @@ class TransactionController extends Controller
         $data_month = [
             'san_luong' => $tran_month['san_luong'] + $data_month_agent['san_luong'], // tổng số tiền GD trong tháng
             'tien_nhan' => $tran_month['tien_nhan'] + $data_month_agent['tien_nhan'], // tổng tiền thực nhận của pos sau khi trừ phí gốc
-            'profit' => round($tran_month['profit'] + $data_month_agent['profit'], 2), // tổng lợi nhuận theo GD và lô tiền về
+            'profit' => (int)$tran_month['profit'] + $data_month_agent['profit'], // tổng lợi nhuận theo GD và lô tiền về
             'tien_chuyen' => $transfer_month['total_transfer'],
         ];
 

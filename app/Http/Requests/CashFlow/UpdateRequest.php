@@ -3,6 +3,7 @@
 namespace App\Http\Requests\CashFlow;
 
 use App\Helpers\Constants;
+use App\Models\BankAccounts;
 use App\Models\CashFlow;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -68,6 +69,14 @@ class UpdateRequest extends FormRequest
                 $validator->errors()->add('check_exist', 'Không tìm thấy dòng tiền');
             }
 
+            $dep = BankAccounts::where('id', $this->request->get('acc_bank_id'))->first();
+            if ($dep) {
+                if ($dep->status == Constants::USER_STATUS_DELETED) {
+                    $validator->errors()->add('check_exist', 'Tài khoản ngân hàng đã bị xóa');
+                }
+            } else {
+                $validator->errors()->add('check_exist', 'Không tìm thấy tài khoản ngân hàng');
+            }
             // if (! validateMobile($this->request->get('phone'))) {
             //     $validator->errors()->add('check_exist', 'Số điện thoại không đúng định dạng (09x/9x/849x)');
             // }
