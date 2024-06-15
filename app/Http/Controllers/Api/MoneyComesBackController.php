@@ -194,7 +194,7 @@ class MoneyComesBackController extends Controller
         $params['fee_agent'] = floatval(request('fee_agent', 0)); // phí
         $params['total_price'] = floatval(request('total_price', 0)); // tổng tiền xử lý
         $params['payment'] = floatval(request('payment', 0)); // thành tiền
-        $params['status'] = request('status', Constants::USER_STATUS_LOCKED); // trạng thái
+        $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
         $params['created_by'] = auth()->user()->id;
         $params['balance'] = floatval(request('balance', 0)); // tiền  tổng
         $params['agent_id'] = request('agent_id', 0); // id đại lý
@@ -259,7 +259,7 @@ class MoneyComesBackController extends Controller
             $params['fee_agent'] = floatval(request('fee_agent', 0)); // phí
             $params['total_price'] = floatval(request('total_price', 0)); // phí
             $params['payment'] = floatval(request('payment', 0)); // phí
-            $params['status'] = request('status', Constants::USER_STATUS_LOCKED); // trạng thái
+            $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
             $params['created_by'] = auth()->user()->id;
             $params['balance'] = floatval(request('balance', 0)); // tiền  tổng
             $params['agent_id'] = request('agent_id', 0); // id đại lý

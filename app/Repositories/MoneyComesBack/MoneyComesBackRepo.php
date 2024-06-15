@@ -1034,8 +1034,7 @@ class MoneyComesBackRepo extends BaseRepo
                 ];
             })
             ->sortByDesc('total_price_rut')
-            ->values()
-            ->take(10);
+            ->values();
 
         return $query;
     }
