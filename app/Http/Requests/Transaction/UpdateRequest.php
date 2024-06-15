@@ -142,9 +142,9 @@ class UpdateRequest extends FormRequest
                 if ($trans->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
                 }
-                if (auth()->user()->account_type == "STAFF") {
+                if (auth()->user()->account_type == Constants::ACCOUNT_TYPE_STAFF) {
                     if ($this->request->get('method') == "DAO_HAN") {
-                        $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                        $dep = BankAccounts::where('type', Constants::ACCOUNT_TYPE_STAFF)->where('staff_id', auth()->user()->id)->first();
                         if ($dep) {
                             if ($dep->balance < ($this->request->get('price_nop') - $dep->price_nop) || $dep->balance < ($this->request->get('price_transfer') - $dep->price_transfer)) {
                                 $validator->errors()->add('check_exist', 'Số dư không đủ');

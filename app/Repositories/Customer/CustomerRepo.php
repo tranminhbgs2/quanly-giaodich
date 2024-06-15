@@ -34,7 +34,7 @@ class CustomerRepo extends BaseRepo
         $status = isset($params['status']) ? $params['status'] : -1;
         $page_index = isset($params['page_index']) ? $params['page_index'] : 1;
         $page_size = isset($params['page_size']) ? $params['page_size'] : 10;
-        $account_type = isset($params['account_type']) ? $params['account_type'] : 'STAFF';
+        $account_type = isset($params['account_type']) ? $params['account_type'] : Constants::ACCOUNT_TYPE_STAFF;
         $query = User::select([
                 'id', 'username',
                 'fullname', 'email', 'phone',
@@ -58,7 +58,7 @@ class CustomerRepo extends BaseRepo
             });
         });
 
-        $query->where('account_type', $account_type);
+        $query->whereIn('account_type', [Constants::ACCOUNT_TYPE_STAFF, Constants::ACCOUNT_TYPE_ACCOUNTANT]);
 
         if ($status > 0) {
             $query->where('status', $status);

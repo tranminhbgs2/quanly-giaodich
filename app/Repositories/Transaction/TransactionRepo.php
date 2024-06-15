@@ -324,7 +324,7 @@ class TransactionRepo extends BaseRepo
             'total_fee_paid' => $price_fee - $total_fee_paid,
         ];
         return $total;
-        
+
     }
 
     /**
@@ -692,7 +692,7 @@ class TransactionRepo extends BaseRepo
             ])
             ->where('status', Constants::USER_STATUS_ACTIVE);
 
-        if (isset($params['created_by']) && $params['account_type'] === 'STAFF') {
+        if (isset($params['created_by']) && $params['account_type'] === Constants::ACCOUNT_TYPE_STAFF) {
             $transactionsQuery->where('created_by', $params['created_by']);
         }
 
@@ -718,7 +718,7 @@ class TransactionRepo extends BaseRepo
             $query_transfer = Transfer::select()
                 ->where('status', Constants::USER_STATUS_ACTIVE)
                 ->where('to_agent_id', $createdBy->id)
-                ->where('type_to', 'STAFF')
+                ->where('type_to', Constants::ACCOUNT_TYPE_STAFF)
                 ->whereBetween('created_at', [$date_from, $date_to])
                 ->get();
             $total_mester_transfer = $query_transfer->sum('price');

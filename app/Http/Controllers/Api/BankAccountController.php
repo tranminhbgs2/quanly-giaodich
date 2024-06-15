@@ -97,7 +97,7 @@ class BankAccountController extends Controller
         $params['staff_id'] = request('staff_id', null);
 
         switch ($params['type']) {
-            case 'STAFF':
+            case Constants::ACCOUNT_TYPE_STAFF:
                 $params['agent_id'] = 0;
                 break;
             case 'AGENCY':
@@ -152,7 +152,7 @@ class BankAccountController extends Controller
             $params['staff_id'] = request('staff_id', null);
 
             switch ($params['type']) {
-                case 'STAFF':
+                case Constants::ACCOUNT_TYPE_STAFF:
                     $params['agent_id'] = 0;
                     break;
                 case 'AGENCY':

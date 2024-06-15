@@ -77,7 +77,7 @@ class PaymentFeeRequest extends FormRequest
                         $validator->errors()->add('check_exist', 'Phí thanh toán không được lớn hơn phí còn lại');
                     }
                     if ($dep->method != "DAO_HAN") {
-                        $dep_bank = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                        $dep_bank = BankAccounts::where('type', Constants::ACCOUNT_TYPE_STAFF)->where('staff_id', auth()->user()->id)->first();
                         if ($dep_bank) {
                             if ($dep_bank->balance < $dep->price_transfer) {
                                 $validator->errors()->add('check_exist', 'Số dư không đủ');

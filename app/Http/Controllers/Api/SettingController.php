@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\Constants;
 use App\Repositories\Setting\VersionRepo;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -115,7 +116,7 @@ class SettingController extends Controller
             ],
             1 => [
                 'name' => 'Tài khoản nhân viên',
-                'code' => 'STAFF'
+                'code' => Constants::ACCOUNT_TYPE_STAFF
             ],
             2 => [
                 'name' => 'Tài khoản đại lý',
@@ -184,17 +185,17 @@ class SettingController extends Controller
             0 => [
                 'id' => 1,
                 'name' => 'ADMIN',
-                'code' => 'SYSTEM'
+                'code' => Constants::ACCOUNT_TYPE_SYSTEM
             ],
             1 => [
                 'id' => 2,
                 'name' => 'Kế toán',
-                'code' => 'ACCOUNTANT'
+                'code' => Constants::ACCOUNT_TYPE_ACCOUNTANT
             ],
             2 => [
                 'id' => 3,
                 'name' => 'Nhân viên',
-                'code' => 'STAFF'
+                'code' => Constants::ACCOUNT_TYPE_STAFF
             ],
         ];
         return response()->json([

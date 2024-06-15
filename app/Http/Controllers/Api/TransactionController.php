@@ -63,7 +63,7 @@ class TransactionController extends Controller
         $params['method'] = request('method', null);
         $params['status_fee'] = request('status_fee', 1);
 
-        if ($params['account_type'] == 'STAFF') {
+        if ($params['account_type'] == Constants::ACCOUNT_TYPE_STAFF) {
             $params['created_by'] = auth()->user()->id;
         }
 

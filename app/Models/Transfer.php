@@ -77,7 +77,7 @@ class Transfer extends Model
         switch ($this->type_from) {
             case 'AGENCY':
                 return 'ĐL-' . optional($this->fromAgent)->name;
-            case 'STAFF':
+            case Constants::ACCOUNT_TYPE_STAFF:
                 return 'NV-' . optional($this->fromUser)->fullname;
             case 'MASTER':
                 return 'Nguồn';
@@ -91,7 +91,7 @@ class Transfer extends Model
         switch ($this->type_to) {
             case 'AGENCY':
                 return 'ĐL-' . optional($this->toAgent)->name;
-            case 'STAFF':
+            case Constants::ACCOUNT_TYPE_STAFF:
                 return 'NV-' . optional($this->toUser)->fullname;
             case 'MASTER':
                 return 'Nguồn';

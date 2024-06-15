@@ -138,13 +138,13 @@ class TransferController extends Controller
 
         if ($bank_from->type == "AGENCY") {
             $params['from_agent_id'] = $bank_from->agent_id;
-        } else if ($bank_from->type == "STAFF") {
+        } else if ($bank_from->type == Constants::ACCOUNT_TYPE_STAFF) {
             $params['from_agent_id'] = $bank_from->staff_id;
         }
 
         if ($bank_to->type == "AGENCY") {
             $params['to_agent_id'] = $bank_to->agent_id;
-        } else if ($bank_to->type == "STAFF") {
+        } else if ($bank_to->type == Constants::ACCOUNT_TYPE_STAFF) {
             $params['to_agent_id'] = $bank_to->staff_id;
         }
 
@@ -159,7 +159,7 @@ class TransferController extends Controller
                 $agent_balance = $agent->balance + $params['price'];
                 $this->agent_repo->updateBalance($agent->id, $agent_balance, "CREATED_TRANSFER_" . $resutl->id);
             }
-            if ($bank_from->type == "STAFF") {
+            if ($bank_from->type == Constants::ACCOUNT_TYPE_STAFF) {
                 $user = $this->userRepo->getById($bank_from->staff_id);
                 $user_balance = $user->balance - $params['price'];
                 $this->userRepo->updateBalance($bank_from->staff_id, $user_balance, "CREATED_TRANSFER_" . $resutl->id);
@@ -172,7 +172,7 @@ class TransferController extends Controller
                 $agent_balance = $agent->balance - $params['price'];
                 $this->agent_repo->updateBalance($agent->id, $agent_balance, "CREATED_TRANSFER_" . $resutl->id);
             }
-            if ($bank_to->type == "STAFF") {
+            if ($bank_to->type == Constants::ACCOUNT_TYPE_STAFF) {
                 $user = $this->userRepo->getById($bank_to->staff_id);
                 $user_balance = $user->balance + $params['price'];
                 $this->userRepo->updateBalance($bank_to->staff_id, $user_balance, "CREATED_TRANSFER_" . $resutl->id);
@@ -246,13 +246,13 @@ class TransferController extends Controller
 
             if ($bank_from->type == "AGENCY") {
                 $params['from_agent_id'] = $bank_from->agent_id;
-            } else if ($bank_from->type == "STAFF") {
+            } else if ($bank_from->type == Constants::ACCOUNT_TYPE_STAFF) {
                 $params['from_agent_id'] = $bank_from->staff_id;
             }
 
             if ($bank_to->type == "AGENCY") {
                 $params['to_agent_id'] = $bank_to->agent_id;
-            } else if ($bank_to->type == "STAFF") {
+            } else if ($bank_to->type == Constants::ACCOUNT_TYPE_STAFF) {
                 $params['to_agent_id'] = $bank_to->staff_id;
             }
 
@@ -271,7 +271,7 @@ class TransferController extends Controller
                         $agent_old = $this->agent_repo->getById($bank_from_old->agent_id);
                         $agent_balance = $agent_old->balance - $transfer_old->price;
                         $this->agent_repo->updateBalance($agent_old->id, $agent_balance, "UPDATE_TRANSFER_" . $params['id']);
-                    }elseif ($bank_from_old->type == "STAFF") {
+                    }elseif ($bank_from_old->type == Constants::ACCOUNT_TYPE_STAFF) {
                         $user = $this->userRepo->getById($bank_from_old->staff_id);
                         $user_balance = $user->balance + $transfer_old->price;
                         $this->userRepo->updateBalance($bank_from_old->staff_id, $user_balance, "UPDATE_TRANSFER_" . $params['id']);
@@ -286,7 +286,7 @@ class TransferController extends Controller
                         $agent_new = $this->agent_repo->getById($bank_from_new->agent_id);
                         $agent_balance = $agent_new->balance + $params['price'];
                         $this->agent_repo->updateBalance($agent_new->id, $agent_balance, "UPDATE_TRANSFER_" . $params['id']);
-                    }elseif ($bank_from_new->type == "STAFF") {
+                    }elseif ($bank_from_new->type == Constants::ACCOUNT_TYPE_STAFF) {
                         $user_new = $this->userRepo->getById($bank_from_new->staff_id);
                         $user_new_balance = $user_new->balance - $params['price'];
                         $this->userRepo->updateBalance($bank_from_new->staff_id, $user_new_balance, "UPDATE_TRANSFER_" . $params['id']);
@@ -300,7 +300,7 @@ class TransferController extends Controller
                         $agent = $this->agent_repo->getById($bank_from->agent_id);
                         $agent_balance = $agent->balance - $params['price'] + $transfer_old->price;
                         $this->agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_TRANSFER_" . $params['id']);
-                    }elseif ($bank_from->type == "STAFF") {
+                    }elseif ($bank_from->type == Constants::ACCOUNT_TYPE_STAFF) {
                         $user = $this->userRepo->getById($bank_from->staff_id);
                         $user_balance = $user->balance + $params['price'] - $transfer_old->price;
                         $this->userRepo->updateBalance($bank_from->staff_id, $user_balance, "UPDATE_TRANSFER_" . $params['id']);
@@ -318,7 +318,7 @@ class TransferController extends Controller
                         $agent_old = $this->agent_repo->getById($bank_to_old->agent_id);
                         $agent_balance = $agent_old->balance + $transfer_old->price;
                         $this->agent_repo->updateBalance($agent_old->id, $agent_balance, "UPDATE_TRANSFER_" . $params['id']);
-                    } elseif ($bank_to_old->type == "STAFF") {
+                    } elseif ($bank_to_old->type == Constants::ACCOUNT_TYPE_STAFF) {
                         $user = $this->userRepo->getById($bank_to_old->staff_id);
                         $user_balance = $user->balance - $transfer_old->price;
                         $this->userRepo->updateBalance($bank_to_old->staff_id, $user_balance, "UPDATE_TRANSFER_" . $params['id']);
@@ -333,7 +333,7 @@ class TransferController extends Controller
                         $agent_new = $this->agent_repo->getById($bank_to_new->agent_id);
                         $agent_balance = $agent_new->balance - $params['price'];
                         $this->agent_repo->updateBalance($agent_new->id, $agent_balance, "UPDATE_TRANSFER_" . $params['id']);
-                    } elseif ($bank_to_new->type == "STAFF") {
+                    } elseif ($bank_to_new->type == Constants::ACCOUNT_TYPE_STAFF) {
                         $user = $this->userRepo->getById($bank_to_new->staff_id);
                         $user_balance = $user->balance + $params['price'];
                         $this->userRepo->updateBalance($bank_to_new->staff_id, $user_balance, "UPDATE_TRANSFER_" . $params['id']);
@@ -347,7 +347,7 @@ class TransferController extends Controller
                         $agent = $this->agent_repo->getById($bank_to->agent_id);
                         $agent_balance = $agent->balance - $params['price'] + $transfer_old->price;
                         $this->agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_TRANSFER_" . $params['id']);
-                    } elseif ($bank_to->type == "STAFF") {
+                    } elseif ($bank_to->type == Constants::ACCOUNT_TYPE_STAFF) {
                         $user = $this->userRepo->getById($bank_to->staff_id);
                         $user_balance = $user->balance + $params['price'] - $transfer_old->price;
                         $this->userRepo->updateBalance($bank_to->staff_id, $user_balance, "UPDATE_TRANSFER_" . $params['id']);
@@ -400,7 +400,7 @@ class TransferController extends Controller
                     $agent = $this->agent_repo->getById($bank_from->agent_id);
                     $agent_balance = $agent->balance - $transfer->price;
                     $this->agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_TRANSFER_" . $params['id']);
-                } elseif ($bank_from->type == "STAFF") {
+                } elseif ($bank_from->type == Constants::ACCOUNT_TYPE_STAFF) {
                     $user = $this->userRepo->getById($bank_from->staff_id);
                     $user_balance = $user->balance + $transfer->price;
                     $this->userRepo->updateBalance($bank_from->staff_id, $user_balance, "DELETE_TRANSFER_" . $params['id']);
@@ -413,7 +413,7 @@ class TransferController extends Controller
                     $agent = $this->agent_repo->getById($bank_to->agent_id);
                     $agent_balance = $agent->balance + $transfer->price;
                     $this->agent_repo->updateBalance($agent->id, $agent_balance, "DELETE_TRANSFER_" . $params['id']);
-                } elseif ($bank_to->type == "STAFF") {
+                } elseif ($bank_to->type == Constants::ACCOUNT_TYPE_STAFF) {
                     $user = $this->userRepo->getById($bank_to->staff_id);
                     $user_balance = $user->balance - $transfer->price;
                     $this->userRepo->updateBalance($bank_to->staff_id, $user_balance, "DELETE_TRANSFER_" . $params['id']);

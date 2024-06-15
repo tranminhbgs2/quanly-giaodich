@@ -106,9 +106,9 @@ class StoreRequest extends FormRequest
             //         $validator->errors()->add('check_exist', 'Mã nhóm quyền đã tồn tại');
             //     }
             // });
-            if (auth()->user()->account_type == "STAFF") {
+            if (auth()->user()->account_type == Constants::ACCOUNT_TYPE_STAFF || auth()->user()->account_type == Constants::ACCOUNT_TYPE_ACCOUNTANT){
                 if ($this->request->get('method') == "DAO_HAN") {
-                    $dep = BankAccounts::where('type', 'STAFF')->where('staff_id', auth()->user()->id)->first();
+                    $dep = BankAccounts::where('type', Constants::ACCOUNT_TYPE_STAFF)->where('staff_id', auth()->user()->id)->first();
                     if ($dep) {
                         if ($dep->balance < $this->request->get('price_nop') || $dep->balance < $this->request->get('price_transfer')) {
                             $validator->errors()->add('check_exist', 'Số dư không đủ');

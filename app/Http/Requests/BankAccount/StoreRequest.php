@@ -84,7 +84,7 @@ class StoreRequest extends FormRequest
             }
 
             switch ($this->request->get('type')) {
-                case 'STAFF':
+                case Constants::ACCOUNT_TYPE_STAFF:
                     if (empty($this->request->get('staff_id'))) {
                         $validator->errors()->add('check_exist_staff', 'Nhân viên không được bỏ trống');
                     }
