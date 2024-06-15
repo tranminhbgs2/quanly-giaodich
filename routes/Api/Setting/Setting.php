@@ -26,6 +26,7 @@ Route::group(['prefix' => 'dropdown'], function (){
         Route::get('/type-transfer', 'SettingController@getTypeTransfer');
         Route::get('/staff', 'UserController@getAllStaff');
         Route::get('/type-card', 'SettingController@getTypeCard');
+        Route::get('/group-account', 'SettingController@getGroupAccount');
     });
 
 });

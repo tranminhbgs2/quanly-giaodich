@@ -22,6 +22,17 @@ class StoreRequest extends FormRequest
     }
 
     /**
+     * Prepare the data for validation.
+     *
+     * @return void
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'is_duplicate' => $this->input('is_duplicate', false),
+        ]);
+    }
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
@@ -35,6 +46,7 @@ class StoreRequest extends FormRequest
             'type_from' => ['required', 'in:STAFF,AGENCY,MASTER,FEE'],
             'price' => ['required', 'numeric', 'min:0'],
             'time_payment' => ['required', 'date_format:Y/m/d H:i:s'],
+            'is_duplicate' => 'boolean',
 
         ];
 
@@ -89,15 +101,16 @@ class StoreRequest extends FormRequest
             } elseif ($bank_to->type != $this->request->get('type_to')) {
                 $validator->errors()->add('acc_bank_to_id', 'Loại tài khoản nhận đã chọn không khớp');
             }
-            // Check username
-            $dep = Transfer::
-            where('acc_bank_from_id', $this->request->get('acc_bank_from_id'))
-            ->where('acc_bank_to_id', $this->request->get('acc_bank_to_id'))
-            ->where('time_payment', $this->request->get('time_payment'))
-            ->withTrashed()->first();
+            if ($this->request->has('is_duplicate') == false) {
+                // Check username
+                $dep = Transfer::where('acc_bank_from_id', $this->request->get('acc_bank_from_id'))
+                    ->where('acc_bank_to_id', $this->request->get('acc_bank_to_id'))
+                    ->where('time_payment', $this->request->get('time_payment'))
+                    ->withTrashed()->first();
 
-            if ($dep) {
-                $validator->errors()->add('check_exist', 'Chuyển tiền đã tồn tại');
+                if ($dep) {
+                    $validator->errors()->add('check_exist', 'Chuyển tiền đã tồn tại');
+                }
             }
         });
     }

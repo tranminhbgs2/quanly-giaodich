@@ -11,6 +11,7 @@ use App\Repositories\Agent\AgentRepo;
 use App\Repositories\BaseRepo;
 use App\Repositories\HoKinhDoanh\HoKinhDoanhRepo;
 use App\Repositories\Pos\PosRepo;
+use App\Repositories\Transfer\TransferRepo;
 use Carbon\Carbon;
 
 class MoneyComesBackRepo extends BaseRepo
@@ -996,6 +997,7 @@ class MoneyComesBackRepo extends BaseRepo
         $date_from = Carbon::parse($date_from)->startOfDay();
         $date_to = Carbon::parse($date_to)->endOfDay();
 
+        $transferRepo = new TransferRepo();
         $query = MoneyComesBack::select(['agent_id', 'total_price', 'payment', 'fee_agent', 'fee', 'created_at'])
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
@@ -1003,20 +1005,35 @@ class MoneyComesBackRepo extends BaseRepo
             ->where('created_at', '<=', $date_to)
             ->get()
             ->groupBy('agent_id')
-            ->map(function ($group) {
+            ->map(function ($group) use ($transferRepo, $date_from, $date_to){
                 $total_price_rut = $group->sum('total_price');
                 $total_payment = $group->sum('payment');
                 $total_profit = $group->sum(function ($transaction) {
                     return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
                 });
+                //cần lấy thêm tổng số tiền đã chuyển khoản trong bảng transfer
+                $total_transfer = $transferRepo->getTotalAgent([
+                    'agent_id' => $group->first()->agent_id,
+                    'date_from' => $date_from,
+                    'date_to' => $date_to
+                ]);
+                if (count($total_transfer) > 0) {
+                    $row_total_transfer = $total_transfer['total_transfer'];
+                    $total_cash = $total_payment - $total_payment['total_transfer'];
+                } else {
+                    $row_total_transfer = 0;
+                    $total_cash = $total_payment;
+                }
                 return [
                     'agent_id' => $group->first()->agent_id,
                     'total_price_rut' => $total_price_rut,
                     'total_payment' => $total_payment,
-                    'total_profit' => $total_profit
+                    'total_profit' => $total_profit,
+                    'total_cash' => $total_cash,
+                    'total_transfer' => $row_total_transfer
                 ];
             })
-            ->sortByDesc('total_profit')
+            ->sortByDesc('total_price_rut')
             ->values()
             ->take(10);
 
