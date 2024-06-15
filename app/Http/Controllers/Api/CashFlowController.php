@@ -107,7 +107,7 @@ class CashFlowController extends Controller
             } elseif ($params['type'] == "NAP_TIEN") {
                 $bank_to_new = $this->bankAccountRepo->getById($params['acc_bank_id']);
                 $bank_to_new_balance = $bank_to_new->balance + $params['price'];
-                $this->bankAccountRepo->updateBalance($params['acc_bank_id'], $bank_to_new_balance, "CREATED_CASH_FLOW_" . $params['id']);
+                $this->bankAccountRepo->updateBalance($params['acc_bank_id'], $bank_to_new_balance, "CREATED_CASH_FLOW_" . $id);
             }
             return response()->json([
                 'code' => 200,
