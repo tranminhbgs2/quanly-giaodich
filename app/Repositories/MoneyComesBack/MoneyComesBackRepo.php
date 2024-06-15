@@ -114,7 +114,7 @@ class MoneyComesBackRepo extends BaseRepo
 
         $query = MoneyComesBack::select()->with([
             'pos' => function ($sql) {
-                $sql->select(['id', 'name']);
+                $sql->select(['id', 'name', 'bank_code']);
             },
             'agency' => function ($sql) {
                 $sql->select(['id', 'name', 'balance']);
@@ -986,5 +986,40 @@ class MoneyComesBackRepo extends BaseRepo
         ];
 
         return MoneyComesBack::where('id', $id)->update($update);
+    }
+
+    public function getTopAgency($params)
+    {
+        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
+
+        $date_from = Carbon::parse($date_from)->startOfDay();
+        $date_to = Carbon::parse($date_to)->endOfDay();
+
+        $query = MoneyComesBack::select(['agent_id', 'total_price', 'payment', 'fee_agent', 'fee', 'created_at'])
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->whereNotNull('agent_id')
+            ->where('created_at', '>=', $date_from)
+            ->where('created_at', '<=', $date_to)
+            ->get()
+            ->groupBy('agent_id')
+            ->map(function ($group) {
+                $total_price_rut = $group->sum('total_price');
+                $total_payment = $group->sum('payment');
+                $total_profit = $group->sum(function ($transaction) {
+                    return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
+                });
+                return [
+                    'agent_id' => $group->first()->agent_id,
+                    'total_price_rut' => $total_price_rut,
+                    'total_payment' => $total_payment,
+                    'total_profit' => $total_profit
+                ];
+            })
+            ->sortByDesc('total_profit')
+            ->values()
+            ->take(10);
+
+        return $query;
     }
 }

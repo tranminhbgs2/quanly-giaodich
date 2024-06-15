@@ -171,4 +171,36 @@ class SettingController extends Controller
             'data' => $data
         ]);
     }
+
+    /**
+     * API lấy danh sách phương thức thanh toán
+     * URL: {{url}}/api/v1/dropdown/phuong-thuc
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getGroupAccount()
+    {
+        $data = [
+            0 => [
+                'id' => 1,
+                'name' => 'ADMIN',
+                'code' => 'SYSTEM'
+            ],
+            1 => [
+                'id' => 2,
+                'name' => 'Kế toán',
+                'code' => 'ACCOUNTANT'
+            ],
+            2 => [
+                'id' => 3,
+                'name' => 'Nhân viên',
+                'code' => 'STAFF'
+            ],
+        ];
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách nhóm quyền user',
+            'data' => $data
+        ]);
+    }
 }
