@@ -1019,7 +1019,7 @@ class MoneyComesBackRepo extends BaseRepo
                 ]);
                 if (count($total_transfer) > 0) {
                     $row_total_transfer = $total_transfer['total_transfer'];
-                    $total_cash = $total_payment - $total_payment['total_transfer'];
+                    $total_cash = $total_payment - $total_transfer['total_transfer'];
                 } else {
                     $row_total_transfer = 0;
                     $total_cash = $total_payment;

@@ -292,7 +292,7 @@ class MoneyComesBackController extends Controller
                     ]);
                 }
             }
-            
+
             $resutl = $this->money_repo->update($params, $params['id']);
 
             if ($resutl) {
@@ -393,6 +393,22 @@ class MoneyComesBackController extends Controller
             'code' => 400,
             'error' => 'Kết toán lô không thành công',
             'data' => null
+        ]);
+    }
+
+    public function getTopAgency()
+    {
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
+
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
+
+        $data = $this->money_repo->getTopAgency($params);
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách top đại lý',
+            'data' => $data
         ]);
     }
 }

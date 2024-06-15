@@ -15,6 +15,7 @@ Route::group(['prefix' => 'lo-tien-ve'], function (){
         Route::get('/cashback', 'MoneyComesBackController@getListingCashBack');
         Route::get('/agency', 'MoneyComesBackController@getListingAgency');
         Route::post('/ket-toan-lo', 'MoneyComesBackController@ketToanLo');
+        Route::get('/get-top-agency', 'MoneyComesBackController@getTopAgency');
     });
 
 });
