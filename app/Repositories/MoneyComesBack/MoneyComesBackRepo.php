@@ -987,59 +987,57 @@ class MoneyComesBackRepo extends BaseRepo
         ];
 
         return MoneyComesBack::where('id', $id)->update($update);
-    }
-
-    public function getTopAgency($params)
+    }public function getTopAgency($params)
     {
-        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
-        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
-
-        $date_from = Carbon::parse($date_from)->startOfDay();
-        $date_to = Carbon::parse($date_to)->endOfDay();
+        $date_from = Carbon::parse($params['date_from'] ?? Carbon::now()->startOfDay())->startOfDay();
+        $date_to = Carbon::parse($params['date_to'] ?? Carbon::now()->endOfDay())->endOfDay();
 
         $transferRepo = new TransferRepo();
-        $query = MoneyComesBack::select(['agent_id', 'total_price', 'payment', 'fee_agent', 'fee', 'created_at'])
+
+        // Query to get all relevant transactions
+        $transactions = MoneyComesBack::select(['agent_id', 'total_price', 'payment', 'payment_agent', 'fee_agent', 'fee', 'created_at'])
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
-            ->where('created_at', '>=', $date_from)
-            ->where('created_at', '<=', $date_to)
+            ->whereBetween('created_at', [$date_from, $date_to])
             ->get()
-            ->groupBy('agent_id')
-            ->map(function ($group) use ($transferRepo, $date_from, $date_to){
-                $total_price_rut = $group->sum('total_price');
-                $total_payment = $group->sum('payment');
-                $total_profit = $group->sum(function ($transaction) {
-                    return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
-                });
-                //cần lấy thêm tổng số tiền đã chuyển khoản trong bảng transfer
-                $total_transfer = $transferRepo->getTotalAgent([
-                    'agent_id' => $group->first()->agent_id,
-                    'date_from' => $date_from,
-                    'date_to' => $date_to
-                ]);
-                if (count($total_transfer) > 0) {
-                    $row_total_transfer = $total_transfer['total_transfer'];
-                    $total_cash = $total_payment - $total_transfer['total_transfer'];
-                } else {
-                    $row_total_transfer = 0;
-                    $total_cash = $total_payment;
-                }
-                return [
-                    'agent_id' => $group->first()->agent_id,
-                    'total_price_rut' => $total_price_rut,
-                    'total_payment' => $total_payment,
-                    'total_profit' => $total_profit,
-                    'total_cash' => $total_cash,
-                    'total_transfer' => $row_total_transfer
-                ];
-            })
-            ->sortByDesc('total_price_rut')
-            ->values();
+            ->groupBy('agent_id');
 
-        return $query;
+        // Get all agents involved in the transactions
+        $agentIds = $transactions->keys();
+        $agents = Agent::whereIn('id', $agentIds)->get()->keyBy('id');
+
+        $result = $transactions->map(function ($group) use ($agents, $transferRepo, $date_from, $date_to) {
+            $total_price_rut = $group->sum('total_price');
+            $total_payment = $group->sum('payment_agent');
+            $total_profit = $group->sum(function ($transaction) {
+                return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
+            });
+
+            // Get total transfer amount
+            $total_transfer_data = $transferRepo->getTotalAgent([
+                'agent_id' => $group->first()->agent_id,
+                'date_from' => $date_from,
+                'date_to' => $date_to
+            ]);
+
+            $row_total_transfer = $total_transfer_data['total_transfer'] ?? 0;
+            $total_cash = $total_payment - $row_total_transfer;
+
+            $agent = $agents[$group->first()->agent_id];
+
+            return [
+                'agent_id' => $group->first()->agent_id,
+                'name' => $agent->name ?? 'N/A',
+                'total_price_rut' => $total_price_rut,
+                'total_payment' => $total_payment,
+                'total_profit' => (int)$total_profit,
+                'total_cash' => $total_cash,
+                'total_transfer' => (int)$row_total_transfer
+            ];
+        })->sortByDesc('total_price_rut')->values();
+
+        return $result;
     }
-
-
 
     public function getListingAllAgent($params, $is_counting = false, $is_agent = false)
     {
