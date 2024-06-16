@@ -119,4 +119,9 @@ class Transfer extends Model
     {
         return optional($this->toAgent)->id;
     }
+
+    public function getPriceAttribute($value)
+    {
+        return (int) $value;
+    }
 }
