@@ -459,7 +459,7 @@ class MoneyComesBackController extends Controller
             if (isset($data[$i])) {
                 $mergedItem['doi_ung'] = $data[$i];
             } else {
-                $mergedItem['doi_ung'] = [];
+                $mergedItem['doi_ung'] = null;
             }
 
             // If the $data_agent array has an item at this index, merge the specific fields
