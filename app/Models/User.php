@@ -132,4 +132,9 @@ class User extends Model
     {
         return $this->belongsToMany(Position::class, 'user_position', 'user_id', 'position_id');
     }
+
+    public function getBalanceAttribute($value)
+    {
+        return (int) $value;
+    }
 }
