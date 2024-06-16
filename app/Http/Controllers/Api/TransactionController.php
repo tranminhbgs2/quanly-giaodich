@@ -225,7 +225,7 @@ class TransactionController extends Controller
                 return response()->json([
                     'code' => 400,
                     'error' => 'Không thể thêm mới giao dịch cho lô đã kết toán',
-                    'data' => null
+                    'data' => $money_comeb->time_end
                 ]);
             }
         }
@@ -264,7 +264,7 @@ class TransactionController extends Controller
                         'total_price' => $total_price,
                         'payment' => $payment,
                         'created_by' => auth()->user()->id,
-                        'status' => Constants::USER_STATUS_ACTIVE,
+                        'status' => Constants::USER_STATUS_LOCKED,
                     ];
                     $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100); // Tính số tiền cộng cho HKD
                     $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, "CREATED");
