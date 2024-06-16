@@ -39,7 +39,7 @@ class StoreRequest extends FormRequest
             'price_rut' => ['numeric', 'min:0'],
             'price_fee' => ['numeric', 'min:0'],
             'price_transfer' => ['numeric', 'min:0'],
-            'price_repair' => ['numeric', 'min:0'],
+            'price_repair' => ['numeric'],
             'type_card' => ['required_if:bank_code,VIETCOMBANK', 'in:VISA,MASTER,NAPAS,AMEX,JCB'],
 
 

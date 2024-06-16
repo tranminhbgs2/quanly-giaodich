@@ -42,7 +42,7 @@ class UpdateRequest extends FormRequest
             'price_rut' => ['required', 'numeric', 'min:0'],
             'price_fee' => ['required', 'numeric', 'min:0'],
             'price_transfer' => ['numeric', 'min:0'],
-            'price_repair' => ['numeric', 'min:0'],
+            'price_repair' => ['numeric'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED . ',' . Constants::USER_STATUS_DRAFT],
         ];
 
@@ -99,7 +99,6 @@ class UpdateRequest extends FormRequest
             'price_transfer.numeric' => 'Tham số price_transfer phải là số',
             'price_transfer.min' => "Tham số price_transfer tối thiểu phải là :min",
             'price_repair.numeric' => 'Tham số price_repair phải là số',
-            'price_repair.min' => "Tham số price_repair tối thiểu phải là :min",
             'status.integer' => 'Tham số status phải là số nguyên',
             'status.in' => 'Tham số status không hợp lệ',
             'fee.max' => 'Tham số fee tối đa phải là 99',
