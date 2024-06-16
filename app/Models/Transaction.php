@@ -100,4 +100,39 @@ class Transaction extends Model
     {
         return $this->price_fee - $this->fee_paid;
     }
+    // New Accessors to convert float fields to int
+    public function getPriceNopAttribute($value)
+    {
+        return (int) $value;
+    }
+
+    public function getPriceRutAttribute($value)
+    {
+        return (int) $value;
+    }
+
+    public function getPriceFeeAttribute($value)
+    {
+        return (int) $value;
+    }
+
+    public function getPriceTransferAttribute($value)
+    {
+        return (int) $value;
+    }
+
+    public function getProfitAttribute($value)
+    {
+        return (int) $value;
+    }
+
+    public function getPriceRepairAttribute($value)
+    {
+        return (int) $value;
+    }
+
+    public function getFeePaidAttribute($value)
+    {
+        return (int) $value;
+    }
 }
