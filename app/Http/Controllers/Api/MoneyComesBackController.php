@@ -424,13 +424,23 @@ class MoneyComesBackController extends Controller
 
         // Merge $data and $data_agent
         $mergedData = $this->mergeDataArrays($data, $data_agent);
+        $params_transfer['agent_id'] = $params['agent_id'];
+        $params_transfer['date_from'] = $params['date_from'];
+        $params_transfer['date_to'] = $params['date_to'];
+        $total_transfer = $this->transfer_repo->getTotalAgent($params_transfer);
+        $total_payment = $this->money_repo->getTotalAgent($params_transfer);
+        if (count($total_transfer) > 0) {
+            $total_payment['total_transfer'] = $total_transfer['total_transfer'];
+            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'];
+        }
 
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách đại lý',
             'total' => [
-                'total_doi_ung' => count($data),
-                'total_transfer' => count($data_agent)
+                'total_number_doi_ung' => count($data),
+                'total_number_transfer' => count($data_agent),
+                'total_payment' => $total_payment,
             ],
             'data' => $mergedData,
         ]);
