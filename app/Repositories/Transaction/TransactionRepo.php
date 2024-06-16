@@ -317,9 +317,9 @@ class TransactionRepo extends BaseRepo
         $total = [
             'price_nop' => $price_nop,
             'price_rut' => $transactions->sum('price_rut'),
-            'price_fee' => $price_fee,
+            'price_fee' => (int)$price_fee,
             'price_transfer' => $price_transfer,
-            'profit' => $transactions->sum('profit'),
+            'profit' => (int)$transactions->sum('profit'),
             'price_repair' => $transactions->sum('price_repair'),
             'total_fee_paid' => $price_fee - $total_fee_paid,
         ];
@@ -406,7 +406,7 @@ class TransactionRepo extends BaseRepo
                     'pos_id' => $pos->id,
                     'date' => $date,
                     'total_price_rut' => $total_price_rut,
-                    'total_payment_cashback' => $total_payment_cashback,
+                    'total_payment_cashback' => (int)$total_payment_cashback,
                     'pos' => [
                         'id' => $pos->id,
                         'name' => $pos->name,
@@ -727,7 +727,7 @@ class TransactionRepo extends BaseRepo
                 'id' => $createdBy->id,
                 'name' => $createdBy->fullname,
                 'total_price_rut' => $total_price_rut,
-                'total_profit' => round($total_profit, 2),
+                'total_profit' => (int)$total_profit,
                 'total_price_transfer' => $total_price_transfer,
                 'user_balance' => $createdBy->balance,
                 'total_mester_transfer' => $total_mester_transfer,
@@ -799,7 +799,7 @@ class TransactionRepo extends BaseRepo
             return [
                 'date' => $formatted_date,
                 'total_price_rut' => $total_price_rut,
-                'total_profit' => round($total_profit, 2)
+                'total_profit' => (int)$total_profit
             ];
         });
 

@@ -638,7 +638,7 @@ class TransactionController extends Controller
 
         $data_month = [
             'san_luong' => $tran_month['san_luong'] + $data_month_agent['san_luong'], // tổng số tiền GD trong tháng
-            'tien_nhan' => $tran_month['tien_nhan'] + $data_month_agent['tien_nhan'], // tổng tiền thực nhận của pos sau khi trừ phí gốc
+            'tien_nhan' => (int)($tran_month['tien_nhan'] + $data_month_agent['tien_nhan']), // tổng tiền thực nhận của pos sau khi trừ phí gốc
             'profit' => (int)($tran_month['profit'] + $data_month_agent['profit']), // tổng lợi nhuận theo GD và lô tiền về
             'tien_chuyen' => $transfer_month['total_transfer'],
         ];
@@ -724,7 +724,7 @@ class TransactionController extends Controller
         // Tính tổng hợp của tất cả các ngày
         $total = [
             'total_price_rut' => array_sum(array_column($result, 'total_price_rut')),
-            'total_profit' => round(array_sum(array_column($result, 'total_profit')), 2)
+            'total_profit' => (int)array_sum(array_column($result, 'total_profit'))
         ];
 
         $final_result = [
