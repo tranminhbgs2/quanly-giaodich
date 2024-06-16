@@ -31,4 +31,9 @@ class BankAccounts extends Model
     {
         return $this->belongsTo(User::class, 'staff_id', 'id');
     }
+
+    public function getBalanceAttribute($value)
+    {
+        return (int) $value;
+    }
 }
