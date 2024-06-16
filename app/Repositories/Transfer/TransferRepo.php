@@ -200,7 +200,7 @@ class TransferRepo extends BaseRepo
         }
 
         $total = [
-            'price' => $query->sum('price'),
+            'price' => (int)$query->sum('price'),
         ];
 
         return $total;

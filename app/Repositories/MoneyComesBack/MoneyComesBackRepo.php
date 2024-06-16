@@ -884,9 +884,9 @@ class MoneyComesBackRepo extends BaseRepo
 
         // Tính tổng của từng trường cần thiết
         $total = [
-            'total_price' => $query->sum('total_price'),
-            'total_payment' => $query->sum('payment'),
-            'total_payment_agent' => $query->sum('payment_agent'),
+            'total_price' => (int)$query->sum('total_price'),
+            'total_payment' => (int)$query->sum('payment'),
+            'total_payment_agent' => (int)$query->sum('payment_agent'),
             'total_profit' => $query->sum('payment') - $query->sum('payment_agent'),
             'total_cash' => 0
         ];

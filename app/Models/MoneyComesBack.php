@@ -74,4 +74,19 @@ class MoneyComesBack extends Model
         }
         return 'Chưa kết toán';
     }
+
+    public function getTotalPriceAttribute()
+    {
+        return (int)$this->attributes['total_price'];
+    }
+
+    public function getPaymentAttribute()
+    {
+        return (int)$this->attributes['payment'];
+    }
+
+    public function getPaymentAgentAttribute()
+    {
+        return (int)$this->attributes['payment_agent'];
+    }
 }
