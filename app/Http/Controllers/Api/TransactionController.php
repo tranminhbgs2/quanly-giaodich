@@ -210,8 +210,10 @@ class TransactionController extends Controller
         }
 
         if ($params['price_fee'] == 0) {
-            $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
+            $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100; // số tiền phí
         }
+        $params['price_fee'] += $params['price_repair'];
+
         $params['profit'] = $params['price_fee'] - ($params['original_fee'] * $params['price_rut'] / 100); // lợi nhuận
 
         if ($params['lo_number'] > 0) {
@@ -393,8 +395,10 @@ class TransactionController extends Controller
             }
 
             if ($params['price_fee'] == 0) {
-                $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
+                $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100; // số tiền phí
             }
+            $params['price_fee'] += $params['price_repair'];
+
             $params['profit'] = $params['price_fee']  - $params['original_fee'] * $params['price_rut'] / 100;
 
 
