@@ -154,6 +154,7 @@ class CustomerRepo extends BaseRepo
         (isset($params['address']) && $params['address']) ? $update['address'] = $params['address'] : null;
 
         (isset($params['status']) && $params['status']) ? $update['status'] = $params['status'] : null;
+        (isset($params['account_type']) && $params['account_type']) ? $update['account_type'] = $params['account_type'] : null;
 
         $user = User::where('id', $id)->update($update);
         if ($user) {

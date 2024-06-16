@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Repositories\User;
 
 use App\Events\ActionLogEvent;
@@ -63,7 +64,7 @@ class UserRepo extends BaseRepo
             }
         }
 
-        if (!empty($insert['account_number']) && !empty($insert['bank_code']) && !empty($insert['account_name'])){
+        if (!empty($insert['account_number']) && !empty($insert['bank_code']) && !empty($insert['account_name'])) {
             return User::create($insert) ? true : false;
         }
 
@@ -211,13 +212,13 @@ class UserRepo extends BaseRepo
         // echo 'a';
         $query = User::where('id', Auth::id());
         $query->with([
-            'permissions' => function($sql){
+            'permissions' => function ($sql) {
                 $sql->select('*');
             }
         ]);
         $result = $query->get();
         if (isset($result[0])) {
-            $permissions =  collect($result[0]->permissions)->map(function ($item){
+            $permissions =  collect($result[0]->permissions)->map(function ($item) {
                 return $item->code;
             })->all();
         } else {
@@ -234,16 +235,16 @@ class UserRepo extends BaseRepo
         // echo 'a';
         $query = User::where('id', $user_id);
         $query->with([
-            'permissions' => function($sql){
+            'permissions' => function ($sql) {
                 $sql->select('*');
             }
         ]);
         $result = $query->get();
         if (isset($result[0])) {
-            $data['permissions'] =  collect($result[0]->permissions)->map(function ($item){
+            $data['permissions'] =  collect($result[0]->permissions)->map(function ($item) {
                 return $item->permission_id;
             })->all();
-            $roles = collect($result[0]->permissions)->map(function ($item){
+            $roles = collect($result[0]->permissions)->map(function ($item) {
                 return $item->role_id;
             })->all();
             $roles = collect($roles)->unique();
@@ -270,7 +271,7 @@ class UserRepo extends BaseRepo
             'actor_id' => auth()->user()->id,
             'username' => auth()->user()->username,
             'action' => 'UPDATE_BANLANCE_ACC_BANK',
-            'description' => $action. ' Cập nhật số tiền cho User ' . $user->username . ' từ ' . $user->balance . ' thành ' . $balance,
+            'description' => $action . ' Cập nhật số tiền cho User ' . $user->username . ' từ ' . $user->balance . ' thành ' . $balance,
             'data_new' => $balance,
             'data_old' => $user->balance,
             'model' => 'User',
@@ -281,5 +282,47 @@ class UserRepo extends BaseRepo
 
         $update = ['balance' => $balance];
         return $user->update($update);
+    }
+
+    public function getUserPermissions($userId)
+    {
+        $user = User::with(['userPermissions.groupRule'])->find($userId);
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $result = [];
+
+        foreach ($user->userPermissions as $position) {
+            $departmentId = $position->groupRule->id;
+            $departmentName = $position->groupRule->name;
+            $function_code = $position->groupRule->code;
+            $path = $position->groupRule->url;
+
+            // Check if department already exists in result
+            if (!isset($result[$departmentId])) {
+                $result[$departmentId] = [
+                    'id' => $departmentId,
+                    'function_code' => $function_code,
+                    'function_name' => $departmentName,
+                    'path' => $path,
+                    'actions' => []
+                ];
+            }
+
+            // Add position action to the department's actions list
+            $result[$departmentId]['actions'][] = [
+                'action_id' => $position->id,
+                'action_name' => $position->name,
+                'action_code' => $position->code,
+                'path' => $position->url
+            ];
+        }
+
+        // Reindex permissions array by removing keys
+        $result = array_values($result);
+
+        return $result;
     }
 }

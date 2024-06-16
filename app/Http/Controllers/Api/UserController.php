@@ -70,6 +70,7 @@ class UserController extends Controller
         $id = Auth::user()->id;
         if ($id) {
             $user = $this->user_repo->getById($id);
+            $permissions = $this->user_repo->getUserPermissions($id);
             $res = [
                 'id' => $user->id,
                 'account_type' => $user->account_type,
@@ -79,7 +80,9 @@ class UserController extends Controller
                 'phone' => $user->phone,
                 'birthday' => $user->birthday,
                 'display_name' => $user->display_name,
-                'address' => $user->address
+                'address' => $user->address,
+                'balance' => $user->balance,
+                'user_permissions' => $permissions,
             ];
 
             return response()->json([
@@ -184,6 +187,7 @@ $params['birthday'] = $birthday;
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
             $params['gender'] = request('gender', "P");
             $params['display_name'] = request('display_name', $params['fullname']);
+            $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
             $params['birthday'] = request('birthday', null);
 // Chuyển đổi định dạng ngày tháng
 $birthday = Carbon::createFromFormat('d/m/Y', $params['birthday'])->format('Y-m-d');

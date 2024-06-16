@@ -12,6 +12,7 @@ use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Models\LogAuth;
 use App\Repositories\Customer\CustomerRepo;
 use App\Repositories\OtpRepo;
+use App\Repositories\User\UserRepo;
 use App\Services\Email\MailerService;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -22,16 +23,17 @@ class AuthController extends Controller
 {
     protected $otpRepository;
     protected $customer_repo;
-
+    protected $user_repo;
     /**
      * Create a new AuthController instance.
      *
      * @return void
      */
-    public function __construct(OtpRepo $otpRepository, CustomerRepo $customerRepo)
+    public function __construct(OtpRepo $otpRepository, CustomerRepo $customerRepo, UserRepo $userRepo)
     {
         $this->otpRepository = $otpRepository;
         $this->customer_repo = $customerRepo;
+        $this->user_repo = $userRepo;
     }
 
     /**
@@ -94,6 +96,7 @@ class AuthController extends Controller
             $user->last_login = Carbon::now();
             $user->save();
 
+            $permissions = $this->user_repo->getUserPermissions($user->id);
             // Cập nhật device_token nếu có
 
             $data = [
@@ -108,6 +111,8 @@ class AuthController extends Controller
                 'display_name' => $user->display_name,
                 'address' => $user->address,
                 'session_id' => $session_id,
+                'balance' => $user->balance,
+                'user_permissions' => $permissions,
             ];
 
             // Data chung
