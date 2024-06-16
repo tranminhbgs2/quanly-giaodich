@@ -60,6 +60,9 @@ class MoneyComesBack extends Model
 
     public function getTimeEndAttribute()
     {
+        if (empty($this->attributes['time_end'])) {
+            return null;
+        }
         //format time_end to Y/m/d H:i:s
         return date('Y/m/d H:i:s', strtotime($this->attributes['time_end']));
     }

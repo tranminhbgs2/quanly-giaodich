@@ -225,7 +225,7 @@ class TransactionController extends Controller
                 return response()->json([
                     'code' => 400,
                     'error' => 'Không thể thêm mới giao dịch cho lô đã kết toán',
-                    'data' => $money_comeb->time_end
+                    'data' => null
                 ]);
             }
         }
