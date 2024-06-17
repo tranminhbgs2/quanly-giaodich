@@ -767,6 +767,7 @@ class TransactionRepo extends BaseRepo
     $topStaff = $staffTransactions->sortByDesc('total_price_rut')->values();
 
     // Calculate total_price_transfer for each staff in the topStaff
+    $topStaffs = [];
     foreach ($topStaff as $staff) {
         $staffId = $staff['id'];
         $total_price_transfer = 0;
@@ -784,9 +785,10 @@ class TransactionRepo extends BaseRepo
         }
 
         $staff['total_price_transfer'] = $total_price_transfer;
+        $topStaffs[] = $staff;
     }
 
-    return $topStaff;
+    return $topStaffs;
 }
 
 
