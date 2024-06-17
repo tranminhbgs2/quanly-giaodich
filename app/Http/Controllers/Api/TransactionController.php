@@ -636,7 +636,7 @@ class TransactionController extends Controller
             'san_luong' => $tran_day['san_luong'] + $data_day_agent['san_luong'], // tổng số tiền GD trong ngày
             'tien_nhan' => $tran_day['tien_nhan'] + $data_day_agent['tien_nhan'], // tổng tiền thực nhận của pos sau khi trừ phí gốc
             'profit' => (int)($tran_day['profit'] + $data_day_agent['profit']), // tổng lợi nhuận theo GD và lô tiền về
-            'tien_chuyen' => $transfer_day['total_transfer'],
+            'tien_chuyen' => (int)$transfer_day['total_transfer'],
         ];
 
         $params['date_from'] = date('Y-m-d H:i:s', strtotime('first day of this month'));
@@ -649,7 +649,7 @@ class TransactionController extends Controller
             'san_luong' => $tran_month['san_luong'] + $data_month_agent['san_luong'], // tổng số tiền GD trong tháng
             'tien_nhan' => (int)($tran_month['tien_nhan'] + $data_month_agent['tien_nhan']), // tổng tiền thực nhận của pos sau khi trừ phí gốc
             'profit' => (int)($tran_month['profit'] + $data_month_agent['profit']), // tổng lợi nhuận theo GD và lô tiền về
-            'tien_chuyen' => $transfer_month['total_transfer'],
+            'tien_chuyen' => (int)$transfer_month['total_transfer'],
         ];
 
         return response()->json([
