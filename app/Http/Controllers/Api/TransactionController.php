@@ -218,7 +218,9 @@ class TransactionController extends Controller
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100; // số tiền phí
         }
         $params['price_fee'] += $params['price_repair'];
-
+        if($params['method'] != 'DAO_HAN'){
+            $params['price_transfer'] -= $params['price_repair'];
+        }
         $params['profit'] = $params['price_fee'] - ($params['original_fee'] * $params['price_rut'] / 100); // lợi nhuận
 
         if ($params['lo_number'] > 0) {
@@ -404,6 +406,9 @@ class TransactionController extends Controller
             }
             $params['price_fee'] += $params['price_repair'];
 
+            if($params['method'] != 'DAO_HAN'){
+                $params['price_transfer'] = $params['price_transfer'] + $tran_old->price_repair - $params['price_repair'];
+            }
             $params['profit'] = $params['price_fee']  - $params['original_fee'] * $params['price_rut'] / 100;
 
 
