@@ -39,6 +39,7 @@ class Transaction extends Model
         'bank_code',
         'type_card',
         'status_fee',
+        'transfer_by',
     ];
 
     /**

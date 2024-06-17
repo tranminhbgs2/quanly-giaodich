@@ -115,7 +115,7 @@ class TransferRepo extends BaseRepo
             }
         }
 
-        $query->orderBy('id', 'DESC');
+        $query->orderBy('time_payment', 'DESC');
 
         return $query->get()->toArray();
     }

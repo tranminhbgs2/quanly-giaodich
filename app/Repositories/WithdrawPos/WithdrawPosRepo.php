@@ -156,7 +156,7 @@ class WithdrawPosRepo extends BaseRepo
 
         // Tính tổng của từng trường cần thiết
         $total = [
-            'price_withdraw' => $query->sum('price_withdraw'),
+            'price_withdraw' => (int)$query->sum('price_withdraw'),
         ];
 
         return $total;

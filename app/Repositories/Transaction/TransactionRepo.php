@@ -99,7 +99,7 @@ class TransactionRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-        
+
         //Kế toán này chỉ xem dc GD Online
         if(auth()->user()->id == 2372){
             if (!empty($method)) {
@@ -313,8 +313,21 @@ class TransactionRepo extends BaseRepo
             $query->where('status', Constants::USER_STATUS_ACTIVE);
         }
 
-        if (!empty($method)) {
-            $query->where('method', $method);
+        //Kế toán này chỉ xem dc GD Online
+        if(auth()->user()->id == 2372){
+            if (!empty($method)) {
+                if ($method != 'ONLINE') {
+                    $query->where('method', $method);
+                } else {
+                    $query->where('method', '!=', 'ONLINE');
+                }
+            } else {
+                $query->where('method', '!=', 'ONLINE');
+            }
+        } else {
+            if (!empty($method)) {
+                $query->where('method', $method);
+            }
         }
 
         // Fetch all transactions to perform conditional sum operations
@@ -322,8 +335,11 @@ class TransactionRepo extends BaseRepo
 
         // Sum the fields based on status_fee condition
         $price_transfer = $transactions->where('status_fee', 3)->sum('price_transfer');
-        $not_price_transfer = $transactions->where('status_fee', '!=', 3)->sum('price_transfer');
+        $not_price_transfer = $transactions->where('status_fee', '!=', 3)->where('method','!=', 'DAO_HAN')->sum('price_transfer');
         $price_nop = $transactions->sum('price_nop');
+
+        // Tổng tiền đã chuyển khoản: tiền đã ck + tiền nộp(nộp vào pos)
+        $price_transfer += $price_nop;
 
         $total_fee_paid = $transactions->sum('fee_paid');
         $price_fee = $transactions->sum('price_fee');
@@ -689,8 +705,7 @@ class TransactionRepo extends BaseRepo
         });
 
         return $total;
-    }
-    public function topStaffTransaction($params)
+    }public function topStaffTransaction($params)
     {
         // Set default date range if not provided
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
@@ -700,7 +715,7 @@ class TransactionRepo extends BaseRepo
         $date_to = Carbon::parse($date_to)->endOfDay();
 
         // Query to get transactions within the date range and group by 'created_by'
-        $transactionsQuery = Transaction::select(['created_by', 'price_rut', 'price_nop', 'profit', 'price_transfer', 'original_fee', 'status_fee'])
+        $transactionsQuery = Transaction::select(['created_by', 'price_rut', 'price_nop', 'profit', 'price_transfer', 'original_fee', 'status_fee', 'method', 'transfer_by'])
             ->with([
                 'createdBy' => function ($query) {
                     $query->select(['id', 'fullname', 'balance']);
@@ -716,28 +731,40 @@ class TransactionRepo extends BaseRepo
             ->get()
             ->groupBy('created_by');
 
+        // Fetch all transfers within the date range to reduce DB queries
+        $allTransfers = Transfer::select('to_agent_id', 'price')
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->where('type_to', Constants::ACCOUNT_TYPE_STAFF)
+            ->whereBetween('created_at', [$date_from, $date_to])
+            ->get()
+            ->groupBy('to_agent_id');
+
         // Map the grouped transactions to calculate the required fields
-        $staffTransactions = $transactions->map(function ($group) use ($date_from, $date_to) {
+        $staffTransactions = $transactions->map(function ($group) use ($allTransfers) {
             $total_price_rut = $group->sum('price_rut');
             $total_profit = $group->sum('profit');
-            $price_nop = $group->sum('price_nop');
 
             $createdBy = $group->first()->createdBy;
-            // Add condition to filter records for price_transfer
-            $price_transfer = $group->filter(function ($transaction) {
-                return $transaction->status_fee == 3;
-            })->sum('price_transfer');
+            $createdById = $createdBy->id;
 
-            $total_price_transfer = $price_transfer + $price_nop;
+            // Initialize total_price_transfer
+            $total_price_transfer = 0;
 
-            // Calculate the total amount transferred to the staff from transferRepo
-            $query_transfer = Transfer::select()
-                ->where('status', Constants::USER_STATUS_ACTIVE)
-                ->where('to_agent_id', $createdBy->id)
-                ->where('type_to', Constants::ACCOUNT_TYPE_STAFF)
-                ->whereBetween('created_at', [$date_from, $date_to])
-                ->get();
-            $total_mester_transfer = $query_transfer->sum('price');
+            // Iterate through transactions to calculate transfer amounts
+            foreach ($group as $transaction) {
+                if ($transaction->transfer_by == $createdById) {
+                    if ($transaction->status_fee == 3 && $transaction->method != 'DAO_HAN') {
+                        $total_price_transfer += $transaction->price_transfer;
+                    } elseif ($transaction->method == 'DAO_HAN') {
+                        $total_price_transfer += $transaction->price_nop;
+                    }
+                }
+            }
+
+            // Calculate the total amount transferred to the staff from the fetched transfers
+            $total_mester_transfer = isset($allTransfers[$createdById])
+                ? $allTransfers[$createdById]->sum('price')
+                : 0;
 
             return [
                 'id' => $createdBy->id,
@@ -757,7 +784,8 @@ class TransactionRepo extends BaseRepo
         return $topStaff;
     }
 
-    public function changeFeePaid($fee_paid, $id, $type = "")
+
+    public function changeFeePaid($fee_paid, $id, $transfer_by,  $type = "")
     {
         $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
         $fee_paid_new = $tran->fee_paid + $fee_paid;
@@ -770,7 +798,7 @@ class TransactionRepo extends BaseRepo
         if ($type == "RESTORE") {
             $status_fee = 2;
         }
-        $update = ['fee_paid' => $fee_paid_new, 'status_fee' => $status_fee];
+        $update = ['fee_paid' => $fee_paid_new, 'status_fee' => $status_fee, 'transfer_by' => $transfer_by];
 
         return $tran->update($update);
     }

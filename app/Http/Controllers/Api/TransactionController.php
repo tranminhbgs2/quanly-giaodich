@@ -248,6 +248,7 @@ class TransactionController extends Controller
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
+                $params['transfer_by'] = auth()->user()->id;
             }
         }
 
@@ -425,6 +426,7 @@ class TransactionController extends Controller
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
+                $params['transfer_by'] = auth()->user()->id;
             }
 
             $resutl = $this->tran_repo->update($params);
@@ -503,7 +505,11 @@ class TransactionController extends Controller
                 //Xử lý trừ tiền của nhân viên
                 if ($params['method'] == 'DAO_HAN') {
                     $user = $this->userRepo->getById(auth()->user()->id);
-                    $user_balance = $user->balance + $tran_old->price_nop - $params['price_nop'];
+                    if($tran_old->method == 'DAO_HAN'){
+                        $user_balance = $user->balance + $tran_old->price_nop - $params['price_nop'];
+                    } else{
+                        $user_balance = $user->balance - $params['price_nop'];
+                    }
                     $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
                     //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
                     $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
@@ -679,10 +685,12 @@ class TransactionController extends Controller
         $id = request('id', null);
         $fee_paid = request('fee_paid', 0);
         $tran_detail = $this->tran_repo->getById($id);
+        $transfer_by = 0;
         if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT') {
             $fee_paid = 0;
+            $transfer_by = auth()->user()->id;
         }
-        $tran = $this->tran_repo->changeFeePaid($fee_paid, $id);
+        $tran = $this->tran_repo->changeFeePaid($fee_paid, $id, $transfer_by);
 
         if ($tran) {
             if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT') {
@@ -777,7 +785,7 @@ class TransactionController extends Controller
             $fee_paid = $tran_fee->fee_paid * (-1);
             $fee_paid_balance = $tran_fee->fee_paid;
         }
-        $tran = $this->tran_repo->changeFeePaid($fee_paid, $id, "RESTORE");
+        $tran = $this->tran_repo->changeFeePaid($fee_paid, $id, 0, "RESTORE");
 
         if ($tran) {
             if ($tran_fee->method == 'ONLINE' || $tran_fee->method == 'RUT_TIEN_MAT') {

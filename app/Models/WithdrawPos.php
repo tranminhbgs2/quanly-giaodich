@@ -42,4 +42,9 @@ class WithdrawPos extends Model
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
+    public function getPriceWithdrawAttribute($value)
+    {
+        return (int) $value;
+    }
+
 }
