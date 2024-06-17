@@ -308,6 +308,7 @@ class TransactionRepo extends BaseRepo
 
         // Sum the fields based on status_fee condition
         $price_transfer = $transactions->where('status_fee', 3)->sum('price_transfer');
+        $not_price_transfer = $transactions->where('status_fee', '!=', 3)->sum('price_transfer');
         $price_nop = $transactions->sum('price_nop');
 
         $total_fee_paid = $transactions->sum('fee_paid');
@@ -319,6 +320,7 @@ class TransactionRepo extends BaseRepo
             'price_rut' => $transactions->sum('price_rut'),
             'price_fee' => (int)$price_fee,
             'price_transfer' => $price_transfer,
+            'not_price_transfer' => $not_price_transfer,
             'profit' => (int)$transactions->sum('profit'),
             'price_repair' => $transactions->sum('price_repair'),
             'total_fee_paid' => $price_fee - $total_fee_paid,
