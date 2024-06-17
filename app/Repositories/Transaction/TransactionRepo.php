@@ -99,8 +99,22 @@ class TransactionRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-        if (!empty($method)) {
-            $query->where('method', $method);
+        
+        //Kế toán này chỉ xem dc GD Online
+        if(auth()->user()->id == 2372){
+            if (!empty($method)) {
+                if ($method != 'ONLINE') {
+                    $query->where('method', $method);
+                } else {
+                    $query->where('method', '!=', 'ONLINE');
+                }
+            } else {
+                $query->where('method', '!=', 'ONLINE');
+            }
+        } else {
+            if (!empty($method)) {
+                $query->where('method', $method);
+            }
         }
 
         if ($is_counting) {
