@@ -389,8 +389,7 @@ class TransferController extends Controller
             $params['id'] = request('id', null);
             $transfer = $this->cate_repo->getById($id);
             if ($id == $params['id']) {
-                $data = $this->cate_repo->delete($params);
-            } else {
+
                 // Return balance to bank account
                 $bank_from = $this->bank_acc_repo->getById($transfer->acc_bank_from_id);
                 $bank_from_balance = $bank_from->balance + $transfer->price;
@@ -399,7 +398,7 @@ class TransferController extends Controller
                 if ($bank_from->type == "AGENCY") {
                     $agent = $this->agent_repo->getById($bank_from->agent_id);
                     $agent_balance = $agent->balance - $transfer->price;
-                    $this->agent_repo->updateBalance($agent->id, $agent_balance, "UPDATE_TRANSFER_" . $params['id']);
+                    $this->agent_repo->updateBalance($agent->id, $agent_balance, "DELETE_TRANSFER_" . $params['id']);
                 } elseif ($bank_from->type == Constants::ACCOUNT_TYPE_STAFF) {
                     $user = $this->userRepo->getById($bank_from->staff_id);
                     $user_balance = $user->balance + $transfer->price;
@@ -418,12 +417,14 @@ class TransferController extends Controller
                     $user_balance = $user->balance - $transfer->price;
                     $this->userRepo->updateBalance($bank_to->staff_id, $user_balance, "DELETE_TRANSFER_" . $params['id']);
                 }
+                $data = $this->cate_repo->delete($params);
 
-                return response()->json([
-                    'code' => 422,
+            } else {
+                $data = [
+                    'code' => 400,
                     'error' => 'ID không hợp lệ',
                     'data' => null
-                ]);
+                ];
             }
         } else {
             $data = [
