@@ -67,6 +67,11 @@ class TransactionController extends Controller
             $params['created_by'] = auth()->user()->id;
         }
 
+        //Kế toán này chỉ xem dc GD Online
+        if(auth()->user()->id == 2373){
+            $params['method'] = 'ONLINE';
+        }
+
         $data = $this->tran_repo->getListing($params, false);
         $total = $this->tran_repo->getListing($params, true);
         $export = $this->tran_repo->getTotal($params); //số liệu báo cáo

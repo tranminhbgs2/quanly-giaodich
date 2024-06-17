@@ -113,6 +113,11 @@ class UpdateRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+
+            //Kế toán này chỉ xem dc GD Online
+            if (auth()->user()->id == 2370 && $this->request->get('method') != "ONLINE") {
+                $validator->errors()->add('check_exist', 'Bạn chỉ được thực hiện giao dịch online');
+            }
             // Check tồn tại
             $dep = Pos::where('id', $this->request->get('pos_id'))->first();
 

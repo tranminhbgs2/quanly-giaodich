@@ -86,6 +86,11 @@ class StoreRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+
+            //Kế toán này chỉ xem dc GD Online
+            if (auth()->user()->id == 2370 && $this->request->get('method') != "ONLINE") {
+                $validator->errors()->add('check_exist', 'Bạn chỉ được thực hiện giao dịch online');
+            }
             //     // Check username
             $dep = Pos::where('id', $this->request->get('pos_id'))->first();
 
@@ -106,7 +111,7 @@ class StoreRequest extends FormRequest
             //         $validator->errors()->add('check_exist', 'Mã nhóm quyền đã tồn tại');
             //     }
             // });
-            if (auth()->user()->account_type == Constants::ACCOUNT_TYPE_STAFF || auth()->user()->account_type == Constants::ACCOUNT_TYPE_ACCOUNTANT){
+            if (auth()->user()->account_type == Constants::ACCOUNT_TYPE_STAFF || auth()->user()->account_type == Constants::ACCOUNT_TYPE_ACCOUNTANT) {
                 if ($this->request->get('method') == "DAO_HAN") {
                     $dep = BankAccounts::where('type', Constants::ACCOUNT_TYPE_STAFF)->where('staff_id', auth()->user()->id)->first();
                     if ($dep) {

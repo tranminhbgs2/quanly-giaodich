@@ -21,4 +21,9 @@ class HoKinhDoanh extends Model
         'balance',
     ];
 
+
+    public function getBalanceAttribute($value)
+    {
+        return (int) $value;
+    }
 }
