@@ -493,6 +493,7 @@ class TransactionRepo extends BaseRepo
             'hkd_id',
             'type_card',
             'bank_code',
+            'transfer_by'
         ];
 
         $insert = [];
@@ -546,7 +547,8 @@ class TransactionRepo extends BaseRepo
             'fee_paid',
             'hkd_id',
             'type_card',
-            'bank_code'
+            'bank_code',
+            'transfer_by'
         ];
 
         $update = [];
