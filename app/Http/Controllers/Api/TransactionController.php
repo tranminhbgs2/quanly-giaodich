@@ -217,10 +217,7 @@ class TransactionController extends Controller
         if ($params['price_fee'] == 0) {
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100; // số tiền phí
         }
-        // $params['price_fee'] += $params['price_repair'];
-        // if($params['method'] != 'DAO_HAN'){
-        //     $params['price_transfer'] -= $params['price_repair'];
-        // }
+
         $params['profit'] = $params['price_fee'] - ($params['original_fee'] * $params['price_rut'] / 100); // lợi nhuận
 
         if ($params['lo_number'] > 0) {
@@ -292,18 +289,18 @@ class TransactionController extends Controller
                     ];
                     $this->money_comes_back_repo->store($money_comes_back);
                 }
+            }
 
-                //Xử lý trừ tiền của nhân viên đối với đáo hạn
-                if ($params['method'] == 'DAO_HAN') {
-                    $user = $this->userRepo->getById(auth()->user()->id);
-                    $user_balance = $user->balance - $params['price_nop'];
-                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATE_TRANSACTION_" . $resutl->id);
-                    //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
-                    $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
-                    if ($bank_account) {
-                        $bank_account->balance -= $params['price_nop'];
-                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "CREATE_TRANSACTION_" . $resutl->id);
-                    }
+            //Xử lý trừ tiền của nhân viên đối với đáo hạn
+            if ($params['method'] == 'DAO_HAN') {
+                $user = $this->userRepo->getById(auth()->user()->id);
+                $user_balance = $user->balance - $params['price_nop'];
+                $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "CREATE_TRANSACTION_" . $resutl->id);
+                //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
+                $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+                if ($bank_account) {
+                    $bank_account->balance -= $params['price_nop'];
+                    $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "CREATE_TRANSACTION_" . $resutl->id);
                 }
             }
             return response()->json([
