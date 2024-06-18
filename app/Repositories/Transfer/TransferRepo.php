@@ -442,16 +442,18 @@ class TransferRepo extends BaseRepo
                 // Handle invalid date format
             }
         }
-        $query->where('type_from', "MASTER");
 
         if ($status > 0) {
             $query->where('status', $status);
         } else {
             $query->where('status', Constants::USER_STATUS_ACTIVE);
         }
-
+        // tính tổng tiền nhận đã được chuyển cho nhân viên
         if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
-            $query->where('created_by', auth()->user()->id);
+            $query->where('to_agent_id', auth()->user()->id);
+            $query->where('type_from', "STAFF");
+        } else {
+            $query->where('type_from', "MASTER");
         }
         // Tính tổng của từng trường cần thiết
         $total = [
