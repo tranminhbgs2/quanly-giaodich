@@ -872,6 +872,7 @@ class MoneyComesBackRepo extends BaseRepo
         }
 
         $query->whereNotNull('agent_id');
+        $query->where('agent_id', '!=', 0);
 
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
@@ -908,6 +909,7 @@ class MoneyComesBackRepo extends BaseRepo
         ])
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
+            ->where('agent_id', '!=', 0)
             ->whereBetween('created_at', [$date_from, $date_to]);
 
         if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
@@ -945,6 +947,7 @@ class MoneyComesBackRepo extends BaseRepo
         $query = MoneyComesBack::select(['total_price', 'fee_agent', 'fee', 'created_at'])
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
+            ->where('agent_id', '!=', 0)
             ->whereBetween('created_at', [$date_from, $date_to])
             ->get()
             ->groupBy(function ($transaction) {
@@ -1002,6 +1005,7 @@ class MoneyComesBackRepo extends BaseRepo
         $transactions = MoneyComesBack::select(['agent_id', 'total_price', 'payment', 'payment_agent', 'fee_agent', 'fee', 'created_at'])
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
+            ->where('agent_id', '!=', 0)
             ->whereBetween('created_at', [$date_from, $date_to])
             ->get()
             ->groupBy('agent_id');
@@ -1091,6 +1095,7 @@ class MoneyComesBackRepo extends BaseRepo
         }
 
         $query->whereNotNull('agent_id');
+        $query->where('agent_id', '!=', 0);
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
         }
