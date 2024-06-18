@@ -815,7 +815,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
-        $query->whereNull('agent_id');
+        // $query->whereNull('agent_id');
 
         if ($status > 0) {
             $query->where('status', $status);
@@ -825,9 +825,9 @@ class MoneyComesBackRepo extends BaseRepo
 
         // Tính tổng của từng trường cần thiết
         $total = [
-            'total_price' => $query->sum('total_price'),
-            'total_payment' => $query->sum('payment'),
-            'total_payment_agent' => $query->sum('payment_agent'),
+            'total_price' => (int)$query->sum('total_price'),
+            'total_payment' => (int)$query->sum('payment'),
+            'total_payment_agent' => (int)$query->sum('payment_agent'),
         ];
 
         return $total;
