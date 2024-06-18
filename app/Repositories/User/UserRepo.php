@@ -270,7 +270,7 @@ class UserRepo extends BaseRepo
         event(new ActionLogEvent([
             'actor_id' => auth()->user()->id,
             'username' => auth()->user()->username,
-            'action' => 'UPDATE_BANLANCE_ACC_BANK',
+            'action' => 'UPDATE_BANLANCE_USER',
             'description' => $action . ' Cập nhật số tiền cho User ' . $user->username . ' từ ' . $user->balance . ' thành ' . $balance,
             'data_new' => $balance,
             'data_old' => $user->balance,

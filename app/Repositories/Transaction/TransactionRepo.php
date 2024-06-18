@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Transaction;
 
+use App\Events\ActionLogEvent;
 use App\Helpers\Constants;
 use App\Models\Transaction;
 use App\Models\Transfer;
@@ -101,7 +102,7 @@ class TransactionRepo extends BaseRepo
 
 
         //Kế toán này chỉ xem dc GD Online
-        if(auth()->user()->id == 2372){
+        if (auth()->user()->id == 2372) {
             if (!empty($method)) {
                 if ($method != 'ONLINE') {
                     $query->where('method', $method);
@@ -314,7 +315,7 @@ class TransactionRepo extends BaseRepo
         }
 
         //Kế toán này chỉ xem dc GD Online
-        if(auth()->user()->id == 2372){
+        if (auth()->user()->id == 2372) {
             if (!empty($method)) {
                 if ($method != 'ONLINE') {
                     $query->where('method', $method);
@@ -335,7 +336,7 @@ class TransactionRepo extends BaseRepo
 
         // Sum the fields based on status_fee condition
         $price_transfer = $transactions->where('status_fee', 3)->sum('price_transfer');
-        $not_price_transfer = $transactions->where('status_fee', '!=', 3)->where('method','!=', 'DAO_HAN')->sum('price_transfer');
+        $not_price_transfer = $transactions->where('status_fee', '!=', 3)->where('method', '!=', 'DAO_HAN')->sum('price_transfer');
         $price_nop = $transactions->sum('price_nop');
 
         // Tổng tiền đã chuyển khoản: tiền đã ck + tiền nộp(nộp vào pos)
@@ -356,7 +357,6 @@ class TransactionRepo extends BaseRepo
             'total_fee_paid' => $price_fee - $total_fee_paid,
         ];
         return $total;
-
     }
 
     /**
@@ -560,9 +560,39 @@ class TransactionRepo extends BaseRepo
                 $update[$field] = $params[$field];
             }
         }
+        $tran = Transaction::where('id', $params['id']);
+        // Lưu log qua event
+        if(isset($update['price_nop']) && $update['price_nop'] != $tran->price_nop){
+            event(new ActionLogEvent([
+                'actor_id' => auth()->user()->id,
+                'username' => auth()->user()->username,
+                'action' => 'UPDATED_TRANSACTION',
+                'description' => 'UPDATED_TRANSACTION_' . $tran->id . ' Cập nhật Transaction ' . $tran->id . ' từ ' . $tran->price_nop . ' thành ' . $update['price_nop'],
+                'data_new' => $update['price_nop'],
+                'data_old' => $tran->price_nop,
+                'model' => 'Transaction',
+                'table' => 'transactions',
+                'record_id' => $tran->id,
+                'ip_address' => request()->ip()
+            ]));
+        }
 
+        if(isset($update['price_transfer']) && $update['price_transfer'] != $tran->price_transfer){
+            event(new ActionLogEvent([
+                'actor_id' => auth()->user()->id,
+                'username' => auth()->user()->username,
+                'action' => 'UPDATED_TRANSACTION',
+                'description' => 'UPDATED_TRANSACTION_' . $tran->id . ' Cập nhật Transaction ' . $tran->id . ' từ ' . $tran->price_transfer . ' thành ' . $update['price_transfer'],
+                'data_new' => $update['price_transfer'],
+                'data_old' => $tran->price_transfer,
+                'model' => 'Transaction',
+                'table' => 'transactions',
+                'record_id' => $tran->id,
+                'ip_address' => request()->ip()
+            ]));
+        }
         // Tìm đối tượng theo ID và cập nhật thông tin nếu tìm thấy
-        return Transaction::where('id', $params['id'])->update($update);
+        return $tran->update($update);
     }
 
 
@@ -709,89 +739,89 @@ class TransactionRepo extends BaseRepo
         return $total;
     }
     public function topStaffTransaction($params)
-{
-    // Set default date range if not provided
-    $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
-    $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
+    {
+        // Set default date range if not provided
+        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
+        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
 
-    $date_from = Carbon::parse($date_from)->startOfDay();
-    $date_to = Carbon::parse($date_to)->endOfDay();
+        $date_from = Carbon::parse($date_from)->startOfDay();
+        $date_to = Carbon::parse($date_to)->endOfDay();
 
-    // Query to get transactions within the date range and group by 'created_by'
-    $transactionsQuery = Transaction::select([
+        // Query to get transactions within the date range and group by 'created_by'
+        $transactionsQuery = Transaction::select([
             'created_by', 'price_rut', 'price_nop', 'profit', 'price_transfer', 'original_fee',
             'status_fee', 'method', 'transfer_by'
         ])
-        ->with([
-            'createdBy' => function ($query) {
-                $query->select(['id', 'fullname', 'balance']);
-            }
-        ])
-        ->where('status', Constants::USER_STATUS_ACTIVE);
+            ->with([
+                'createdBy' => function ($query) {
+                    $query->select(['id', 'fullname', 'balance']);
+                }
+            ])
+            ->where('status', Constants::USER_STATUS_ACTIVE);
 
-    if (isset($params['created_by']) && $params['account_type'] === Constants::ACCOUNT_TYPE_STAFF) {
-        $transactionsQuery->where('created_by', $params['created_by']);
-    }
+        if (isset($params['created_by']) && $params['account_type'] === Constants::ACCOUNT_TYPE_STAFF) {
+            $transactionsQuery->where('created_by', $params['created_by']);
+        }
 
-    $transactions = $transactionsQuery->whereBetween('created_at', [$date_from, $date_to])
-        ->get()
-        ->groupBy('created_by');
+        $transactions = $transactionsQuery->whereBetween('created_at', [$date_from, $date_to])
+            ->get()
+            ->groupBy('created_by');
 
-    // Map the grouped transactions to calculate the required fields
-    $staffTransactions = $transactions->map(function ($group) use ($date_from, $date_to) {
-        $total_price_rut = $group->sum('price_rut');
-        $total_profit = $group->sum('profit');
+        // Map the grouped transactions to calculate the required fields
+        $staffTransactions = $transactions->map(function ($group) use ($date_from, $date_to) {
+            $total_price_rut = $group->sum('price_rut');
+            $total_profit = $group->sum('profit');
 
-        $createdBy = $group->first()->createdBy;
+            $createdBy = $group->first()->createdBy;
 
-        // Calculate the total amount transferred to the staff from transferRepo
-        $query_transfer = Transfer::select('to_agent_id', 'price')
-            ->where('status', Constants::USER_STATUS_ACTIVE)
-            ->where('to_agent_id', $createdBy->id)
-            ->where('type_to', Constants::ACCOUNT_TYPE_STAFF)
-            ->whereBetween('created_at', [$date_from, $date_to])
-            ->get();
-        $total_mester_transfer = $query_transfer->sum('price');
+            // Calculate the total amount transferred to the staff from transferRepo
+            $query_transfer = Transfer::select('to_agent_id', 'price')
+                ->where('status', Constants::USER_STATUS_ACTIVE)
+                ->where('to_agent_id', $createdBy->id)
+                ->where('type_to', Constants::ACCOUNT_TYPE_STAFF)
+                ->whereBetween('created_at', [$date_from, $date_to])
+                ->get();
+            $total_mester_transfer = $query_transfer->sum('price');
 
-        return [
-            'id' => $createdBy->id,
-            'name' => $createdBy->fullname,
-            'total_price_rut' => $total_price_rut,
-            'total_profit' => (int)$total_profit,
-            'total_price_transfer' => 0, // Initialize to 0, will be calculated later
-            'user_balance' => $createdBy->balance,
-            'total_mester_transfer' => $total_mester_transfer,
-            'transactions' => $group->values() // Return the transactions in the group
-        ];
-    });
+            return [
+                'id' => $createdBy->id,
+                'name' => $createdBy->fullname,
+                'total_price_rut' => $total_price_rut,
+                'total_profit' => (int)$total_profit,
+                'total_price_transfer' => 0, // Initialize to 0, will be calculated later
+                'user_balance' => $createdBy->balance,
+                'total_mester_transfer' => $total_mester_transfer,
+                'transactions' => $group->values() // Return the transactions in the group
+            ];
+        });
 
-    // Sort by total price rutted and return all results
-    $topStaff = $staffTransactions->sortByDesc('total_price_rut')->values();
+        // Sort by total price rutted and return all results
+        $topStaff = $staffTransactions->sortByDesc('total_price_rut')->values();
 
-    // Calculate total_price_transfer for each staff in the topStaff
-    $topStaffs = [];
-    foreach ($topStaff as $staff) {
-        $staffId = $staff['id'];
-        $total_price_transfer = 0;
+        // Calculate total_price_transfer for each staff in the topStaff
+        $topStaffs = [];
+        foreach ($topStaff as $staff) {
+            $staffId = $staff['id'];
+            $total_price_transfer = 0;
 
-        foreach ($transactions as $group) {
-            foreach ($group as $transaction) {
-                if ($transaction->transfer_by == $staffId) {
-                    if ($transaction->status_fee == 3 && $transaction->method != 'DAO_HAN') {
-                        $total_price_transfer += $transaction->price_transfer;
-                    } elseif ($transaction->method == 'DAO_HAN') {
-                        $total_price_transfer += $transaction->price_nop;
+            foreach ($transactions as $group) {
+                foreach ($group as $transaction) {
+                    if ($transaction->transfer_by == $staffId) {
+                        if ($transaction->status_fee == 3 && $transaction->method != 'DAO_HAN') {
+                            $total_price_transfer += $transaction->price_transfer;
+                        } elseif ($transaction->method == 'DAO_HAN') {
+                            $total_price_transfer += $transaction->price_nop;
+                        }
                     }
                 }
             }
+
+            $staff['total_price_transfer'] = $total_price_transfer;
+            $topStaffs[] = $staff;
         }
 
-        $staff['total_price_transfer'] = $total_price_transfer;
-        $topStaffs[] = $staff;
+        return $topStaffs;
     }
-
-    return $topStaffs;
-}
 
 
     public function changeFeePaid($fee_paid, $id, $transfer_by,  $type = "")
