@@ -915,7 +915,6 @@ class MoneyComesBackRepo extends BaseRepo
         if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
             $query->where('created_by', auth()->user()->id);
         }
-
         $totals = $query->first();
 
         return [

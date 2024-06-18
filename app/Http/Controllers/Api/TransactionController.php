@@ -676,7 +676,9 @@ class TransactionController extends Controller
             'error' => 'Báo cáo Dashboard',
             'data' => [
                 'day' => $data_day,
-                'month' => $data_month
+                'month' => $data_month,
+                'data_month_agent' => $data_month_agent,
+                'tran_month' => $tran_month,
             ],
         ]);
     }
