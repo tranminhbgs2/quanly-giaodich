@@ -915,12 +915,23 @@ class MoneyComesBackRepo extends BaseRepo
         if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
             $query->where('created_by', auth()->user()->id);
         }
+        // Print the SQL query and bindings
+        $sql = $query->toSql();
+        $bindings = $query->getBindings();
+
+        // Replace placeholders with bindings
+        foreach ($bindings as $binding) {
+            // Ensure the binding is properly escaped for use in a raw SQL query
+            $value = is_numeric($binding) ? $binding : "'" . str_replace("'", "''", $binding) . "'";
+            $sql = preg_replace('/\?/', $value, $sql, 1);
+        }
         $totals = $query->first();
 
         return [
             'san_luong' => (int)$totals->total_price,
             'tien_nhan' => (int)$totals->payment,
-            'profit' => (int)$totals->profit
+            'profit' => (int)$totals->profit,
+            'sql' => $sql
         ];
     }
 
