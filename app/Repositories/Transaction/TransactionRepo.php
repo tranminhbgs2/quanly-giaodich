@@ -339,8 +339,8 @@ class TransactionRepo extends BaseRepo
         $not_price_transfer = $transactions->where('status_fee', '!=', 3)->where('method', '!=', 'DAO_HAN')->sum('price_transfer');
         $price_nop = $transactions->sum('price_nop');
 
-        // Tổng tiền đã chuyển khoản: tiền đã ck + tiền nộp(nộp vào pos)
-        $price_transfer += $price_nop;
+        // Tổng tiền đã chuyển khoản đi: tiền đã ck + tiền nộp(nộp vào pos)
+        $total_price_transfer = $price_transfer + $price_nop;
 
         $total_fee_paid = $transactions->sum('fee_paid');
         $price_fee = $transactions->sum('price_fee');
@@ -355,6 +355,7 @@ class TransactionRepo extends BaseRepo
             'profit' => (int)$transactions->sum('profit'),
             'price_repair' => $transactions->sum('price_repair'),
             'total_fee_paid' => $price_fee - $total_fee_paid,
+            'total_price_transfer' => $total_price_transfer,
         ];
         return $total;
     }
@@ -560,7 +561,7 @@ class TransactionRepo extends BaseRepo
                 $update[$field] = $params[$field];
             }
         }
-        $tran = Transaction::where('id', $params['id']);
+        $tran = Transaction::where('id', $params['id'])->first();
         // Lưu log qua event
         if(isset($update['price_nop']) && $update['price_nop'] != $tran->price_nop){
             event(new ActionLogEvent([
