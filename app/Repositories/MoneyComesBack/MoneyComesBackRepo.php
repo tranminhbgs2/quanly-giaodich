@@ -927,11 +927,16 @@ class MoneyComesBackRepo extends BaseRepo
         }
         $totals = $query->first();
 
+        // Convert the results to integer
+        $total_san_luong = isset($totals->total_price) ? (int)$totals->total_price : 0;
+        $total_tien_nhan = isset($totals->payment) ? (int)$totals->payment : 0;
+        $total_profit = isset($totals->profit) ? (int)$totals->profit : 0;
+
         return [
-            'san_luong' => (int)$totals->total_price,
-            'tien_nhan' => (int)$totals->payment,
-            'profit' => (int)$totals->profit,
-            'sql' => $sql
+            'san_luong' => $total_san_luong,
+            'tien_nhan' => $total_tien_nhan,
+            'profit' => $total_profit,
+            'sql' => $sql,
         ];
     }
 

@@ -77,12 +77,16 @@ class MoneyComesBack extends Model
 
     public function getTotalPriceAttribute()
     {
-        return (int)$this->attributes['total_price'];
+        if (!empty($this->attributes['total_price'])) {
+            return (int)$this->attributes['total_price'];
+        }
     }
 
     public function getPaymentAttribute()
     {
-        return (int)$this->attributes['payment'];
+        if (!empty($this->attributes['payment'])) {
+            return (int)$this->attributes['payment'];
+        }
     }
 
     public function getPaymentAgentAttribute()
