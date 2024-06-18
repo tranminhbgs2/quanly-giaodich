@@ -650,9 +650,7 @@ class TransactionController extends Controller
 
         $params['date_from'] = date('Y-m-d H:i:s', strtotime('first day of this month'));
         $params['date_to'] = date('Y-m-d H:i:s', strtotime('last day of this month'));
-        $params['account_type'] = auth()->user()->account_type;
         $tran_month = $this->tran_repo->ReportDashboard($params);
-        $data_month_agent = $this->money_comes_back_repo->ReportDashboardAgent($params);
         $transfer_month = $this->transfer_repo->getTotalMaster($params);
 
         if(auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM){
@@ -663,6 +661,7 @@ class TransactionController extends Controller
                 'tien_chuyen' => (int)$tran_month['price_nop'] + (int)$tran_month['price_transfer'], // Tiền chuyển và tiền nộp cho KH
             ];
         } else{
+            $data_month_agent = $this->money_comes_back_repo->ReportDashboardAgent($params);
             $data_month = [
                 'san_luong' => $tran_month['san_luong'] + $data_month_agent['san_luong'], // tổng số tiền GD trong tháng
                 'tien_nhan' => (int)($tran_month['tien_nhan'] + $data_month_agent['tien_nhan']), // tổng tiền thực nhận của pos sau khi trừ phí gốc
