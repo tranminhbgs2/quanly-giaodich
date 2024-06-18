@@ -674,6 +674,8 @@ class TransactionController extends Controller
         if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT') {
             $fee_paid = 0;
             $transfer_by = auth()->user()->id;
+        } else {
+            $transfer_by = $tran_detail->transfer_by;
         }
         $tran = $this->tran_repo->changeFeePaid($fee_paid, $id, $transfer_by);
 
