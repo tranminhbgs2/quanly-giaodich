@@ -894,6 +894,7 @@ class MoneyComesBackRepo extends BaseRepo
         ];
         return $total;
     }
+
     public function ReportDashboardAgent($params)
     {
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
@@ -902,11 +903,12 @@ class MoneyComesBackRepo extends BaseRepo
         $date_from = Carbon::parse($date_from)->startOfDay();
         $date_to = Carbon::parse($date_to)->endOfDay();
 
-        $query = MoneyComesBack::select([
-            DB::raw('SUM(total_price) as total_price'),
-            DB::raw('SUM(payment) as payment'),
-            DB::raw('SUM(total_price * (fee_agent - fee) / 100) as profit')
-        ])
+        $query = DB::table('money_comes_back')
+            ->select(
+                DB::raw('SUM(total_price) as total_price'),
+                DB::raw('SUM(payment) as payment'),
+                DB::raw('SUM(total_price * (fee_agent - fee) / 100) as profit')
+            )
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
             ->where('agent_id', '!=', 0)
@@ -915,6 +917,7 @@ class MoneyComesBackRepo extends BaseRepo
         if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
             $query->where('created_by', auth()->user()->id);
         }
+
         // Print the SQL query and bindings
         $sql = $query->toSql();
         $bindings = $query->getBindings();
@@ -925,6 +928,11 @@ class MoneyComesBackRepo extends BaseRepo
             $value = is_numeric($binding) ? $binding : "'" . str_replace("'", "''", $binding) . "'";
             $sql = preg_replace('/\?/', $value, $sql, 1);
         }
+
+        // Debugging: Print SQL query and die
+        // Uncomment the following line to see the generated SQL query
+        // print_r($sql); die;
+
         $totals = $query->first();
 
         // Convert the results to integer
@@ -939,8 +947,6 @@ class MoneyComesBackRepo extends BaseRepo
             'sql' => $sql,
         ];
     }
-
-
 
     public function chartDashboardAgent($params)
     {
