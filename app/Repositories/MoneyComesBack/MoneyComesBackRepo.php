@@ -918,21 +918,6 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('created_by', auth()->user()->id);
         }
 
-        // Print the SQL query and bindings
-        $sql = $query->toSql();
-        $bindings = $query->getBindings();
-
-        // Replace placeholders with bindings
-        foreach ($bindings as $binding) {
-            // Ensure the binding is properly escaped for use in a raw SQL query
-            $value = is_numeric($binding) ? $binding : "'" . str_replace("'", "''", $binding) . "'";
-            $sql = preg_replace('/\?/', $value, $sql, 1);
-        }
-
-        // Debugging: Print SQL query and die
-        // Uncomment the following line to see the generated SQL query
-        // print_r($sql); die;
-
         $totals = $query->first();
 
         // Convert the results to integer
@@ -943,8 +928,7 @@ class MoneyComesBackRepo extends BaseRepo
         return [
             'san_luong' => $total_san_luong,
             'tien_nhan' => $total_tien_nhan,
-            'profit' => $total_profit,
-            'sql' => $sql,
+            'profit' => $total_profit
         ];
     }
 

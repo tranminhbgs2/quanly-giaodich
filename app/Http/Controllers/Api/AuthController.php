@@ -111,7 +111,7 @@ class AuthController extends Controller
                 'display_name' => $user->display_name,
                 'address' => $user->address,
                 'session_id' => $session_id,
-                'balance' => $user->balance,
+                'balance' => (int)$user->balance,
                 'user_permissions' => $permissions,
             ];
 
