@@ -83,6 +83,9 @@ class Transaction extends Model
             case 'ONLINE':
                 $name = 'Online';
                 break;
+            case 'QR_CODE':
+                $name = 'QR Code';
+                break;
         }
         // Định dạng dữ liệu của method tại đây
         return $name; // Ví dụ: chuyển thành chữ hoa

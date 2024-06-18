@@ -239,7 +239,7 @@ class TransactionController extends Controller
         if ($params['lo_number'] <= 0 && $params['pos_id'] == 0) {
             $params['status'] = Constants::USER_STATUS_DRAFT;
         } else {
-            if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
+            if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['price_fee'];
             } else {
@@ -405,7 +405,7 @@ class TransactionController extends Controller
             $params['profit'] = $params['price_fee']  - $params['original_fee'] * $params['price_rut'] / 100;
 
 
-            if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT') {
+            if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['price_fee'];
             } else {
@@ -565,7 +565,7 @@ class TransactionController extends Controller
                 }
 
                 //Xử lý trừ tiền của nhân viên
-                if (($tran->method == 'ONLINE' || $tran->method == 'RUT_TIEN_MAT') && $tran->status_fee == 3) {
+                if (($tran->method == 'ONLINE' || $tran->method == 'RUT_TIEN_MAT' || $tran->method == 'QR_CODE' ) && $tran->status_fee == 3) {
                     //đã xác nhận chuyển tiền thì mới thực hiện trừ cộng lại tiền
                     $user = $this->userRepo->getById(auth()->user()->id);
                     $user_balance = $user->balance + $tran->price_transfer;
@@ -673,7 +673,7 @@ class TransactionController extends Controller
         $fee_paid = request('fee_paid', 0);
         $tran_detail = $this->tran_repo->getById($id);
         $transfer_by = 0;
-        if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT') {
+        if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT' || $tran_detail->method == 'QR_CODE') {
             $fee_paid = 0;
             $transfer_by = auth()->user()->id;
         } else {
@@ -682,7 +682,7 @@ class TransactionController extends Controller
         $tran = $this->tran_repo->changeFeePaid($fee_paid, $id, $transfer_by);
 
         if ($tran) {
-            if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT') {
+            if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT' || $tran_detail->method == 'QR_CODE') {
                 // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
                 $user = $this->userRepo->getById($transfer_by);
                 if($user){
@@ -777,7 +777,7 @@ class TransactionController extends Controller
             $fee_paid_balance = $tran_fee->fee_paid;
         }
         $transfer_by = 0;
-        if ($tran_fee->method == 'ONLINE' || $tran_fee->method == 'RUT_TIEN_MAT') {
+        if ($tran_fee->method == 'ONLINE' || $tran_fee->method == 'RUT_TIEN_MAT' || $tran_fee->method == 'QR_CODE') {
             $transfer_by = 0;
         } else {
             $transfer_by = $tran_fee->transfer_by;
@@ -785,7 +785,7 @@ class TransactionController extends Controller
         $tran = $this->tran_repo->changeFeePaid($fee_paid, $id, $transfer_by, "RESTORE");
 
         if ($tran) {
-            if ($tran_fee->method == 'ONLINE' || $tran_fee->method == 'RUT_TIEN_MAT') {
+            if ($tran_fee->method == 'ONLINE' || $tran_fee->method == 'RUT_TIEN_MAT' || $tran_fee->method == 'QR_CODE') {
                 // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
                 $user = $this->userRepo->getById($tran_fee->transfer_by);
                 if($user){

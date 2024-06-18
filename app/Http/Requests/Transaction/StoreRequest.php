@@ -29,7 +29,7 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         $rule = [
-            'method' => ['required', 'in:DAO_HAN,RUT_TIEN_MAT,ONLINE'],
+            'method' => ['required', 'in:DAO_HAN,RUT_TIEN_MAT,ONLINE,QR_CODE'],
             'category_id' => ['integer', 'min:0'],
             'pos_id' => ['integer', 'min:0'],
             'fee' => ['numeric', 'min:0', 'max:99'],

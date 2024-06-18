@@ -32,7 +32,7 @@ class UpdateRequest extends FormRequest
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
             'bank_card' => ['required'],
-            'method' => ['required', 'in:DAO_HAN,RUT_TIEN_MAT,ONLINE'],
+            'method' => ['required', 'in:DAO_HAN,RUT_TIEN_MAT,ONLINE,QR_CODE'],
             'category_id' => ['required', 'integer', 'min:1'],
             'pos_id' => ['required', 'integer', 'min:1'],
             'fee' => ['required', 'numeric', 'min:0', 'max:99'],

@@ -67,6 +67,11 @@ class SettingController extends Controller
                 'name' => 'Online',
                 'code' => 'ONLINE'
             ],
+            3 => [
+                'id' => 4,
+                'name' => 'QR Code',
+                'code' => 'QR_CODE'
+            ],
         ];
         return response()->json([
             'code' => 200,
