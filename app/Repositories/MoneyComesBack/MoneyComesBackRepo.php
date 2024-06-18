@@ -32,7 +32,7 @@ class MoneyComesBackRepo extends BaseRepo
 
         $query = MoneyComesBack::select()->with([
             'pos' => function ($sql) {
-                $sql->select(['id', 'name']);
+                $sql->select(['id', 'name', 'bank_code']);
             },
             'agency' => function ($sql) {
                 $sql->select(['id', 'name', 'balance']);
@@ -77,7 +77,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('hkd_id', $hkd_id);
         }
 
-        $query->whereNull('agent_id');
+        // $query->whereNull('agent_id');
 
         if ($status > 0) {
             $query->where('status', $status);

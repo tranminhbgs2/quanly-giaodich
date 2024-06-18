@@ -88,10 +88,9 @@ class StoreRequest extends FormRequest
         $validator->after(function ($validator) {
 
             //Kế toán này chỉ xem dc GD Online
-            if (auth()->user()->id == 2370 && $this->request->get('method') != "ONLINE") {
-                $validator->errors()->add('check_exist', 'Bạn chỉ được thực hiện giao dịch online');
+            if (auth()->user()->id == 2370 && !in_array($this->request->get('method'), ['ONLINE', 'QR_CODE'])) {
+                $validator->errors()->add('check_exist', 'Bạn chỉ được thực hiện giao dịch online hoặc qua mã QR');
             }
-            //     // Check username
             $dep = Pos::where('id', $this->request->get('pos_id'))->first();
 
             if ($dep) {

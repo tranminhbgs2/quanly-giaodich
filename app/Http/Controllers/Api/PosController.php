@@ -33,6 +33,7 @@ class PosController extends Controller
     public function getListing(ListingRequest $request)
     {
         $params['keyword'] = request('keyword', null);
+        $params['method'] = request('method', null);
         $params['status'] = request('status', -1);
         $params['hkd_id'] = request('hkd_id', 0);
         $params['page_index'] = request('page_index', 1);
@@ -281,7 +282,9 @@ class PosController extends Controller
 
     public function getAll()
     {
-        $data = $this->pos_repo->getAll();
+        $params['hkd_id'] = request('hkd_id', 0);
+        $params['method'] = request('method', null);
+        $data = $this->pos_repo->getAll($params);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách máy Pos',

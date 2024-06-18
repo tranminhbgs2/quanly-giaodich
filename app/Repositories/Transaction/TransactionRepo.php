@@ -101,16 +101,27 @@ class TransactionRepo extends BaseRepo
         }
 
 
-        //Kế toán này chỉ xem dc GD Online
+        //Kế toán này chỉ xem dc GD POSS
         if (auth()->user()->id == 2372) {
             if (!empty($method)) {
-                if ($method != 'ONLINE') {
+                if ($method != 'ONLINE' && $method != 'QR_CODE') {
                     $query->where('method', $method);
                 } else {
-                    $query->where('method', '!=', 'ONLINE');
+                    $query->whereNotIn('method', ['ONLINE', 'QR_CODE']);
                 }
             } else {
-                $query->where('method', '!=', 'ONLINE');
+                $query->whereNotIn('method', ['ONLINE', 'QR_CODE']);
+            }
+        } elseif(auth()->user()->id == 2373){
+            //Kế toán này chỉ xem dc GD Online
+            if (!empty($method)) {
+                if ($method == 'ONLINE' || $method == 'QR_CODE') {
+                    $query->where('method', $method);
+                } else {
+                    $query->whereIn('method', ['ONLINE', 'QR_CODE']);
+                }
+            } else {
+                $query->whereIn('method', ['ONLINE', 'QR_CODE']);
             }
         } else {
             if (!empty($method)) {
@@ -317,13 +328,24 @@ class TransactionRepo extends BaseRepo
         //Kế toán này chỉ xem dc GD Online
         if (auth()->user()->id == 2372) {
             if (!empty($method)) {
-                if ($method != 'ONLINE') {
+                if ($method != 'ONLINE' && $method != 'QR_CODE') {
                     $query->where('method', $method);
                 } else {
-                    $query->where('method', '!=', 'ONLINE');
+                    $query->whereNotIn('method', ['ONLINE', 'QR_CODE']);
                 }
             } else {
-                $query->where('method', '!=', 'ONLINE');
+                $query->whereNotIn('method', ['ONLINE', 'QR_CODE']);
+            }
+        } elseif(auth()->user()->id == 2373){
+            //Kế toán này chỉ xem dc GD Online
+            if (!empty($method)) {
+                if ($method == 'ONLINE' || $method == 'QR_CODE') {
+                    $query->where('method', $method);
+                } else {
+                    $query->whereIn('method', ['ONLINE', 'QR_CODE']);
+                }
+            } else {
+                $query->whereIn('method', ['ONLINE', 'QR_CODE']);
             }
         } else {
             if (!empty($method)) {

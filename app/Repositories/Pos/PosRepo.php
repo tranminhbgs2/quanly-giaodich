@@ -23,6 +23,7 @@ class PosRepo extends BaseRepo
         $page_size = $params['page_size'] ?? 10;
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
+        $method = $params['method'] ?? null;
         $hkd_id = $params['hkd_id'] ?? 0;
         $created_by = $params['created_by'] ?? 0;
         $account_type = $params['account_type'] ?? Constants::ACCOUNT_TYPE_STAFF;
@@ -60,6 +61,10 @@ class PosRepo extends BaseRepo
             $query->where('status', $status);
         } else {
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        if($method) {
+            $query->where('method', $method);
         }
 
         if ($is_counting) {
@@ -305,9 +310,19 @@ class PosRepo extends BaseRepo
         return Pos::where('id', $id)->update($update);
     }
 
-    public function getAll()
+    public function getAll($params)
     {
-        return Pos::select('id', 'code', 'name', 'fee', 'fee_cashback', 'total_fee', 'bank_code')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+        $hkd_id = $params['hkd_id'] ?? 0;
+        $method = $params['method'] ?? null;
+
+        $query = Pos::select('id', 'hkd_id', 'method', 'code', 'name', 'fee', 'fee_cashback', 'total_fee', 'bank_code')->where('status', Constants::USER_STATUS_ACTIVE);
+        if ($hkd_id > 0) {
+            $query->where('hkd_id', $hkd_id);
+        }
+        if ($method) {
+            $query->where('method', $method);
+        }
+        return $query->get()->toArray();
     }
 
     public function updatePricePos ($price_pos, $id, $action = "")
