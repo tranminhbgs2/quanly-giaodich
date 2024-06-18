@@ -641,6 +641,7 @@ class TransactionController extends Controller
 
         $params['date_from'] = date('Y-m-d H:i:s', strtotime('first day of this month'));
         $params['date_to'] = date('Y-m-d H:i:s', strtotime('last day of this month'));
+        $params['account_type'] = auth()->user()->account_type;
         $tran_month = $this->tran_repo->ReportDashboard($params);
         $data_month_agent = $this->money_comes_back_repo->ReportDashboardAgent($params);
         $transfer_month = $this->transfer_repo->getTotalMaster($params);

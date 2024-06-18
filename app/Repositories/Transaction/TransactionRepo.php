@@ -112,7 +112,7 @@ class TransactionRepo extends BaseRepo
             } else {
                 $query->whereNotIn('method', ['ONLINE', 'QR_CODE']);
             }
-        } elseif(auth()->user()->id == 2373){
+        } elseif (auth()->user()->id == 2373) {
             //Kế toán này chỉ xem dc GD Online
             if (!empty($method)) {
                 if ($method == 'ONLINE' || $method == 'QR_CODE') {
@@ -336,7 +336,7 @@ class TransactionRepo extends BaseRepo
             } else {
                 $query->whereNotIn('method', ['ONLINE', 'QR_CODE']);
             }
-        } elseif(auth()->user()->id == 2373){
+        } elseif (auth()->user()->id == 2373) {
             //Kế toán này chỉ xem dc GD Online
             if (!empty($method)) {
                 if ($method == 'ONLINE' || $method == 'QR_CODE') {
@@ -585,7 +585,7 @@ class TransactionRepo extends BaseRepo
         }
         $tran = Transaction::where('id', $params['id'])->first();
         // Lưu log qua event
-        if(isset($update['price_nop']) && $update['price_nop'] != $tran->price_nop){
+        if (isset($update['price_nop']) && $update['price_nop'] != $tran->price_nop) {
             event(new ActionLogEvent([
                 'actor_id' => auth()->user()->id,
                 'username' => auth()->user()->username,
@@ -600,7 +600,7 @@ class TransactionRepo extends BaseRepo
             ]));
         }
 
-        if(isset($update['price_transfer']) && $update['price_transfer'] != $tran->price_transfer){
+        if (isset($update['price_transfer']) && $update['price_transfer'] != $tran->price_transfer) {
             event(new ActionLogEvent([
                 'actor_id' => auth()->user()->id,
                 'username' => auth()->user()->username,
@@ -745,19 +745,23 @@ class TransactionRepo extends BaseRepo
         $query = Transaction::select()
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->where('created_at', '>=', $date_from)
-            ->where('created_at', '<=', $date_to)
-            ->get();
+            ->where('created_at', '<=', $date_to);
+        if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
+            $query->where('created_by', auth()->user()->id);
+        }
+        $query->get();
 
 
         // Tính tổng của từng trường cần thiết
         $total = [
-            'san_luong' => $query->sum('price_rut'),
-            'profit' => $query->sum('profit')
+            'san_luong' => (int)$query->sum('price_rut'),
+            'profit' => (int)$query->sum('profit')
         ];
         //Tính tiền gốc nhận được theo từng giao dịch sau đó tính tổng bằng = price_rut - price_rut * original_fee / 100
-        $total['tien_nhan'] = $query->sum(function ($transaction) {
-            return $transaction->price_rut - $transaction->price_rut * $transaction->original_fee / 100;
-        });
+        $total['tien_nhan'] = 0;
+        foreach ($query as $transaction) {
+            $total['tien_nhan'] += (int)($transaction->price_rut - $transaction->price_rut * $transaction->original_fee / 100);
+        }
 
         return $total;
     }

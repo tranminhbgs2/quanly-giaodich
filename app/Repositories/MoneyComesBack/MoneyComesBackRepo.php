@@ -13,6 +13,7 @@ use App\Repositories\HoKinhDoanh\HoKinhDoanhRepo;
 use App\Repositories\Pos\PosRepo;
 use App\Repositories\Transfer\TransferRepo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class MoneyComesBackRepo extends BaseRepo
 {
@@ -892,7 +893,6 @@ class MoneyComesBackRepo extends BaseRepo
         ];
         return $total;
     }
-
     public function ReportDashboardAgent($params)
     {
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
@@ -900,26 +900,29 @@ class MoneyComesBackRepo extends BaseRepo
 
         $date_from = Carbon::parse($date_from)->startOfDay();
         $date_to = Carbon::parse($date_to)->endOfDay();
-        $query = MoneyComesBack::select()
+
+        $query = MoneyComesBack::select([
+            DB::raw('SUM(total_price) as total_price'),
+            DB::raw('SUM(payment) as payment'),
+            DB::raw('SUM(total_price * (fee_agent - fee) / 100) as profit')
+        ])
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
-            ->where('created_at', '>=', $date_from)
-            ->where('created_at', '<=', $date_to)
-            ->get();
+            ->whereBetween('created_at', [$date_from, $date_to]);
 
+        if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
+            $query->where('created_by', auth()->user()->id);
+        }
 
-        // Tính tổng của từng trường cần thiết
-        $total = [
-            'san_luong' => $query->sum('total_price'),
-            'tien_nhan' => $query->sum('payment')
+        $totals = $query->first();
+
+        return [
+            'san_luong' => (int)$totals->total_price,
+            'tien_nhan' => (int)$totals->payment,
+            'profit' => (int)$totals->profit
         ];
-        //Tính lợi nhuận
-        $total['profit'] = $query->sum(function ($transaction) {
-            return $transaction->total_price * ($transaction->fee_agent - $transaction->fee) / 100;
-        });
-
-        return $total;
     }
+
 
 
     public function chartDashboardAgent($params)
@@ -987,7 +990,8 @@ class MoneyComesBackRepo extends BaseRepo
         ];
 
         return MoneyComesBack::where('id', $id)->update($update);
-    }public function getTopAgency($params)
+    }
+    public function getTopAgency($params)
     {
         $date_from = Carbon::parse($params['date_from'] ?? Carbon::now()->startOfDay())->startOfDay();
         $date_to = Carbon::parse($params['date_to'] ?? Carbon::now()->endOfDay())->endOfDay();
@@ -1101,5 +1105,4 @@ class MoneyComesBackRepo extends BaseRepo
 
         return $query->get()->toArray();
     }
-
 }

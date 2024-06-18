@@ -69,7 +69,7 @@ class MoneyComesBack extends Model
 
     public function getStatusKetToanAttribute()
     {
-        if (!empty($this->time_end) ) {
+        if (!empty($this->time_end)) {
             return 'Đã kết toán';
         }
         return 'Chưa kết toán';
@@ -87,6 +87,9 @@ class MoneyComesBack extends Model
 
     public function getPaymentAgentAttribute()
     {
-        return (int)$this->attributes['payment_agent'];
+        if (!empty($this->attributes['payment_agent'])) {
+            return (int)$this->attributes['payment_agent'];
+        }
+
     }
 }

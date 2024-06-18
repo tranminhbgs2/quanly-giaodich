@@ -449,9 +449,13 @@ class TransferRepo extends BaseRepo
         } else {
             $query->where('status', Constants::USER_STATUS_ACTIVE);
         }
+
+        if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
+            $query->where('created_by', auth()->user()->id);
+        }
         // Tính tổng của từng trường cần thiết
         $total = [
-            'total_transfer' => $query->sum('price'),
+            'total_transfer' => (int)$query->sum('price'),
         ];
 
         return $total;
