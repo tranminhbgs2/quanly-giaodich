@@ -451,7 +451,7 @@ class TransferRepo extends BaseRepo
         // tính tổng tiền nhận đã được chuyển cho nhân viên
         if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
             $query->where('to_agent_id', auth()->user()->id);
-            $query->where('type_from', "STAFF");
+            $query->where('type_to', "STAFF");
         } else {
             $query->where('type_from', "MASTER");
         }
