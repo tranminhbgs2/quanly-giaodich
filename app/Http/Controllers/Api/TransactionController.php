@@ -496,16 +496,7 @@ class TransactionController extends Controller
                                 'created_by' => auth()->user()->id,
                                 'status' => $money_come->status,
                             ];
-                            $pos = $this->pos_repo->getById($tran_old->pos_id, false);
                             $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, 'UPDATED');
-                        }else {
-
-                            return response()->json([
-                                'code' => 200,
-                                'error' => 'Cập nhật thông tin thành công22'. $time_process,
-                                'data' => $money_come,
-                                'param' => $params
-                            ]);
                         }
                     }
                 }
