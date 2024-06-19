@@ -447,8 +447,10 @@ class TransactionController extends Controller
                                 $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
                             }
                             $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
+                        } else{
+                          $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");  
                         }
-                        $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
+                        
                     } elseif ($tran_old->lo_number != $params['lo_number']) {
                         $money_come_old = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $tran_old->lo_number, 'time_process' => $time_process_old]);
                         $money_come_new = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
@@ -473,8 +475,10 @@ class TransactionController extends Controller
                                 $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
                             }
                             $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
+                        } else {
+                            $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
                         }
-                        $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
+                        
                     } else {
                         $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
 
