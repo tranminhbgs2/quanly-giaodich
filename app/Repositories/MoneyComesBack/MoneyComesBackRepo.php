@@ -406,14 +406,14 @@ class MoneyComesBackRepo extends BaseRepo
             if ($res) {
                 $pos = Pos::where('id', $insert['pos_id'])->first();
                 if ($pos) {
-                    $pos_balance = $pos->price_pos + $insert['payment'];
+                    $pos_balance = $pos->price_pos + ($insert['total_price'] - ($pos->total_fee * $insert['total_price']) / 100);
                     $pos_repo = new PosRepo();
                     $pos_repo->updatePricePos($pos_balance, $pos->id, "CREATE_MONEY_COMES_BACK_" . $res->id);
                 }
                 $hkd_repo = new HoKinhDoanhRepo();
                 $hkd = $hkd_repo->getById($insert['hkd_id']);
                 if ($hkd) {
-                    $hkd_balance = $hkd->balance + ($insert['total_price'] - ($pos->totoal_fee * $insert['total_price']) / 100);
+                    $hkd_balance = $hkd->balance + ($insert['total_price'] - ($pos->total_fee * $insert['total_price']) / 100);
                     $hkd_repo->updateBalance($hkd_balance, $hkd->id, "CREATE_MONEY_COMES_BACK_" . $res->id);
                 }
                 if (isset($insert['agent_id']) && $insert['agent_id'] > 0) {
@@ -468,9 +468,9 @@ class MoneyComesBackRepo extends BaseRepo
                 'actor_id' => auth()->user()->id,
                 'username' => auth()->user()->username,
                 'action' => 'UPDATE_BANLANCE_MONEY_COMES_BACK',
-                'description' => 'Cập nhật số tiền lô tiền về ' . $old_money->lo_number . ' từ ' . $old_money->payment . ' thành ' . $params['payment'],
-                'data_new' => $params['payment'],
-                'data_old' => $old_money->payment,
+                'description' => 'Cập nhật số tiền lô tiền về ' . $old_money->lo_number . ' từ ' . $old_money->total_price . ' thành ' . $params['total_price'],
+                'data_new' => $params['total_price'],
+                'data_old' => $old_money->total_price,
                 'model' => 'MoneyComesBack',
                 'table' => 'money_comes_back',
                 'record_id' => $id,
@@ -592,9 +592,9 @@ class MoneyComesBackRepo extends BaseRepo
                 'actor_id' => auth()->user()->id,
                 'username' => auth()->user()->username,
                 'action' => 'UPDATE_BANLANCE_MONEY_COMES_BACK',
-                'description' => 'Cập nhật số tiền lô tiền về KL ' . $old_money->lo_number . ' từ ' . $old_money->payment . ' thành ' . $params['payment'],
-                'data_new' => $params['payment'],
-                'data_old' => $old_money->payment,
+                'description' => 'Cập nhật số tiền lô tiền về KL ' . $old_money->lo_number . ' từ ' . $old_money->total_price . ' thành ' . $params['total_price'],
+                'data_new' => $params['total_price'],
+                'data_old' => $old_money->total_price,
                 'model' => 'MoneyComesBack',
                 'table' => 'money_comes_back',
                 'record_id' => $id,
@@ -642,8 +642,8 @@ class MoneyComesBackRepo extends BaseRepo
                 if ($moneyComesBack->save()) {
                     // Xóa lô tiền về thì trừ đi tiền pos tồn
                     $pos = Pos::where('id', $moneyComesBack->pos_id)->first();
-                    if ($pos && $pos->price_pos >= $balance_change) {
-                        $pos_balance = $pos->price_pos - $balance_change;
+                    if ($pos ) {
+                        $pos_balance = $pos->price_pos - ($moneyComesBack->total_price - ($pos->total_fee * $moneyComesBack->total_price) / 100);
                         $pos_repo = new PosRepo();
                         $pos_repo->updatePricePos($pos_balance, $pos->id, "DELETE_MONEY_COMES_BACK_" . $id);
                     }
@@ -735,7 +735,6 @@ class MoneyComesBackRepo extends BaseRepo
         $pos_id = isset($params['pos_id']) ? $params['pos_id'] : 0;
         $time_process = isset($params['time_process']) ? $params['time_process'] : null;
         $tran = MoneyComesBack::where('lo_number', $lo_number);
-        
         $tran->where('agent_id', 0);
         $tran->where('pos_id', $pos_id);
         if ($time_process) {
