@@ -583,7 +583,7 @@ class TransactionController extends Controller
                     }
                 }
 
-                if ($tran->fee_paid > 0) {
+                if ($tran->status_fee == 3) {
                     $bank_account = $this->bankAccountRepo->getAccountFee();
                     if ($bank_account) {
                         $bank_account->balance -= $tran->fee_paid;

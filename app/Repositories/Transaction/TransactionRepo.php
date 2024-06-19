@@ -64,7 +64,8 @@ class TransactionRepo extends BaseRepo
         if (!empty($keyword)) {
             $keyword = translateKeyWord($keyword);
             $query->where(function ($sub_sql) use ($keyword) {
-                $sub_sql->where('customer_name', 'LIKE', "%" . $keyword . "%");
+                $sub_sql->where('customer_name', 'LIKE', "%" . $keyword . "%")
+                    ->orwhere('lo_number', 'LIKE', "%" . $keyword . "%");
             });
         }
 
