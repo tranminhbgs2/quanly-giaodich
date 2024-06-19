@@ -61,6 +61,11 @@ class Transaction extends Model
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
 
+    public function transferBy()
+    {
+        return $this->belongsTo(User::class, 'transfer_by', 'id');
+    }
+
     public function pos()
     {
         return $this->belongsTo(Pos::class, 'pos_id', 'id');
@@ -137,6 +142,11 @@ class Transaction extends Model
     }
 
     public function getFeePaidAttribute($value)
+    {
+        return (int) $value;
+    }
+
+    public function getTotalFeeAttribute($value)
     {
         return (int) $value;
     }
