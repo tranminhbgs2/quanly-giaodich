@@ -736,6 +736,7 @@ class MoneyComesBackRepo extends BaseRepo
         $time_process = isset($params['time_process']) ? $params['time_process'] : null;
         $tran = MoneyComesBack::where('lo_number', $lo_number);
         $tran->whereNull('agent_id');
+        $tran->where('agent_id', '!=', 0);
         $tran->where('pos_id', $pos_id);
         if ($time_process) {
             $tran->where('time_process', $time_process);
