@@ -798,57 +798,67 @@ class TransactionRepo extends BaseRepo
         }
 
         $transactions = $transactionsQuery->whereBetween('created_at', [$date_from, $date_to])
-            ->get();
+            ->get()
+            ->groupBy('created_by');
 
-        // Initialize an array to store the transfer amounts for each staff
+        // Initialize an array to store staff information
         $staffs = [];
 
         // Calculate total_price_transfer for each staff
-        foreach ($transactions as $transaction) {
-            $createdBy = $transaction->createdBy;
-            $transferBy = $transaction->transfer_by;
+        foreach ($transactions as $group) {
+            foreach ($group as $transaction) {
+                $createdBy = $transaction->createdBy;
+                $transferBy = $transaction->transferBy;
 
-            // Add or update createdBy in the staffs array
-            if (!isset($staffs[$createdBy->id])) {
-                $staffs[$createdBy->id] = [
-                    'id' => $createdBy->id,
-                    'name' => $createdBy->fullname,
-                    'total_price_rut' => 0,
-                    'total_profit' => 0,
-                    'total_price_transfer' => 0,
-                    'user_balance' => $createdBy->balance,
-                    'total_mester_transfer' => 0
-                ];
-            }
-
-            // Add transaction values to createdBy's totals
-            $staffs[$createdBy->id]['total_price_rut'] += $transaction->price_rut;
-            $staffs[$createdBy->id]['total_profit'] += $transaction->profit;
-
-            // If transferBy exists and is different from createdBy, calculate transfer amounts
-            if ($transferBy && $transferBy != $createdBy->id) {
-                // Add or update transferBy in the staffs array
-                if (!isset($staffs[$transferBy])) {
-                    $staffs[$transferBy] = [
-                        'id' => $transferBy,
-                        'name' => $transaction->transferBy->fullname,
+                // Initialize the staff entry if not exists for createdBy
+                if (!isset($staffs[$createdBy->id])) {
+                    $staffs[$createdBy->id] = [
+                        'id' => $createdBy->id,
+                        'name' => $createdBy->fullname,
                         'total_price_rut' => 0,
                         'total_profit' => 0,
                         'total_price_transfer' => 0,
-                        'user_balance' => $transaction->transferBy->balance,
+                        'user_balance' => $createdBy->balance,
                         'total_mester_transfer' => 0
                     ];
                 }
 
-                // Calculate total_price_transfer for transferBy
-                if ($transaction->status_fee == 3 && $transaction->method != 'DAO_HAN') {
-                    $staffs[$transferBy]['total_price_transfer'] += $transaction->price_transfer;
-                } elseif ($transaction->method == 'DAO_HAN') {
-                    $staffs[$transferBy]['total_price_transfer'] += $transaction->price_nop;
+                // Add transaction values to createdBy's totals
+                $staffs[$createdBy->id]['total_price_rut'] += $transaction->price_rut;
+                $staffs[$createdBy->id]['total_profit'] += $transaction->profit;
+
+                // Check if transferBy exists and is different from createdBy
+                if ($transferBy) {
+                    // Initialize the staff entry if not exists for transferBy
+                    if (!isset($staffs[$transferBy->id])) {
+                        $staffs[$transferBy->id] = [
+                            'id' => $transferBy->id,
+                            'name' => $transferBy->fullname,
+                            'total_price_rut' => 0,
+                            'total_profit' => 0,
+                            'total_price_transfer' => 0,
+                            'user_balance' => $transferBy->balance,
+                            'total_mester_transfer' => 0
+                        ];
+                    }
+
+                    // Calculate total_price_transfer for transferBy
+                    if ($transaction->status_fee == 3 && $transaction->method != 'DAO_HAN') {
+                        $staffs[$transferBy->id]['total_price_transfer'] += $transaction->price_transfer;
+                    } elseif ($transaction->method == 'DAO_HAN') {
+                        $staffs[$transferBy->id]['total_price_transfer'] += $transaction->price_nop;
+                    }
+                } else {
+                    // Calculate total_price_transfer for createdBy
+                    if ($transaction->status_fee == 3 && $transaction->method != 'DAO_HAN') {
+                        $staffs[$createdBy->id]['total_price_transfer'] += $transaction->price_transfer;
+                    } elseif ($transaction->method == 'DAO_HAN') {
+                        $staffs[$createdBy->id]['total_price_transfer'] += $transaction->price_nop;
+                    }
+
                 }
             }
         }
-
         // Calculate the total amount transferred to the staff from transferRepo
         foreach ($staffs as &$staff) {
             $query_transfer = Transfer::select('to_agent_id', 'price')
@@ -859,15 +869,11 @@ class TransactionRepo extends BaseRepo
                 ->get();
             $staff['total_mester_transfer'] = $query_transfer->sum('price');
         }
-
         // Sort by total price rutted and return all results
-        $topStaff = collect($staffs)->sortByDesc('total_price_rut')->values();
+        $topStaff = collect($staffs)->sortByDesc('total_price_rut')->values()->all();
 
         return $topStaff;
     }
-
-
-
 
     public function changeFeePaid($fee_paid, $id, $transfer_by,  $type = "")
     {
