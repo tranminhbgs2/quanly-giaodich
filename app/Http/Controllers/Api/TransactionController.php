@@ -498,6 +498,13 @@ class TransactionController extends Controller
                             ];
                             $pos = $this->pos_repo->getById($tran_old->pos_id, false);
                             $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, 'UPDATED');
+                        }else {
+
+                            return response()->json([
+                                'code' => 200,
+                                'error' => 'Cập nhật thông tin thành công',
+                                'data' => $money_come
+                            ]);
                         }
                     }
                 }
