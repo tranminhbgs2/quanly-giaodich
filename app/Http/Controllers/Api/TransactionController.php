@@ -447,10 +447,9 @@ class TransactionController extends Controller
                                 $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
                             }
                             $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
-                        } else{
-                          $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");  
+                        } else {
+                            $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
                         }
-                        
                     } elseif ($tran_old->lo_number != $params['lo_number']) {
                         $money_come_old = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $tran_old->lo_number, 'time_process' => $time_process_old]);
                         $money_come_new = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
@@ -478,35 +477,19 @@ class TransactionController extends Controller
                         } else {
                             $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
                         }
-                        
                     } else {
                         $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
-                        if ($money_come) {
-                            $total_price = $money_come->total_price + $params['price_rut'] - $tran_old->price_rut;
-                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran_old->price_rut - $tran_old->price_fee);
-                            $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100) - ($tran_old->price_rut - ($params['original_fee'] * $tran_old->price_rut) / 100); // Tính số tiền cộng cho HKD
-                            $money_comes_back = [
-                                'pos_id' => $tran_old->pos_id,
-                                'hkd_id' => $money_come->hkd_id,
-                                'lo_number' => $tran_old->lo_number,
-                                'time_process' => $time_process,
-                                'fee' => $tran_old->original_fee,
-                                'total_price' => $total_price,
-                                'payment' => $payment,
-                                'created_by' => auth()->user()->id,
-                                'status' => $money_come->status,
-                            ];
-                            $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, 'UPDATED');
-                        }
+
+                        $this->CreateMoneyComesBack($money_come, $tran_old, $params, $time_process, "UPDATED");
                     }
                 }
                 $user_balance = 0;
                 //Xử lý trừ tiền của nhân viên
                 if ($params['method'] == 'DAO_HAN') {
                     $user = $this->userRepo->getById(auth()->user()->id);
-                    if($tran_old->method == 'DAO_HAN'){
+                    if ($tran_old->method == 'DAO_HAN') {
                         $user_balance = $user->balance + $tran_old->price_nop - $params['price_nop'];
-                    } else{
+                    } else {
                         $user_balance = $user->balance - $params['price_nop'];
                     }
                     $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
@@ -520,9 +503,7 @@ class TransactionController extends Controller
                 return response()->json([
                     'code' => 200,
                     'error' => 'Cập nhật thông tin thành công',
-                    'data' => $user_balance,
-                    'price_nop' => $params['price_nop'],
-                    'price_nop_old' => $tran_old->price_nop,
+                    'data' => null,
                 ]);
             }
 
@@ -579,7 +560,7 @@ class TransactionController extends Controller
                 }
 
                 //Xử lý trừ tiền của nhân viên
-                if (($tran->method == 'ONLINE' || $tran->method == 'RUT_TIEN_MAT' || $tran->method == 'QR_CODE' ) && $tran->status_fee == 3) {
+                if (($tran->method == 'ONLINE' || $tran->method == 'RUT_TIEN_MAT' || $tran->method == 'QR_CODE') && $tran->status_fee == 3) {
                     //đã xác nhận chuyển tiền thì mới thực hiện trừ cộng lại tiền
                     $user = $this->userRepo->getById(auth()->user()->id);
                     $user_balance = $user->balance + $tran->price_transfer;
@@ -650,14 +631,14 @@ class TransactionController extends Controller
         $tran_day = $this->tran_repo->ReportDashboard([]);
         $transfer_day = $this->transfer_repo->getTotalMaster([]);
 
-        if(auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM){
+        if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
             $data_day = [
                 'san_luong' => $tran_day['san_luong'], // tổng số tiền GD trong ngày
                 'tien_nhan' => (int)$transfer_day['total_transfer'], // Tiền master chuyển khoản
                 'profit' => (int)$tran_day['profit'], // tổng lợi nhuận theo GD và lô tiền về
                 'tien_chuyen' => (int)$tran_day['price_nop'] + (int)$tran_day['price_transfer'], // Tiền chuyển và tiền nộp cho KH
             ];
-        } else{
+        } else {
             $data_day_agent = $this->money_comes_back_repo->ReportDashboardAgent([]);
             $data_day = [
                 'san_luong' => $tran_day['san_luong'] + $data_day_agent['san_luong'], // tổng số tiền GD trong ngày
@@ -673,14 +654,14 @@ class TransactionController extends Controller
         $transfer_month = $this->transfer_repo->getTotalMaster($params);
         $data_month_agent = $this->money_comes_back_repo->ReportDashboardAgent($params);
 
-        if(auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM){
+        if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
             $data_month = [
                 'san_luong' => $tran_month['san_luong'], // tổng số tiền GD trong tháng
                 'tien_nhan' => (int)$transfer_month['total_transfer'], // Tiền master chuyển khoản
                 'profit' => (int)$tran_month['profit'], // tổng lợi nhuận theo GD và lô tiền về
                 'tien_chuyen' => (int)$tran_month['price_nop'] + (int)$tran_month['price_transfer'], // Tiền chuyển và tiền nộp cho KH
             ];
-        } else{
+        } else {
             $data_month = [
                 'san_luong' => $tran_month['san_luong'] + $data_month_agent['san_luong'], // tổng số tiền GD trong tháng
                 'tien_nhan' => (int)($tran_month['tien_nhan'] + $data_month_agent['tien_nhan']), // tổng tiền thực nhận của pos sau khi trừ phí gốc
@@ -719,7 +700,7 @@ class TransactionController extends Controller
             if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT' || $tran_detail->method == 'QR_CODE') {
                 // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
                 $user = $this->userRepo->getById($transfer_by);
-                if($user){
+                if ($user) {
                     $user_balance = $user->balance - $tran_detail->price_transfer;
                     $this->userRepo->updateBalance($transfer_by, $user_balance, "PAYMENT_FEE_TRANSACTION_" . $tran_detail->id);
                 }
@@ -822,7 +803,7 @@ class TransactionController extends Controller
             if ($tran_fee->method == 'ONLINE' || $tran_fee->method == 'RUT_TIEN_MAT' || $tran_fee->method == 'QR_CODE') {
                 // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
                 $user = $this->userRepo->getById($tran_fee->transfer_by);
-                if($user){
+                if ($user) {
                     $user_balance = $user->balance + $tran_fee->price_transfer;
                     $this->userRepo->updateBalance($tran_fee->transfer_by, $user_balance, "RESTORE_FEE_TRANSACTION_" . $tran_fee->id);
                 }
