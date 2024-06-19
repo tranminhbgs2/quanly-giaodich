@@ -40,6 +40,7 @@ class Transaction extends Model
         'type_card',
         'status_fee',
         'transfer_by',
+        'total_fee',
     ];
 
     /**

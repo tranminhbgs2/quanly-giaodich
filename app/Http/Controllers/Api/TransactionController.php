@@ -213,6 +213,9 @@ class TransactionController extends Controller
             $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100; // số tiền phí
         }
 
+        //tổng phí
+        $params['total_fee'] = $params['price_fee'] + $params['price_repair'];
+
         $params['profit'] = $params['price_fee'] - ($params['original_fee'] * $params['price_rut'] / 100); // lợi nhuận
 
         if ($params['lo_number'] > 0) {
@@ -236,7 +239,7 @@ class TransactionController extends Controller
         } else {
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
-                $params['fee_paid'] = $params['price_fee'];
+                $params['fee_paid'] = $params['total_fee'];
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
@@ -397,12 +400,15 @@ class TransactionController extends Controller
             if ($params['price_fee'] == 0) {
                 $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
             }
+            //tổng phí
+            $params['total_fee'] = $params['price_fee'] + $params['price_repair'];
+
             $params['profit'] = $params['price_fee']  - $params['original_fee'] * $params['price_rut'] / 100;
 
 
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
-                $params['fee_paid'] = $params['price_fee'];
+                $params['fee_paid'] = $params['total_price'];
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
