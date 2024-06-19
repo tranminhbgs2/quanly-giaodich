@@ -481,8 +481,24 @@ class TransactionController extends Controller
                         
                     } else {
                         $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
-
-                        $this->CreateMoneyComesBack($money_come, $tran_old, $params, $time_process);
+                        if ($money_come) {
+                            $total_price = $money_come->total_price + $params['price_rut'] - $tran_old->price_rut;
+                            $payment = $money_come->payment + ($params['price_rut'] - $params['price_fee']) - ($tran_old->price_rut - $tran_old->price_fee);
+                            $price_rut = ($params['price_rut'] - ($params['original_fee'] * $params['price_rut']) / 100) - ($tran_old->price_rut - ($params['original_fee'] * $tran_old->price_rut) / 100); // Tính số tiền cộng cho HKD
+                            $money_comes_back = [
+                                'pos_id' => $tran_old->pos_id,
+                                'hkd_id' => $money_come->hkd_id,
+                                'lo_number' => $tran_old->lo_number,
+                                'time_process' => $time_process,
+                                'fee' => $tran_old->original_fee,
+                                'total_price' => $total_price,
+                                'payment' => $payment,
+                                'created_by' => auth()->user()->id,
+                                'status' => $money_come->status,
+                            ];
+                            $pos = $this->pos_repo->getById($tran_old->pos_id, false);
+                            $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, 'UPDATED');
+                        }
                     }
                 }
                 $user_balance = 0;
