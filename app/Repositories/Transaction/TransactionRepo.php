@@ -366,7 +366,7 @@ class TransactionRepo extends BaseRepo
         $total_price_transfer = $price_transfer + $price_nop;
 
         $total_fee_paid = $transactions->sum('fee_paid');
-        $price_fee = $transactions->sum('price_fee');
+        $price_fee = $transactions->sum('total_fee');
 
         // Tính tổng của từng trường cần thiết
         $total = [
