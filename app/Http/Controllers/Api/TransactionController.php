@@ -408,7 +408,7 @@ class TransactionController extends Controller
 
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
-                $params['fee_paid'] = $params['total_price'];
+                $params['fee_paid'] = $params['total_fee'];
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
