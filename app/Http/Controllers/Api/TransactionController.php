@@ -502,8 +502,9 @@ class TransactionController extends Controller
 
                             return response()->json([
                                 'code' => 200,
-                                'error' => 'Cập nhật thông tin thành công',
-                                'data' => $money_come
+                                'error' => 'Cập nhật thông tin thành công22'. $time_process,
+                                'data' => $money_come,
+                                'param' => $params
                             ]);
                         }
                     }
