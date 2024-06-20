@@ -879,7 +879,7 @@ class TransactionRepo extends BaseRepo
     {
         $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
         $fee_paid_new = $tran->fee_paid + $fee_paid;
-        if ($fee_paid_new == $tran->price_fee) {
+        if ($fee_paid_new == $tran->total_fee) {
             $status_fee = 3;
         } else {
             $status_fee = 2;
