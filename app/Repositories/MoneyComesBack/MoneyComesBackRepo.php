@@ -787,6 +787,7 @@ class MoneyComesBackRepo extends BaseRepo
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
         $pos_id = $params['pos_id'] ?? 0;
+        $hkd_id = $params['hkd_id'] ?? 0;
         $agent_id = $params['agent_id'] ?? 0;
 
         $query = MoneyComesBack::select();
@@ -815,6 +816,11 @@ class MoneyComesBackRepo extends BaseRepo
         if ($lo_number > 0) {
             $query->where('lo_number', $lo_number);
         }
+
+        if ($hkd_id > 0) {
+            $query->where('hkd_id', $hkd_id);
+        }
+
 
         // $query->whereNull('agent_id');
 
