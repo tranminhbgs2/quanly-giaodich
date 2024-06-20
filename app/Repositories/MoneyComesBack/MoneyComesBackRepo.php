@@ -95,7 +95,7 @@ class MoneyComesBackRepo extends BaseRepo
             }
         }
 
-        $query->orderBy('lo_number', 'DESC');
+        $query->orderBy('lo_number', 'ASC');
 
         return $query->get()->toArray();
     }
@@ -174,7 +174,7 @@ class MoneyComesBackRepo extends BaseRepo
             }
         }
 
-        $query->orderBy('lo_number', 'DESC');
+        $query->orderBy('lo_number', 'ASC');
 
         return $query->get()->toArray();
     }
