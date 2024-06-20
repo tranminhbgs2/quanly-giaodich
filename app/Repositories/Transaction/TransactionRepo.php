@@ -878,11 +878,15 @@ class TransactionRepo extends BaseRepo
     public function changeFeePaid($fee_paid, $id, $transfer_by,  $type = "")
     {
         $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
-        $fee_paid_new = $tran->fee_paid + $fee_paid;
-        if ($fee_paid_new == $tran->total_fee) {
+        if($tran->fee_paid == $tran->total_fee){
             $status_fee = 3;
-        } else {
-            $status_fee = 2;
+        } elseif{
+            $fee_paid_new = $tran->fee_paid + $fee_paid;
+            if ($fee_paid_new == $tran->total_fee) {
+                $status_fee = 3;
+            } else {
+                $status_fee = 2;
+            }
         }
         //danh cho quy lại các action
         if ($type == "RESTORE") {
