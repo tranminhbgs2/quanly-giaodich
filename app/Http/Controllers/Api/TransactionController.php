@@ -695,14 +695,16 @@ class TransactionController extends Controller
         $tran_detail = $this->tran_repo->getById($id);
         $transfer_by = 0;
         if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT' || $tran_detail->method == 'QR_CODE') {
-            $fee_paid = $tran_detail->total_fee;
+            if($tran_detail->fee_paid != $tran_detail->total_fee){
+                $fee_paid = $tran_detail->total_fee;
+            }
             $transfer_by = auth()->user()->id;
         } else {
             $transfer_by = $tran_detail->transfer_by;
         }
         $tran = $this->tran_repo->changeFeePaid($fee_paid, $id, $transfer_by);
 
-        if ($tran && $tran_detail->total_fee != $tran_detail->fee_paid) {
+        if ($tran) {
             if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT' || $tran_detail->method == 'QR_CODE') {
                 // Đối với GD rút tiền thì xác nhận phí là thực hiện trừ tiền của nhân viên
                 $user = $this->userRepo->getById($transfer_by);
