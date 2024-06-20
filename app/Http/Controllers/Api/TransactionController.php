@@ -695,7 +695,7 @@ class TransactionController extends Controller
         $tran_detail = $this->tran_repo->getById($id);
         $transfer_by = 0;
         if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT' || $tran_detail->method == 'QR_CODE') {
-            $fee_paid = 0;
+            // $fee_paid = 0;
             $transfer_by = auth()->user()->id;
         } else {
             $transfer_by = $tran_detail->transfer_by;
@@ -720,7 +720,9 @@ class TransactionController extends Controller
                 //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
                 $bank_account = $this->bankAccountRepo->getAccountFee();
                 if ($bank_account) {
-                    $bank_account->balance += $fee_paid;
+                    if($tran_detail->method == 'DAO_HAN'){
+                        $bank_account->balance += $fee_paid ;
+                    }
                     $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $id);
                 }
             }
