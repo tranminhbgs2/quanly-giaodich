@@ -151,9 +151,12 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
+
         $query->whereNotNull('agent_id');
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
+        } else {
+            $query->where('agent_id','!=', 0);
         }
 
         if ($status > 0) {
@@ -878,10 +881,11 @@ class MoneyComesBackRepo extends BaseRepo
         }
 
         $query->whereNotNull('agent_id');
-        $query->where('agent_id', '!=', 0);
 
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
+        } else {
+            $query->where('agent_id','!=', 0);
         }
 
         if ($status > 0) {
