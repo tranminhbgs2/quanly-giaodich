@@ -695,7 +695,7 @@ class TransactionController extends Controller
         $tran_detail = $this->tran_repo->getById($id);
         $transfer_by = 0;
         if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT' || $tran_detail->method == 'QR_CODE') {
-            // $fee_paid = 0;
+            $fee_paid = $tran_detail->total_fee;
             $transfer_by = auth()->user()->id;
         } else {
             $transfer_by = $tran_detail->transfer_by;
