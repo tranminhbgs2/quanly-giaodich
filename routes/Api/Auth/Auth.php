@@ -16,6 +16,9 @@ Route::group(['middleware' => ['filter.signed']], function (){
     Route::post('app-register', 'AuthController@appRegister');
     Route::post('reset-password', 'AuthController@resetPassword');
     Route::get('check-web-order', 'AuthController@checkWebOrder');
+    Route::get('sync-user', 'UserController@syncBalance');
+    Route::get('sync-lo-tien-ve', 'MoneyComesBackController@syncMoneyComesBack');
+    Route::get('sync-ho-kinh-doanh', 'HoKinhDoanhController@syncBalance');
 });
 
 Route::group(['middleware' => ['auth.jwt']], function (){

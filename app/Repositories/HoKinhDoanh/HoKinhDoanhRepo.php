@@ -200,7 +200,7 @@ class HoKinhDoanhRepo extends BaseRepo
 
     public function getAll()
     {
-        return HoKinhDoanh::select('id', 'name')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
+        return HoKinhDoanh::select('id', 'name', 'balance')->where('status', Constants::USER_STATUS_ACTIVE)->orderBy('id', 'DESC')->get()->toArray();
     }
 
     public function updateBalance($price_pos, $id, $action = "")
@@ -209,8 +209,8 @@ class HoKinhDoanhRepo extends BaseRepo
         if (isset($price_pos)) {
             // Lưu log qua event
             event(new ActionLogEvent([
-                'actor_id' => auth()->user()->id,
-                'username' => auth()->user()->username,
+                'actor_id' => auth()->user()->id ?? 0,
+                'username' => auth()->user()->username ?? 0,
                 'action' => 'UPDATE_BANLANCE_HKD',
                 'description' => $action . ' Cập nhật số tiền cho HKD ' . $pos->name . ' từ ' . $pos->balance . ' thành ' . $price_pos,
                 'data_new' => $price_pos,

@@ -153,8 +153,8 @@ class PosRepo extends BaseRepo
         if (isset($params['price_pos']) && $params['price_pos'] != $pos->price_pos) {
             // Lưu log qua event
             event(new ActionLogEvent([
-                'actor_id' => auth()->user()->id,
-                'username' => auth()->user()->username,
+                'actor_id' => auth()->user()->id ?? 0,
+                'username' => auth()->user()->username ?? 0,
                 'action' => 'UPDATE_BANLANCE_POS',
                 'description' => 'Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $params['price_pos'],
                 'data_new' => $params['price_pos'],
@@ -331,8 +331,8 @@ class PosRepo extends BaseRepo
         if (isset($price_pos)) {
             // Lưu log qua event
             event(new ActionLogEvent([
-                'actor_id' => auth()->user()->id,
-                'username' => auth()->user()->username,
+                'actor_id' => auth()->user()->id ?? 0,
+                'username' => auth()->user()->username ?? 0,
                 'action' => 'UPDATE_BANLANCE_POS',
                 'description' => $action . ' Cập nhật số tiền cho máy Pos ' . $pos->name . ' từ ' . $pos->price_pos . ' thành ' . $price_pos,
                 'data_new' => $price_pos,

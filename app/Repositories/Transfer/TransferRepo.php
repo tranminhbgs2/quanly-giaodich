@@ -59,9 +59,9 @@ class TransferRepo extends BaseRepo
             $keyword = translateKeyWord($keyword);
             $query->where(function ($sub_sql) use ($keyword) {
                 $sub_sql->where('acc_name_from', 'LIKE', "%" . $keyword . "%")
-                        ->orWhere('acc_name_to', 'LIKE', "%" . $keyword . "%")
-                        ->orWhere('acc_number_from', 'LIKE', "%" . $keyword . "%")
-                        ->orWhere('acc_number_to', 'LIKE', "%" . $keyword . "%");
+                    ->orWhere('acc_name_to', 'LIKE', "%" . $keyword . "%")
+                    ->orWhere('acc_number_from', 'LIKE', "%" . $keyword . "%")
+                    ->orWhere('acc_number_to', 'LIKE', "%" . $keyword . "%");
             });
         }
 
@@ -69,7 +69,7 @@ class TransferRepo extends BaseRepo
         //     $query->where('created_by', $created_by);
         // }
 
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
@@ -152,9 +152,9 @@ class TransferRepo extends BaseRepo
             $keyword = translateKeyWord($keyword);
             $query->where(function ($sub_sql) use ($keyword) {
                 $sub_sql->where('acc_name_from', 'LIKE', "%" . $keyword . "%")
-                        ->orWhere('acc_name_to', 'LIKE', "%" . $keyword . "%")
-                        ->orWhere('acc_number_from', 'LIKE', "%" . $keyword . "%")
-                        ->orWhere('acc_number_to', 'LIKE', "%" . $keyword . "%");
+                    ->orWhere('acc_name_to', 'LIKE', "%" . $keyword . "%")
+                    ->orWhere('acc_number_from', 'LIKE', "%" . $keyword . "%")
+                    ->orWhere('acc_number_to', 'LIKE', "%" . $keyword . "%");
             });
         }
 
@@ -162,7 +162,7 @@ class TransferRepo extends BaseRepo
         //     $query->where('created_by', $created_by);
         // }
 
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)){
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
@@ -500,5 +500,23 @@ class TransferRepo extends BaseRepo
         }
 
         return $query->get()->toArray();
+    }
+
+    public function getBalanceTransferStaff($id, $type = "TO")
+    {
+        // $date_from = Carbon::now()->startOfDay();
+        // $date_to = Carbon::now()->endOfDay();
+        $query_transfer = Transfer::select('to_agent_id', 'price')
+            ->where('status', Constants::USER_STATUS_ACTIVE);
+        if ($type == 'TO') {
+            $query_transfer->where('to_agent_id', $id)
+                ->where('type_to', Constants::ACCOUNT_TYPE_STAFF);
+        }elseif ($type == "FROM") {
+            $query_transfer->where('from_agent_id', $id)
+                ->where('type_from', Constants::ACCOUNT_TYPE_STAFF);
+        }
+        // $query_transfer->whereBetween('created_at', [$date_from, $date_to]);
+        $query_transfer->get();
+        return (int)$query_transfer->sum('price');
     }
 }

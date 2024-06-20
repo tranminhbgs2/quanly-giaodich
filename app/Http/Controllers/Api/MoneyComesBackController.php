@@ -14,19 +14,23 @@ use App\Http\Requests\MoneyComesBack\UpdateRequest;
 use App\Models\Pos;
 use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
 use App\Repositories\Pos\PosRepo;
+use App\Repositories\Transaction\TransactionRepo;
 use App\Repositories\Transfer\TransferRepo;
+use Carbon\Carbon;
 
 class MoneyComesBackController extends Controller
 {
     protected $money_repo;
     protected $pos_repo;
     protected $transfer_repo;
+    protected $transaction_repo;
 
-    public function __construct(MoneyComesBackRepo $moneyRepo, PosRepo $posRepo, TransferRepo $transferRepo)
+    public function __construct(MoneyComesBackRepo $moneyRepo, PosRepo $posRepo, TransferRepo $transferRepo, TransactionRepo $transactionRepo)
     {
         $this->money_repo = $moneyRepo;
         $this->pos_repo = $posRepo;
         $this->transfer_repo = $transferRepo;
+        $this->transaction_repo = $transactionRepo;
     }
 
     /**
@@ -443,6 +447,36 @@ class MoneyComesBackController extends Controller
                 'total_payment' => $total_payment,
             ],
             'data' => $mergedData,
+        ]);
+    }
+
+    public function syncMoneyComesBack()
+    {
+        $time_process = date('Y-m-d');
+        $data = $this->money_repo->getByTimeProcess($time_process);
+        foreach ($data as $item) {
+            $params['id'] = $item['id'];
+            $params['date_from'] = Carbon::now()->startOfDay();
+            $params['date_to'] = Carbon::now()->endOfDay();
+            $params['hkd_id'] = $item['hkd_id'];
+            $params['pos_id'] = $item['pos_id'];
+            $params['lo_number'] = $item['lo_number'];
+            $total_tran = $this->transaction_repo->getPriceLoNumber($params);
+            $update = [];
+            if ($total_tran) {
+                if ($item['total_price'] != $total_tran['price_rut']) {
+                    $update['total_price'] = $total_tran['price_rut'];
+                    $update['payment'] = $total_tran['price_rut'] - $total_tran['price_fee'];
+                }
+            }
+            if (count($update) > 0) {
+                $this->money_repo->updateSync($update, $params['id']);
+            }
+        }
+        return response()->json([
+            'code' => 200,
+            'error' => 'Đồng bộ dữ liệu lô tiền về thành công',
+            'data' => null
         ]);
     }
 

@@ -592,8 +592,8 @@ class TransactionRepo extends BaseRepo
         // Lưu log qua event
         if (isset($update['price_nop']) && $update['price_nop'] != $tran->price_nop) {
             event(new ActionLogEvent([
-                'actor_id' => auth()->user()->id,
-                'username' => auth()->user()->username,
+                'actor_id' => auth()->user()->id ?? 0,
+                'username' => auth()->user()->username ?? 0,
                 'action' => 'UPDATED_TRANSACTION',
                 'description' => 'UPDATED_TRANSACTION_' . $tran->id . ' Cập nhật price_nop Transaction ' . $tran->id . ' từ ' . $tran->price_nop . ' thành ' . $update['price_nop'],
                 'data_new' => $update['price_nop'],
@@ -607,8 +607,8 @@ class TransactionRepo extends BaseRepo
 
         if (isset($update['price_transfer']) && $update['price_transfer'] != $tran->price_transfer) {
             event(new ActionLogEvent([
-                'actor_id' => auth()->user()->id,
-                'username' => auth()->user()->username,
+                'actor_id' => auth()->user()->id ?? 0,
+                'username' => auth()->user()->username ?? 0,
                 'action' => 'UPDATED_TRANSACTION',
                 'description' => 'UPDATED_TRANSACTION_' . $tran->id . ' Cập nhật price_transfer Transaction ' . $tran->id . ' từ ' . $tran->price_transfer . ' thành ' . $update['price_transfer'],
                 'data_new' => $update['price_transfer'],
@@ -981,5 +981,62 @@ class TransactionRepo extends BaseRepo
             }
         }
         return $query->get()->toArray();
+    }
+
+    public function getPriceNop($transfer_by)
+    {
+        $query = Transaction::select('price_nop')
+            ->where('transfer_by', $transfer_by)
+            ->where('method', 'DAO_HAN')
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->get();
+        return $query->sum('price_nop');
+    }
+
+    public function getPriceTransfer($transfer_by)
+    {
+        $query = Transaction::select('price_transfer')
+            ->where('transfer_by', $transfer_by)
+            ->where('status_fee', 3)
+            ->where('method', '!=', 'DAO_HAN')
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->get();
+        return $query->sum('price_transfer');
+    }
+
+    public function getPriceLoNumber($params)
+    {
+        $lo_number = $params['lo_number'] ?? 0;
+        $pos_id = $params['pos_id'] ?? 0;
+        $hkd_id = $params['hkd_id'] ?? 0;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+
+        $query = Transaction::select('price_rut', 'price_fee')
+            ->where('lo_number', $lo_number)
+            ->where('status', Constants::USER_STATUS_ACTIVE);
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+        if ($hkd_id > 0) {
+            $query->where('hkd_id', $hkd_id);
+        }
+
+        if ($date_from && $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('created_at', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+        $query->get();
+        $total = [
+            'price_rut' => (int)$query->sum('price_rut'),
+            'price_fee' => (int)$query->sum('price_fee'),
+        ];
+        return $total;
     }
 }

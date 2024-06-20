@@ -399,4 +399,13 @@ class WithdrawPosRepo extends BaseRepo
 
         return $query->orderBy('id', 'DESC')->get()->toArray();
     }
+
+    public function getTotalByHkd($hkd_id)
+    {
+        $query = WithdrawPos::select()->where('hkd_id', $hkd_id)->where('status', Constants::USER_STATUS_ACTIVE);
+
+        $total = (int)$query->sum('price_withdraw');
+
+        return $total;
+    }
 }

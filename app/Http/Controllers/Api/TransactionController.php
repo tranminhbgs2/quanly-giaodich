@@ -340,7 +340,7 @@ class TransactionController extends Controller
             $params['price_fee'] = floatval(request('price_fee', 0)); // số tiền bù
             $params['price_transfer'] = floatval(request('price_transfer', 0));
             $params['price_repair'] = floatval(request('price_repair', 0));
-            $params['created_by'] = auth()->user()->id;
+            // $params['created_by'] = auth()->user()->id;
             $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
             $params['customer_id'] = request('customer_id', 0);
             $params['lo_number'] = request('lo_number', 0);

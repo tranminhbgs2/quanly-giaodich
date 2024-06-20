@@ -11,7 +11,10 @@ use App\Http\Requests\Customer\GetListingRequest;
 use App\Http\Requests\Customer\StoreRequest;
 use App\Http\Requests\Customer\UpdateRequest;
 use App\Http\Requests\User\ChangeStatusRequest;
+use App\Repositories\BankAccount\BankAccountRepo;
 use App\Repositories\Customer\CustomerRepo;
+use App\Repositories\Transaction\TransactionRepo;
+use App\Repositories\Transfer\TransferRepo;
 use App\Repositories\User\UserRepo;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -144,11 +147,11 @@ class UserController extends Controller
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
         $params['gender'] = request('gender', "P");
         $params['display_name'] = request('display_name', $params['fullname']);
-// Chuyển đổi định dạng ngày tháng
-$birthday = Carbon::createFromFormat('d/m/Y', $params['birthday'])->format('Y-m-d');
+        // Chuyển đổi định dạng ngày tháng
+        $birthday = Carbon::createFromFormat('d/m/Y', $params['birthday'])->format('Y-m-d');
 
-// Gán lại giá trị vào mảng
-$params['birthday'] = $birthday;
+        // Gán lại giá trị vào mảng
+        $params['birthday'] = $birthday;
         $resutl = $this->cus_repo->store($params);
 
         if ($resutl) {
@@ -189,11 +192,11 @@ $params['birthday'] = $birthday;
             $params['display_name'] = request('display_name', $params['fullname']);
             $params['account_type'] = request('account_type', Constants::ACCOUNT_TYPE_STAFF);
             $params['birthday'] = request('birthday', null);
-// Chuyển đổi định dạng ngày tháng
-$birthday = Carbon::createFromFormat('d/m/Y', $params['birthday'])->format('Y-m-d');
+            // Chuyển đổi định dạng ngày tháng
+            $birthday = Carbon::createFromFormat('d/m/Y', $params['birthday'])->format('Y-m-d');
 
-// Gán lại giá trị vào mảng
-$params['birthday'] = $birthday;
+            // Gán lại giá trị vào mảng
+            $params['birthday'] = $birthday;
 
             $action_ids = request('action_ids', []) ?? [];
             $resutl = $this->cus_repo->update($params, $params['id']);
@@ -313,5 +316,38 @@ $params['birthday'] = $birthday;
             'error' => 'Đã có lỗi xảy ra. Bạn vui lòng thử lại sau',
             'data' => null
         ]);
+    }
+
+    public function syncBalance()
+    {
+        //Lấy tổng số tiền đã được chuyển khoản và số tiền đã chuyển khoản đi
+        $transfer = new TransferRepo();
+        $bank_acc = new BankAccountRepo();
+        $tran_repo = new TransactionRepo();
+        $users = $this->user_repo->getAllStaff();
+        $data = [];
+        foreach ($users as $user) {
+            $total_to = $transfer->getBalanceTransferStaff($user['id']);
+            $total_from = $transfer->getBalanceTransferStaff($user['id'], "FROM");
+            $balance = $total_to - $total_from;
+
+            $total_price_nop = $tran_repo->getPriceNop($user['id']);
+            $total_price_transfer = $tran_repo->getPriceTransfer($user['id']);
+            $total_transfer = $total_price_nop + $total_price_transfer;
+            $balance_new = $balance - $total_transfer;
+
+            if ($balance_new != $user['balance']) {
+                $this->user_repo->updateBalance($user['id'], $balance_new, "SYNC_BALANCE_USER");
+                $bank_account = $bank_acc->getAccountStaff($user['id']);
+                if ($bank_account && $bank_account->balance != $balance_new) {
+                    $bank_acc->updateBalance($bank_account->id, $balance_new, "SYNC_BALANCE_BANK_". $bank_account->id);
+                }
+            }
+        }
+            return response()->json([
+                'code' => 200,
+                'error' => 'Đồng bộ số dư nhân viên thành công',
+                'data' => null
+            ]);
     }
 }

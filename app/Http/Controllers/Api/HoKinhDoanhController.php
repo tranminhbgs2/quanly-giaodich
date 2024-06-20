@@ -11,6 +11,8 @@ use App\Http\Requests\HoKinhDoanh\StoreRequest;
 use App\Http\Requests\HoKinhDoanh\UpdateRequest;
 use App\Http\Requests\HoKinhDoanh\ChangeStatusRequest;
 use App\Repositories\HoKinhDoanh\HoKinhDoanhRepo;
+use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
+use App\Repositories\WithdrawPos\WithdrawPosRepo;
 
 class HoKinhDoanhController extends Controller
 {
@@ -213,6 +215,27 @@ class HoKinhDoanhController extends Controller
             'code' => 200,
             'error' => 'Danh sách hộ kinh doanh',
             'data' => $data
+        ]);
+    }
+
+    public function syncBalance()
+    {
+        $money_repo = new MoneyComesBackRepo();
+        $withdraw_repo = new WithdrawPosRepo();
+
+        $hkds = $this->hkd_repo->getAll();
+        foreach ($hkds as $hkd) {
+            $total_money = $money_repo->getTotalPriceByHkd($hkd['id']);
+            $total_money_withdraw = $withdraw_repo->getTotalByHkd($hkd['id']);
+            $balance = $total_money - $total_money_withdraw;
+            if($balance != $hkd['balance']){
+                $this->hkd_repo->updateBalance($balance, $hkd['id'], "SYNC_BALANCE_" . $hkd['id']);
+            }
+        }
+        return response()->json([
+            'code' => 200,
+            'error' => 'Đồng bộ số dư thành công',
+            'data' => null
         ]);
     }
 }

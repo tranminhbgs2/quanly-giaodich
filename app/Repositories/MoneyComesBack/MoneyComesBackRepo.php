@@ -156,7 +156,7 @@ class MoneyComesBackRepo extends BaseRepo
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
         } else {
-            $query->where('agent_id','!=', 0);
+            $query->where('agent_id', '!=', 0);
         }
 
         if ($status > 0) {
@@ -468,8 +468,8 @@ class MoneyComesBackRepo extends BaseRepo
 
             // Lưu log qua event
             event(new ActionLogEvent([
-                'actor_id' => auth()->user()->id,
-                'username' => auth()->user()->username,
+                'actor_id' => auth()->user()->id ?? 0,
+                'username' => auth()->user()->username ?? 0,
                 'action' => 'UPDATE_BANLANCE_MONEY_COMES_BACK',
                 'description' => 'Cập nhật số tiền lô tiền về ' . $old_money->lo_number . ' từ ' . $old_money->total_price . ' thành ' . $params['total_price'],
                 'data_new' => $params['total_price'],
@@ -592,8 +592,8 @@ class MoneyComesBackRepo extends BaseRepo
         if ($res) {
             // Lưu log qua event
             event(new ActionLogEvent([
-                'actor_id' => auth()->user()->id,
-                'username' => auth()->user()->username,
+                'actor_id' => auth()->user()->id ?? 0,
+                'username' => auth()->user()->username ?? 0,
                 'action' => 'UPDATE_BANLANCE_MONEY_COMES_BACK',
                 'description' => 'Cập nhật số tiền lô tiền về KL ' . $old_money->lo_number . ' từ ' . $old_money->total_price . ' thành ' . $params['total_price'],
                 'data_new' => $params['total_price'],
@@ -645,7 +645,7 @@ class MoneyComesBackRepo extends BaseRepo
                 if ($moneyComesBack->save()) {
                     // Xóa lô tiền về thì trừ đi tiền pos tồn
                     $pos = Pos::where('id', $moneyComesBack->pos_id)->first();
-                    if ($pos ) {
+                    if ($pos) {
                         $pos_balance = $pos->price_pos - ($moneyComesBack->total_price - ($pos->total_fee * $moneyComesBack->total_price) / 100);
                         $pos_repo = new PosRepo();
                         $pos_repo->updatePricePos($pos_balance, $pos->id, "DELETE_MONEY_COMES_BACK_" . $id);
@@ -746,6 +746,11 @@ class MoneyComesBackRepo extends BaseRepo
         return $tran->first();
     }
 
+    public function getByTimeProcess($time_process, $with_trashed = false)
+    {
+        $tran = MoneyComesBack::where('time_process', $time_process)->where('agent_id', 0);
+        return $tran->get()->toArray();
+    }
     /**
      * Hàm lấy chi tiết thông tin GD
      *
@@ -885,7 +890,7 @@ class MoneyComesBackRepo extends BaseRepo
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
         } else {
-            $query->where('agent_id','!=', 0);
+            $query->where('agent_id', '!=', 0);
         }
 
         if ($status > 0) {
@@ -1124,5 +1129,60 @@ class MoneyComesBackRepo extends BaseRepo
         $query->orderBy('id', 'DESC');
 
         return $query->get()->toArray();
+    }
+
+    public function updateSync($params, $id)
+    {
+        $fillable = [
+            'total_price',
+            'payment',
+        ];
+
+        $update = [];
+
+        foreach ($fillable as $field) {
+            if (isset($params[$field])) {
+                $update[$field] = $params[$field];
+            }
+        }
+        $old_money = MoneyComesBack::where('id', $id)->first();
+
+        $res = MoneyComesBack::where('id', $id)->update($update);
+        // Lưu log qua event
+        event(new ActionLogEvent([
+            'actor_id' => auth()->user()->id ?? 0,
+            'username' => auth()->user()->username ?? 0,
+            'action' => 'UPDATE_BANLANCE_MONEY_COMES_BACK',
+            'description' => 'SYNC_BALANCE_MONEY lô tiền về ' . $old_money->lo_number . ' từ ' . $old_money->total_price . ' thành ' . $update['total_price'],
+            'data_new' => $update['total_price'],
+            'data_old' => $old_money->total_price,
+            'model' => 'MoneyComesBack',
+            'table' => 'money_comes_back',
+            'record_id' => $id,
+            'ip_address' => request()->ip()
+        ]));
+        return $res ? true : false;
+    }
+
+    public function getTotalPriceByHkd($hkd_id)
+    {
+        // Lấy tất cả các bản ghi theo hkd_id
+        $records = MoneyComesBack::where('hkd_id', $hkd_id)->where('status', '!=', Constants::USER_STATUS_DELETED)->get();
+
+        // Khởi tạo biến tổng số tiền
+        $totalBalance = 0;
+
+        // Lặp qua từng bản ghi để tính tổng tiền
+        foreach ($records as $record) {
+            // Lấy thông tin POS liên quan
+            $pos = Pos::find($record->pos_id);
+            if ($pos) {
+                // Tính toán tổng tiền theo công thức
+                $hkdBalance = $record->total_price - ($pos->total_fee * $record->total_price) / 100;
+                $totalBalance += $hkdBalance;
+            }
+        }
+
+        return $totalBalance;
     }
 }

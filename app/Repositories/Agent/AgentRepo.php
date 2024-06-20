@@ -231,8 +231,8 @@ class AgentRepo extends BaseRepo
         $bank = Agent::where('id', $id)->first();
         // Lưu log qua event
         event(new ActionLogEvent([
-            'actor_id' => auth()->user()->id,
-            'username' => auth()->user()->username,
+            'actor_id' => auth()->user()->id ?? 0,
+            'username' => auth()->user()->username ?? 0,
             'action' => 'UPDATE_BANLANCE_AGENT',
             'description' => $action. ' Cập nhật số tiền cho Đại lý ' . $bank->name . ' từ ' . $bank->balance . ' thành ' . $balance,
             'data_new' => $balance,
