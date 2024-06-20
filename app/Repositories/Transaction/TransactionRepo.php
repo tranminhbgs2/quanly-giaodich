@@ -880,6 +880,7 @@ class TransactionRepo extends BaseRepo
         $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
         if($tran->fee_paid == $tran->total_fee){
             $status_fee = 3;
+            $fee_paid_new = $fee_paid;
         } elseif{
             $fee_paid_new = $tran->fee_paid + $fee_paid;
             if ($fee_paid_new == $tran->total_fee) {
@@ -890,6 +891,7 @@ class TransactionRepo extends BaseRepo
         }
         //danh cho quy lại các action
         if ($type == "RESTORE") {
+            $fee_paid_new = $tran->fee_paid + $fee_paid;
             $status_fee = 2;
         }
         $update = ['fee_paid' => $fee_paid_new, 'status_fee' => $status_fee, 'transfer_by' => $transfer_by];
