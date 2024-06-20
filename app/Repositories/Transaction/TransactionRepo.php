@@ -881,7 +881,7 @@ class TransactionRepo extends BaseRepo
         if($tran->fee_paid == $tran->total_fee){
             $status_fee = 3;
             $fee_paid_new = $fee_paid;
-        } elseif{
+        } else{
             $fee_paid_new = $tran->fee_paid + $fee_paid;
             if ($fee_paid_new == $tran->total_fee) {
                 $status_fee = 3;
