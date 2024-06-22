@@ -240,6 +240,11 @@ class TransactionController extends Controller
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['total_fee'];
+                if($params['method'] == 'ONLINE' || $params['method'] == 'QR_CODE'){
+                    if($params['lo_number'] == 0){
+                        $params['lo_number'] = $params['pos_id'].date('dmy');
+                    }
+                }
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
@@ -409,6 +414,11 @@ class TransactionController extends Controller
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['total_fee'];
+                if($params['method'] == 'ONLINE' || $params['method'] == 'QR_CODE'){
+                    if($params['lo_number'] == 0){
+                        $params['lo_number'] = $params['pos_id'].date('dmy');
+                    }
+                }
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
