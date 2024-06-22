@@ -134,19 +134,11 @@ class UpdateRequest extends FormRequest
             }
             $trans = Transaction::where('id', $this->request->get('id'))->first();
             if ($trans) {
-                if ($trans->method != $this->request->get('method')) {
-                    $validator->errors()->add('check_exist', 'Không thể thay đổi hình thức giao dịch');
-                }
-                // if ($trans->pos_id > 0 && $trans->pos_id != $this->request->get('pos_id')) {
-                //     $validator->errors()->add('check_exist', 'Không thể thay đổi Máy POS');
-                // }
-                // if ($trans->lo_number > 0 && $trans->lo_number != $this->request->get('lo_number')) {
-                //     $validator->errors()->add('check_exist', 'Không thể thay đổi Số Lô');
-                // }
-                if ($trans->status == Constants::USER_STATUS_DELETED) {
+                if ($trans->method == "DAO_HAN" && $trans->method != $this->request->get('method')) {
+                    $validator->errors()->add('check_exist', 'Không thể thay đổi hình thức giao dịch đáo hạn');
+                }elseif ($trans->status == Constants::USER_STATUS_DELETED) {
                     $validator->errors()->add('check_exist', 'Giao dịch khách lẻ đã bị xóa');
-                }
-                if (auth()->user()->account_type == Constants::ACCOUNT_TYPE_STAFF) {
+                }elseif (auth()->user()->account_type == Constants::ACCOUNT_TYPE_STAFF) {
                     if ($this->request->get('method') == "DAO_HAN") {
                         $dep = BankAccounts::where('type', Constants::ACCOUNT_TYPE_STAFF)->where('staff_id', auth()->user()->id)->first();
                         if ($dep) {
@@ -157,7 +149,7 @@ class UpdateRequest extends FormRequest
                             $validator->errors()->add('check_exist', 'Nhân viên chưa thêm tài khoản ngân hàng');
                         }
                     }
-                } else if (auth()->user()->account_type == "SYSTEM") {
+                } elseif (auth()->user()->account_type == "SYSTEM") {
                     $validator->errors()->add('check_exist', 'Chỉ nhân viên thực hiện giao dịch');
                 }
             } else {
