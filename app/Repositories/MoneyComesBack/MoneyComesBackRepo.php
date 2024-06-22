@@ -1042,13 +1042,20 @@ class MoneyComesBackRepo extends BaseRepo
             });
 
             // Get total transfer amount
-            $total_transfer_data = $transferRepo->getTotalAgent([
+            $total_transfer_data_to = $transferRepo->getTotalAgent([
                 'agent_id' => $group->first()->agent_id,
                 'date_from' => $date_from,
-                'date_to' => $date_to
+                'date_to' => $date_to,
+                'type' => 'TO'
+            ]);
+            $total_transfer_data_from = $transferRepo->getTotalAgent([
+                'agent_id' => $group->first()->agent_id,
+                'date_from' => $date_from,
+                'date_to' => $date_to,
+                'type' => 'FROM'
             ]);
 
-            $row_total_transfer = $total_transfer_data['total_transfer'] ?? 0;
+            $row_total_transfer = (int)($total_transfer_data_to['total_transfer'] - $total_transfer_data_from['total_transfer']);
             $total_cash = $total_payment - $row_total_transfer;
 
             $agent = $agents[$group->first()->agent_id];

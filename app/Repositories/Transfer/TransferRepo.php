@@ -388,6 +388,7 @@ class TransferRepo extends BaseRepo
         $date_from = $params['agent_date_from'] ?? null;
         $date_to = $params['agent_date_to'] ?? null;
         $agent_id = $params['agent_id'] ?? 0;
+        $type = $params['type'] ?? "TO";
 
         $query = Transfer::select();
 
@@ -400,7 +401,11 @@ class TransferRepo extends BaseRepo
                 // Handle invalid date format
             }
         }
-        $query->where('type_to', "AGENCY");
+        if($type == "TO"){
+            $query->where('type_to', "AGENCY");
+        } else {
+            $query->where('type_from', "AGENCY");
+        }
 
         if ($agent_id > 0) {
             $query->where('to_agent_id', $agent_id);
