@@ -408,7 +408,11 @@ class TransferRepo extends BaseRepo
         }
 
         if ($agent_id > 0) {
-            $query->where('to_agent_id', $agent_id);
+            if($type == "TO"){
+                $query->where('to_agent_id', $agent_id);
+            } else {
+                $query->where('from_agent_id', $agent_id);
+            }
         }
 
         if ($status > 0) {
