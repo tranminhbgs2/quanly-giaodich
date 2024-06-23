@@ -1170,26 +1170,171 @@ class MoneyComesBackRepo extends BaseRepo
         ]));
         return $res ? true : false;
     }
-
-    public function getTotalPriceByHkd($hkd_id)
+    public function getTotalPriceByHkd($hkd_id, $params = [])
     {
-        // Lấy tất cả các bản ghi theo hkd_id
-        $records = MoneyComesBack::where('hkd_id', $hkd_id)->where('status', '!=', Constants::USER_STATUS_DELETED)->get();
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+
+        // Lấy tất cả các bản ghi theo hkd_id và status
+        $query = MoneyComesBack::where('hkd_id', $hkd_id)
+                                ->where('status', '!=', Constants::USER_STATUS_DELETED);
+
+        // Áp dụng điều kiện ngày tháng nếu có
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('created_at', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+            }
+        }
+
+        // Lấy kết quả của truy vấn
+        $records = $query->get();
 
         // Khởi tạo biến tổng số tiền
         $totalBalance = 0;
 
         // Lặp qua từng bản ghi để tính tổng tiền
         foreach ($records as $record) {
-            // Lấy thông tin POS liên quan
-            $pos = Pos::find($record->pos_id);
-            if ($pos) {
-                // Tính toán tổng tiền theo công thức
-                $hkdBalance = $record->total_price - ($pos->total_fee * $record->total_price) / 100;
-                $totalBalance += $hkdBalance;
-            }
+            // Tính toán tổng tiền theo công thức
+            $hkdBalance = $record->total_price - ($record->fee * $record->total_price) / 100;
+            $totalBalance += $hkdBalance;
         }
 
         return $totalBalance;
+    }
+
+
+    public function getListingAllHkd($params, $is_counting = false, $is_agent = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $lo_number = $params['lo_number'] ?? 0;
+        $status = $params['status'] ?? -1;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $pos_id = $params['pos_id'] ?? 0;
+        $hkd_id = $params['hkd_id'] ?? 0;
+        $agent_id = $params['agent_id'] ?? 0;
+
+        $query = MoneyComesBack::select()->with([
+            'pos' => function ($sql) {
+                $sql->select(['id', 'name', 'bank_code']);
+            },
+            'agency' => function ($sql) {
+                $sql->select(['id', 'name', 'balance']);
+            },
+            'hkd' => function ($sql) {
+                $sql->select(['id', 'name', 'balance']);
+            }
+        ]);
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('created_at', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        if ($hkd_id > 0) {
+            $query->where('hkd_id', $hkd_id);
+        }
+
+        if ($agent_id > 0) {
+            $query->where('agent_id', $agent_id);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        $query->orderBy('created_at', 'DESC');
+        $results = $query->get()->groupBy(function($date) {
+            return Carbon::parse($date->created_at)->format('Y-m-d'); // Group by date
+        });
+
+        return $results->toArray();
+    }
+    public function getTotalHkd($params, $is_counting = false, $is_agent = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $lo_number = $params['lo_number'] ?? 0;
+        $status = $params['status'] ?? -1;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $pos_id = $params['pos_id'] ?? 0;
+        $agent_id = $params['agent_id'] ?? 0;
+        $hkd_id = $params['hkd_id'] ?? 0;
+
+        $query = MoneyComesBack::select();
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+
+        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_end', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        if ($pos_id > 0) {
+            $query->where('pos_id', $pos_id);
+        }
+
+        if ($lo_number > 0) {
+            $query->where('lo_number', $lo_number);
+        }
+
+        if ($hkd_id > 0) {
+            $query->where('hkd_id', $hkd_id);
+        }
+
+        if ($agent_id > 0) {
+            $query->where('agent_id', $agent_id);
+        } else {
+            $query->where('agent_id', '!=', 0);
+        }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        // Tính tổng của từng trường cần thiết
+        $total = [
+            'total_price' => (int)$query->sum('total_price'),
+            'total_payment' => (int)$query->sum('payment'),
+            'total_cash' => 0
+        ];
+        return $total;
     }
 }

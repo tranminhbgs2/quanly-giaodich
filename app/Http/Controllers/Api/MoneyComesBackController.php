@@ -16,6 +16,7 @@ use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
 use App\Repositories\Pos\PosRepo;
 use App\Repositories\Transaction\TransactionRepo;
 use App\Repositories\Transfer\TransferRepo;
+use App\Repositories\WithdrawPos\WithdrawPosRepo;
 use Carbon\Carbon;
 
 class MoneyComesBackController extends Controller
@@ -24,13 +25,15 @@ class MoneyComesBackController extends Controller
     protected $pos_repo;
     protected $transfer_repo;
     protected $transaction_repo;
+    protected $withdrawPosRepo;
 
-    public function __construct(MoneyComesBackRepo $moneyRepo, PosRepo $posRepo, TransferRepo $transferRepo, TransactionRepo $transactionRepo)
+    public function __construct(MoneyComesBackRepo $moneyRepo, PosRepo $posRepo, TransferRepo $transferRepo, TransactionRepo $transactionRepo, WithdrawPosRepo $withdrawPosRepo)
     {
         $this->money_repo = $moneyRepo;
         $this->pos_repo = $posRepo;
         $this->transfer_repo = $transferRepo;
         $this->transaction_repo = $transactionRepo;
+        $this->withdrawPosRepo = $withdrawPosRepo;
     }
 
     /**
@@ -450,6 +453,50 @@ class MoneyComesBackController extends Controller
         ]);
     }
 
+    public function getAllHKd()
+    {
+        $params['keyword'] = request('keyword', null);
+        $params['status'] = request('status', -1);
+        $params['lo_number'] = request('lo_number', 0);
+        $params['date_from'] = request('date_from', null);
+        $params['date_to'] = request('date_to', null);
+        $params['pos_id'] = request('pos_id', 0);
+        $params['agent_id'] = request('agent_id', 0);
+        $params['hkd_id'] = request('hkd_id', 0);
+
+        $params['date_from'] = str_replace('/', '-', $params['date_from']);
+        $params['date_to'] = str_replace('/', '-', $params['date_to']);
+
+        $data = $this->money_repo->getListingAllHkd($params);
+        $data_hkd = $this->withdrawPosRepo->getListByHkd($params);
+
+        // Merge $data and $data_agent
+        $mergedData = $this->mergeDataArraysHkd($data, $data_hkd);
+        $params_transfer['date_from'] = $params['date_from'];
+        $params_transfer['date_to'] = $params['date_to'];
+        $params_transfer['hkd_id'] = $params['hkd_id'];
+
+        $total_withdraw = $this->withdrawPosRepo->getTotalByHkd($params['hkd_id'], $params_transfer);
+        $total_money = $this->money_repo->getTotalPriceByHkd($params['hkd_id'], $params_transfer);
+        $total_payment = $this->money_repo->getTotalHkd($params_transfer);
+        if ($total_withdraw > 0) {
+            $total_payment['total_withdraw_pos'] = (int)$total_withdraw;
+            $total_payment['total_cash'] = (int)$total_money - (int)$total_withdraw;
+            $total_payment['total_money'] = (int)$total_money;
+        }
+
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách đại lý',
+            'total' => [
+                'total_number_doi_ung' => count($data),
+                'total_number_withdraw' => count($data_hkd),
+                'total_payment' => $total_payment,
+            ],
+            'data' => $mergedData,
+        ]);
+    }
+
     public function syncMoneyComesBack()
     {
         $time_process = date('Y-m-d');
@@ -525,5 +572,78 @@ class MoneyComesBackController extends Controller
         }
 
         return $merged;
+    }
+
+    /**
+     * Merge two arrays into one with the length of the longest array
+     *
+     * @param array $data
+     * @param array $data_hkd
+     * @return array
+     */
+    private function mergeDataArraysHkd(array $groupedMoneyComesBack, array $groupedWithdrawPos)
+    {
+
+        $mergedResults = [];
+        $allDates = array_unique(array_merge(array_keys($groupedMoneyComesBack), array_keys($groupedWithdrawPos)));
+        sort($allDates); // Sort the dates to ensure order
+
+        foreach ($allDates as $date) {
+            $mergedResults[$date] = [];
+
+            // Get items for this date from MoneyComesBack
+            $moneyComesBackItems = $groupedMoneyComesBack[$date] ?? [];
+
+            // Get items for this date from WithdrawPos
+            $withdrawPosItems = $groupedWithdrawPos[$date] ?? [];
+
+            // Determine the length of the longest array for this date
+            $maxLength = max(count($moneyComesBackItems), count($withdrawPosItems));
+
+            for ($i = 0; $i < $maxLength; $i++) {
+                $mergedItem = [];
+
+                // If the $moneyComesBackItems array has an item at this index, merge it
+                $mergedItem['money_comes_back'] = $moneyComesBackItems[$i] ?? null;
+
+                // If the $withdrawPosItems array has an item at this index, merge it
+                if (isset($withdrawPosItems[$i])) {
+                    $mergedItem['withdraw'] = [
+                        'id' => $withdrawPosItems[$i]['id'],
+                        'price_withdraw' => $withdrawPosItems[$i]['price_withdraw'],
+                        'time_withdraw' => $withdrawPosItems[$i]['time_withdraw'],
+                        'hkd_id' => $withdrawPosItems[$i]['hkd_id'],
+                    ];
+                } else {
+                    $mergedItem['withdraw'] = null;
+                }
+
+                $mergedResults[$date][] = $mergedItem;
+            }
+        }
+
+        return $this->flattenMergedResults($mergedResults);
+    }
+    /**
+     * Flatten the nested arrays into a single array
+     *
+     * @param array $mergedResults
+     * @return array
+     */
+    private function flattenMergedResults(array $mergedResults)
+    {
+        $flattenedResults = [];
+
+        foreach ($mergedResults as $date => $items) {
+            foreach ($items as $item) {
+                $flattenedResults[] = [
+                    'date' => $date,
+                    'money_comes_back' => $item['money_comes_back'],
+                    'withdraw' => $item['withdraw'],
+                ];
+            }
+        }
+
+        return $flattenedResults;
     }
 }
