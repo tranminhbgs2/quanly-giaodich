@@ -1317,6 +1317,8 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('hkd_id', $hkd_id);
         }
 
+        $query->whereNotNull('agent_id');
+        $query->where('agent_id', '!=', 0);
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
         } else {
