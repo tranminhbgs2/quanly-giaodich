@@ -479,11 +479,10 @@ class MoneyComesBackController extends Controller
         $total_withdraw_fill = $this->withdrawPosRepo->getTotalByHkd($params['hkd_id'], $params_transfer);
         $total_money = $this->money_repo->getTotalPriceByHkd($params['hkd_id'], $params_transfer);
         $total_payment = $this->money_repo->getTotalHkd($params_transfer);
-        if ($total_withdraw > 0) {
-            $total_payment['total_withdraw_pos'] = (int)$total_withdraw_fill; // tiền rút pos theo lọc ngày
-            $total_payment['total_cash'] = (int)$total_money - (int)$total_withdraw; // tiền tồn pos thực tế
-            $total_payment['total_money'] = (int)$total_money; // tổng tiền thành tiền từ trước đến nay
-        }
+
+        $total_payment['total_withdraw_pos'] = (int)$total_withdraw_fill; // tiền rút pos theo lọc ngày
+        $total_payment['total_cash'] = (int)$total_money - (int)$total_withdraw; // tiền tồn pos thực tế
+        $total_payment['total_money'] = (int)$total_money; // tổng tiền thành tiền từ trước đến nay
 
         return response()->json([
             'code' => 200,
