@@ -49,7 +49,7 @@ class PosRepo extends BaseRepo
         //     $query->where('created_by', $created_by);
         // }
 
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             $query->whereBetween('created_at', [$date_from, $date_to]);
         }
 

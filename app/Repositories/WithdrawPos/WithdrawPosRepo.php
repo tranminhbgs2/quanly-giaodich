@@ -59,7 +59,7 @@ class WithdrawPosRepo extends BaseRepo
         //     $query->where('created_by', $created_by);
         // }
 
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
@@ -406,7 +406,7 @@ class WithdrawPosRepo extends BaseRepo
         $date_to = $params['date_to'] ?? null;
         $query = WithdrawPos::select()->where('hkd_id', $hkd_id)->where('status', Constants::USER_STATUS_ACTIVE);
 
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
@@ -431,7 +431,7 @@ class WithdrawPosRepo extends BaseRepo
             ->where('status', Constants::USER_STATUS_ACTIVE);
 
         // Áp dụng điều kiện ngày tháng nếu có
-        // if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+        // if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
         //     try {
         //         $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
         //         $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();

@@ -466,7 +466,6 @@ class MoneyComesBackController extends Controller
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
-
         $data = $this->money_repo->getListingAllHkd($params);
         $data_hkd = $this->withdrawPosRepo->getListByHkd($params);
 

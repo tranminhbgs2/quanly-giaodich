@@ -69,7 +69,7 @@ class TransferRepo extends BaseRepo
         //     $query->where('created_by', $created_by);
         // }
 
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
@@ -162,7 +162,7 @@ class TransferRepo extends BaseRepo
         //     $query->where('created_by', $created_by);
         // }
 
-        if ($date_from && $date_to && $date_from <= $date_to && !empty($date_from) && !empty($date_to)) {
+        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
