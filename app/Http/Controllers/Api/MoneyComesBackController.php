@@ -476,21 +476,20 @@ class MoneyComesBackController extends Controller
         $params_transfer['date_to'] = $params['date_to'];
         $params_transfer['hkd_id'] = $params['hkd_id'];
 
-        $total_withdraw = $this->withdrawPosRepo->getTotalByHkd($params['hkd_id'], $params_transfer);
+        $total_withdraw = $this->withdrawPosRepo->getTotalByHkd($params['hkd_id']);
+        $total_withdraw_fill = $this->withdrawPosRepo->getTotalByHkd($params['hkd_id'], $params_transfer);
         $total_money = $this->money_repo->getTotalPriceByHkd($params['hkd_id'], $params_transfer);
         $total_payment = $this->money_repo->getTotalHkd($params_transfer);
         if ($total_withdraw > 0) {
-            $total_payment['total_withdraw_pos'] = (int)$total_withdraw;
-            $total_payment['total_cash'] = (int)$total_money - (int)$total_withdraw;
-            $total_payment['total_money'] = (int)$total_money;
+            $total_payment['total_withdraw_pos'] = (int)$total_withdraw_fill; // tiền rút pos theo lọc ngày
+            $total_payment['total_cash'] = (int)$total_money - (int)$total_withdraw; // tiền tồn pos thực tế
+            $total_payment['total_money'] = (int)$total_money; // tổng tiền thành tiền từ trước đến nay
         }
 
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách đại lý',
             'total' => [
-                'total_number_doi_ung' => count($data),
-                'total_number_withdraw' => count($data_hkd),
                 'total_payment' => $total_payment,
             ],
             'data' => $mergedData,
