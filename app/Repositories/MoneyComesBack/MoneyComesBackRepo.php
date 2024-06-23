@@ -1268,7 +1268,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-        $query->orderBy('created_at', 'DESC');
+        $query->orderBy('time_end', 'DESC');
         $results = $query->get()->groupBy(function($date) {
             return Carbon::parse($date->created_at)->format('Y-m-d'); // Group by date
         });
@@ -1309,8 +1309,7 @@ class MoneyComesBackRepo extends BaseRepo
             'total_price' => (int)$query->sum('total_price'),
             'total_payment' => (int)$query->sum('payment'),
             'total_payment_agent' => (int)$query->sum('payment_agent'),
-            'total_cash' => 0,
-            'data' => $query->get()->toArray()
+            'total_cash' => 0
         ];
         return $total;
     }

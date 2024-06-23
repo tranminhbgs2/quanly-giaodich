@@ -431,18 +431,18 @@ class WithdrawPosRepo extends BaseRepo
             ->where('status', Constants::USER_STATUS_ACTIVE);
 
         // Áp dụng điều kiện ngày tháng nếu có
-        // if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
-        //     try {
-        //         $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
-        //         $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
-        //         $query->whereBetween('time_withdraw', [$date_from, $date_to]);
-        //     } catch (\Exception $e) {
-        //         // Xử lý khi định dạng ngày tháng không hợp lệ
-        //         return [
-        //             'error' => 'Invalid date format',
-        //         ];
-        //     }
-        // }
+        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('time_withdraw', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Xử lý khi định dạng ngày tháng không hợp lệ
+                return [
+                    'error' => 'Invalid date format',
+                ];
+            }
+        }
 
         // Sắp xếp kết quả theo thời gian rút tiền giảm dần
         $query->orderBy('time_withdraw', 'DESC');
