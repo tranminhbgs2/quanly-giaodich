@@ -60,7 +60,7 @@ class MoneyComesBackRepo extends BaseRepo
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
-                $query->whereBetween('created_at', [$date_from, $date_to]);
+                $query->whereBetween('time_end', [$date_from, $date_to]);
             } catch (\Exception $e) {
                 // Handle invalid date format
             }
@@ -137,7 +137,7 @@ class MoneyComesBackRepo extends BaseRepo
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
-                $query->whereBetween('created_at', [$date_from, $date_to]);
+                $query->whereBetween('time_end', [$date_from, $date_to]);
             } catch (\Exception $e) {
                 // Handle invalid date format
             }
@@ -1107,7 +1107,7 @@ class MoneyComesBackRepo extends BaseRepo
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
-                $query->whereBetween('created_at', [$date_from, $date_to]);
+                $query->whereBetween('time_end', [$date_from, $date_to]);
             } catch (\Exception $e) {
                 // Handle invalid date format
             }
@@ -1277,23 +1277,12 @@ class MoneyComesBackRepo extends BaseRepo
     }
     public function getTotalHkd($params, $is_counting = false, $is_agent = false)
     {
-        $keyword = $params['keyword'] ?? null;
-        $lo_number = $params['lo_number'] ?? 0;
         $status = $params['status'] ?? -1;
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
-        $pos_id = $params['pos_id'] ?? 0;
-        $agent_id = $params['agent_id'] ?? 0;
         $hkd_id = $params['hkd_id'] ?? 0;
 
         $query = MoneyComesBack::select();
-
-        if (!empty($keyword)) {
-            $keyword = translateKeyWord($keyword);
-            $query->where(function ($sub_sql) use ($keyword) {
-                $sub_sql->where('lo_number', 'LIKE', "%" . $keyword . "%");
-            });
-        }
 
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
@@ -1303,14 +1292,6 @@ class MoneyComesBackRepo extends BaseRepo
             } catch (\Exception $e) {
                 // Handle invalid date format
             }
-        }
-
-        if ($pos_id > 0) {
-            $query->where('pos_id', $pos_id);
-        }
-
-        if ($lo_number > 0) {
-            $query->where('lo_number', $lo_number);
         }
 
         if ($hkd_id > 0) {
@@ -1327,7 +1308,8 @@ class MoneyComesBackRepo extends BaseRepo
         $total = [
             'total_price' => (int)$query->sum('total_price'),
             'total_payment' => (int)$query->sum('payment'),
-            'total_cash' => 0
+            'total_cash' => 0,
+            'data' => $query->get()->toArray()
         ];
         return $total;
     }
