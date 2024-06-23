@@ -1184,7 +1184,7 @@ class MoneyComesBackRepo extends BaseRepo
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
                 $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
-                $query->whereBetween('created_at', [$date_from, $date_to]);
+                $query->whereBetween('time_end', [$date_from, $date_to]);
             } catch (\Exception $e) {
             }
         }
