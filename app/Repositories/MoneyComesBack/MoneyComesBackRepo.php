@@ -1308,6 +1308,7 @@ class MoneyComesBackRepo extends BaseRepo
         $total = [
             'total_price' => (int)$query->sum('total_price'),
             'total_payment' => (int)$query->sum('payment'),
+            'total_payment_agent' => (int)$query->sum('payment_agent'),
             'total_cash' => 0,
             'data' => $query->get()->toArray()
         ];
