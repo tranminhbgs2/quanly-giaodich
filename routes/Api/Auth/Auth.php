@@ -18,6 +18,7 @@ Route::group(['middleware' => ['filter.signed']], function (){
     Route::get('check-web-order', 'AuthController@checkWebOrder');
     Route::get('sync-user', 'UserController@syncBalance');
     Route::get('sync-lo-tien-ve', 'MoneyComesBackController@syncMoneyComesBack');
+    Route::get('sync-lo-ket-toan', 'MoneyComesBackController@syncLoKetToan');
     Route::get('sync-ho-kinh-doanh', 'HoKinhDoanhController@syncBalance');
 });
 

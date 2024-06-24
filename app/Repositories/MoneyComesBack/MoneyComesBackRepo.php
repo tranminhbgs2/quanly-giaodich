@@ -1320,4 +1320,20 @@ class MoneyComesBackRepo extends BaseRepo
         ];
         return $total;
     }
+
+
+    /**
+     * Hàm danh sách lô tiền về chưa kết toán
+     *
+     * @param $params
+     */
+    public function getByTimeEnd($time_process)
+    {
+        $tran = MoneyComesBack::where('time_process', $time_process);
+
+        $tran->whereNull('time_end');
+        $tran->where('status', Constants::USER_STATUS_LOCKED);
+
+        return $tran->get()->toArray();
+    }
 }

@@ -524,6 +524,21 @@ class MoneyComesBackController extends Controller
         ]);
     }
 
+    public function syncLoKetToan()
+    {
+        $time_process = date('Y-m-d');
+        $data = $this->money_repo->getByTimeEnd($time_process);
+        foreach ($data as $item) {
+            $time_end = date('Y-m-d H:i:s');
+            $this->money_repo->ketToanLo($item['id'], $time_process, $time_end);
+        }
+        return response()->json([
+            'code' => 200,
+            'error' => 'Đồng bộ dữ liệu lô kết toán thành công',
+            'data' => null
+        ]);
+    }
+
     /**
      * Merge two arrays into one with the length of the longest array
      *
