@@ -412,10 +412,8 @@ class TransactionController extends Controller
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['total_fee'];
-                if ($params['method'] == 'ONLINE' || $params['method'] == 'QR_CODE') {
-                    if ($params['lo_number'] == 0) {
-                        $params['lo_number'] = $params['pos_id'] . date('dmy');
-                    }
+                if ($params['lo_number'] == 0) {
+                    $params['lo_number'] = $params['pos_id'] . date('dmy');
                 }
             } else {
                 $params['fee_paid'] = 0;
@@ -742,7 +740,7 @@ class TransactionController extends Controller
                 $time_process = date('Y-m-d');
             }
             $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_detail->pos_id, 'lo_number' => $tran_detail->lo_number, 'time_process' => $time_process]);
-            if(!$money_come){
+            if (!$money_come) {
                 $money_comes_back = [
                     'pos_id' => $tran_detail->pos_id,
                     'hkd_id' => $tran_detail->hkd_id,
