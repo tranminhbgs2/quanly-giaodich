@@ -240,10 +240,8 @@ class TransactionController extends Controller
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['total_fee'];
-                if($params['method'] == 'ONLINE' || $params['method'] == 'QR_CODE'){
-                    if($params['lo_number'] == 0){
-                        $params['lo_number'] = $params['pos_id'].date('dmy');
-                    }
+                if ($params['lo_number'] == 0) {
+                    $params['lo_number'] = $params['pos_id'] . date('dmy');
                 }
             } else {
                 $params['fee_paid'] = 0;
@@ -414,9 +412,9 @@ class TransactionController extends Controller
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['total_fee'];
-                if($params['method'] == 'ONLINE' || $params['method'] == 'QR_CODE'){
-                    if($params['lo_number'] == 0){
-                        $params['lo_number'] = $params['pos_id'].date('dmy');
+                if ($params['method'] == 'ONLINE' || $params['method'] == 'QR_CODE') {
+                    if ($params['lo_number'] == 0) {
+                        $params['lo_number'] = $params['pos_id'] . date('dmy');
                     }
                 }
             } else {
@@ -705,7 +703,7 @@ class TransactionController extends Controller
         $tran_detail = $this->tran_repo->getById($id);
         $transfer_by = 0;
         if ($tran_detail->method == 'ONLINE' || $tran_detail->method == 'RUT_TIEN_MAT' || $tran_detail->method == 'QR_CODE') {
-            if($tran_detail->fee_paid != $tran_detail->total_fee){
+            if ($tran_detail->fee_paid != $tran_detail->total_fee) {
                 $fee_paid = $tran_detail->total_fee;
             }
             $transfer_by = auth()->user()->id;
@@ -732,8 +730,8 @@ class TransactionController extends Controller
                 //cộng tiền vào tài khoản ngân hàng hưởng thụ phí
                 $bank_account = $this->bankAccountRepo->getAccountFee();
                 if ($bank_account) {
-                    if($tran_detail->method == 'DAO_HAN'){
-                        $bank_account->balance += $fee_paid ;
+                    if ($tran_detail->method == 'DAO_HAN') {
+                        $bank_account->balance += $fee_paid;
                     }
                     $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $id);
                 }

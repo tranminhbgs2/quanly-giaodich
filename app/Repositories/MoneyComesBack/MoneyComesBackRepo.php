@@ -53,7 +53,7 @@ class MoneyComesBackRepo extends BaseRepo
             });
         }
         // if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
-        //     $query->where('created_by', $created_by);
+        $query->where('total_price', '>', 0);
         // }
 
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
@@ -165,6 +165,8 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
+        $query->where('total_price', '>', 0);
+
         if ($is_counting) {
             return $query->count();
         } else {
@@ -235,6 +237,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
+        $query->where('total_price', '>', 0);
         $query->orderBy('id', 'DESC');
         // Lấy kết quả và nhóm theo pos_id và ngày
         $transactions = $query->with('pos')
@@ -332,6 +335,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
+        $query->where('total_price', '>', 0);
         $query->orderBy('id', 'DESC');
 
 
@@ -830,6 +834,7 @@ class MoneyComesBackRepo extends BaseRepo
         }
 
 
+        $query->where('total_price', '>', 0);
         // $query->whereNull('agent_id');
 
         if ($status > 0) {
@@ -885,6 +890,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
+        $query->where('total_price', '>', 0);
         $query->whereNotNull('agent_id');
 
         if ($agent_id > 0) {
@@ -1121,6 +1127,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
+        $query->where('total_price', '>', 0);
         $query->whereNotNull('agent_id');
         $query->where('agent_id', '!=', 0);
         if ($agent_id > 0) {
@@ -1177,7 +1184,7 @@ class MoneyComesBackRepo extends BaseRepo
 
         // Lấy tất cả các bản ghi theo hkd_id và status
         $query = MoneyComesBack::where('hkd_id', $hkd_id)
-                                ->where('status', '!=', Constants::USER_STATUS_DELETED);
+            ->where('status', '!=', Constants::USER_STATUS_DELETED);
 
         // Áp dụng điều kiện ngày tháng nếu có
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
@@ -1269,7 +1276,7 @@ class MoneyComesBackRepo extends BaseRepo
         }
 
         $query->orderBy('time_end', 'DESC');
-        $results = $query->get()->groupBy(function($date) {
+        $results = $query->get()->groupBy(function ($date) {
             return Carbon::parse($date->created_at)->format('Y-m-d'); // Group by date
         });
 
