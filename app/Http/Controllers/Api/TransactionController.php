@@ -736,6 +736,26 @@ class TransactionController extends Controller
                     $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "PAYMENT_FEE_TRANSACTION_" . $id);
                 }
             }
+            if ($tran_detail->time_payment) {
+                $time_process = date('Y-m-d', strtotime($tran_detail->time_payment));
+            } else {
+                $time_process = date('Y-m-d');
+            }
+            $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_detail->pos_id, 'lo_number' => $tran_detail->lo_number, 'time_process' => $time_process]);
+            if(!$money_come){
+                $money_comes_back = [
+                    'pos_id' => $tran_detail->pos_id,
+                    'hkd_id' => $tran_detail->hkd_id,
+                    'lo_number' => $tran_detail->lo_number,
+                    'time_process' => $time_process,
+                    'fee' => $tran_detail->original_fee,
+                    'total_price' => $tran_detail->price_rut,
+                    'payment' => ($tran_detail->price_rut - $tran_detail->price_fee),
+                    'created_by' => auth()->user()->id,
+                    'status' => Constants::USER_STATUS_LOCKED,
+                ];
+                $this->money_comes_back_repo->store($money_comes_back);
+            }
             return response()->json([
                 'code' => 200,
                 'error' => 'Thanh toán phí thành công',
