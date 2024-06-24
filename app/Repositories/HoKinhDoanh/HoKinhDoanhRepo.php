@@ -73,7 +73,8 @@ class HoKinhDoanhRepo extends BaseRepo
             'phone',
             'address',
             'status',
-            'balance'
+            'balance',
+            'amount_old'
         ];
 
         $insert = [];
@@ -83,7 +84,7 @@ class HoKinhDoanhRepo extends BaseRepo
                 $insert[$field] = $params[$field];
             }
         }
-        if (!empty($insert['name']) && !empty($insert['phone'])) {
+        if (!empty($insert['name'])) {
             return HoKinhDoanh::create($insert) ? true : false;
         }
 
@@ -98,7 +99,8 @@ class HoKinhDoanhRepo extends BaseRepo
             'phone',
             'address',
             'status',
-            'balance'
+            'balance',
+            'amount_old'
         ];
 
         $update = [];
