@@ -28,6 +28,10 @@ class HoKinhDoanh extends Model
     {
         return (int) $value;
     }
+    public function getAmountOldAttribute($value)
+    {
+        return (int) $value;
+    }
 
     public function getTotalBalanceAttribute()
     {
