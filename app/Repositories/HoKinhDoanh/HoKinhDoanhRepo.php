@@ -64,6 +64,53 @@ class HoKinhDoanhRepo extends BaseRepo
 
         return $query->get()->toArray();
     }
+    public function getTotal($params, $is_counting = false)
+    {
+        $keyword = $params['keyword'] ?? null;
+        $status = $params['status'] ?? -1;
+        $page_index = $params['page_index'] ?? 1;
+        $page_size = $params['page_size'] ?? 10;
+        $date_from = $params['date_from'] ?? null;
+        $date_to = $params['date_to'] ?? null;
+        $created_by = $params['created_by'] ?? 0;
+
+        $query = HoKinhDoanh::select();
+
+        if (!empty($keyword)) {
+            $keyword = translateKeyWord($keyword);
+            $query->where(function ($sub_sql) use ($keyword) {
+                $sub_sql->where('name', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('surrogate', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('phone', 'LIKE', "%" . $keyword . "%")
+                        ->orWhere('address', 'LIKE', "%" . $keyword . "%");
+            });
+        }
+        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)){
+            try {
+                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                $query->whereBetween('created_at', [$date_from, $date_to]);
+            } catch (\Exception $e) {
+                // Handle invalid date format
+            }
+        }
+
+        // if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
+        //     $query->where('created_by', $created_by);
+        // }
+
+        if ($status > 0) {
+            $query->where('status', $status);
+        } else {
+            $query->where('status', '!=', Constants::USER_STATUS_DELETED);
+        }
+
+        $total = [
+            'balance' => (int)$query->sum('balance'),
+            'amount_old' => (int)$query->sum('amount_old'),
+        ];
+        return $total;
+    }
 
     public function store($params)
     {

@@ -40,6 +40,7 @@ class HoKinhDoanhController extends Controller
 
         $data = $this->hkd_repo->getListing($params, false);
         $total = $this->hkd_repo->getListing($params, true);
+        $total_balance = $this->hkd_repo->getTotal($params);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách Hộ kinh doanh',
@@ -48,7 +49,10 @@ class HoKinhDoanhController extends Controller
                 "total_page" => ceil($total / $params['page_size']),
                 "page_no" => intval($params['page_index']),
                 "page_size" => intval($params['page_size']),
-                "data" => $data
+                "data" => $data,
+                "total" => [
+                    'total_balance' => $total_balance['balance'] + $total_balance['amount_old']
+                ]
             ],
         ]);
     }
