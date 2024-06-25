@@ -468,14 +468,14 @@ class MoneyComesBackController extends Controller
         $data = $this->money_repo->getListingAllHkd($params);
         $data_hkd = $this->withdrawPosRepo->getListByHkd($params);
         $data_new = [];
-        $total_payment = 0;
+        $total_payments = 0;
         foreach($data as $key => $values){
             $datav = [];
             foreach($values as $value)
                 {
                     $value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
                     $datav[] = $value;
-                    $total_payment = (int)($total_payment + $value['payment']);
+                    $total_payments = (int)($total_payments + $value['payment']);
                 }
                     $data_new[$key] = $datav;
         }
@@ -498,7 +498,7 @@ class MoneyComesBackController extends Controller
         $total_payment['total_cash_ket_toan'] = (int)$total_money_ket_toan - (int)$total_withdraw_fill; // tiền tồn pos thực tế
         $total_payment['total_money_ket_toan'] = (int)$total_money_ket_toan; // tổng tiền thành tiền từ trước đến nay
         $total_payment['total_withdraw_fill'] = (int)$total_withdraw_fill; // tiền rút pos theo lọc ngày
-        $total_payment['total_payment'] = (int)$total_payment; // tổng tiền thành tiền tính lại
+        $total_payment['total_payment'] = (int)$total_payments; // tổng tiền thành tiền tính lại
 
         return response()->json([
             'code' => 200,
@@ -506,7 +506,8 @@ class MoneyComesBackController extends Controller
             'total' => [
                 'total_payment' => $total_payment,
             ],
-            'data' => $mergedData
+            'data' => $mergedData,
+                                '$total_payment' => $total_payments
         ]);
     }
 
