@@ -359,8 +359,10 @@ class AgentController extends Controller
             $datas[] = [
                 'agent_id' => $agent_id,
                 'total_payment' => $total_payment,
-                'total_transfer_to' => $total_transfer_to,
-                'total_transfer_from' => $total_transfer_from
+                'total_transfer_to' => (int)$total_transfer_to,
+                'total_transfer_from' => (int)$total_transfer_from,
+                'params' => $params,
+                'params_transfer' => $params_transfer,
             ];
             if ($agent) {
                 $agent_balance = $total_payment['total_cash'];
