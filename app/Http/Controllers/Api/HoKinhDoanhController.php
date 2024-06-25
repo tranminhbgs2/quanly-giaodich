@@ -239,7 +239,7 @@ class HoKinhDoanhController extends Controller
         return response()->json([
             'code' => 200,
             'error' => 'Đồng bộ số dư thành công',
-            'data' => null
+            'data' => ['total_money' => $total_money, 'total_money_withdraw' => $total_money_withdraw]
         ]);
     }
 }
