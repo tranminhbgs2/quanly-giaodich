@@ -228,10 +228,12 @@ class HoKinhDoanhController extends Controller
         $withdraw_repo = new WithdrawPosRepo();
 
         $hkds = $this->hkd_repo->getAll();
+        $data = [];
         foreach ($hkds as $hkd) {
             $total_money = $money_repo->getTotalPriceByHkd($hkd['id']);
             $total_money_withdraw = $withdraw_repo->getTotalByHkd($hkd['id']);
             $balance = $total_money - $total_money_withdraw;
+            $data[] = ['total_money' => $total_money, 'total_money_withdraw' => $total_money_withdraw, 'id' => $hkd['id'], 'balance' => $balance];
             if($balance != $hkd['balance']){
                 $this->hkd_repo->updateBalance($balance, $hkd['id'], "SYNC_BALANCE_" . $hkd['id']);
             }
@@ -239,7 +241,7 @@ class HoKinhDoanhController extends Controller
         return response()->json([
             'code' => 200,
             'error' => 'Đồng bộ số dư thành công',
-            'data' => ['total_money' => $total_money, 'total_money_withdraw' => $total_money_withdraw]
+            'data' => $data
         ]);
     }
 }
