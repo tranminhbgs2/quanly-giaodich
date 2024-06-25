@@ -469,11 +469,11 @@ class MoneyComesBackController extends Controller
         $data_hkd = $this->withdrawPosRepo->getListByHkd($params);
         $data_new = [];
         foreach($data as $value){
-            $value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
+            //$value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
             $data_new[] = $value;
         }
         // Merge $data and $data_agent
-        $mergedData = $this->mergeDataArraysHkd($data, $data_hkd);
+        $mergedData = $this->mergeDataArraysHkd($data_new, $data_hkd);
         $params_transfer['date_from'] = $params['date_from'];
         $params_transfer['date_to'] = $params['date_to'];
         $params_transfer['hkd_id'] = $params['hkd_id'];
@@ -499,6 +499,7 @@ class MoneyComesBackController extends Controller
                 'total_payment' => $total_payment,
             ],
             'data' => $mergedData,
+                                'aa' => $data
         ]);
     }
 
