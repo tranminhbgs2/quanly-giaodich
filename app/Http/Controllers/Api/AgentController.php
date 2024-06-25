@@ -346,12 +346,14 @@ class AgentController extends Controller
             $agent_id = $agent['id'];
 
             //Lấy tổng số tiền đã được chuyển khoản và số tiền đã chuyển khoản đi
-            $params_transfer['agent_id'] = $agent_id;
+            $params_transfer_to['agent_id'] = $agent_id;
+            $params_transfer_to['type'] = "TO";
             $params['agent_id'] = $agent_id;
             // Merge $data and $data_agent
-            $total_transfer_to = $transfer_repo->getTotalAgent($params_transfer); // tiền nhận
-            $params_transfer['type'] = "FROM";
-            $total_transfer_from = $transfer_repo->getTotalAgent($params_transfer); // tiền nhận
+            $total_transfer_to = $transfer_repo->getTotalAgent($params_transfer_to); // tiền nhận
+            $params_transfer_from['agent_id'] = $agent_id;
+            $params_transfer_from['type'] = "FROM";
+            $total_transfer_from = $transfer_repo->getTotalAgent($params_transfer_from); // tiền nhận
             $total_payment = $money_repo->getTotalAgent($params);
 
             $total_payment['total_transfer'] = (int)$total_transfer_to['total_transfer'] - (int)$total_transfer_from['total_transfer'];
@@ -359,10 +361,11 @@ class AgentController extends Controller
             $datas[] = [
                 'agent_id' => $agent_id,
                 'total_payment' => $total_payment,
-                'total_transfer_to' => (int)$total_transfer_to,
-                'total_transfer_from' => (int)$total_transfer_from,
+                'total_transfer_to' => $total_transfer_to,
+                'total_transfer_from' => $total_transfer_from,
                 'params' => $params,
-                'params_transfer' => $params_transfer,
+                'params_transfer_to' => $params_transfer_to,
+                'params_transfer_from' => $params_transfer_from,
             ];
             if ($agent) {
                 $agent_balance = $total_payment['total_cash'];
