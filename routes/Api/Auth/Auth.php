@@ -20,6 +20,7 @@ Route::group(['middleware' => ['filter.signed']], function (){
     Route::get('sync-lo-tien-ve', 'MoneyComesBackController@syncMoneyComesBack');
     Route::get('sync-lo-ket-toan', 'MoneyComesBackController@syncLoKetToan');
     Route::get('sync-ho-kinh-doanh', 'HoKinhDoanhController@syncBalance');
+    Route::get('sync-agency', 'AgentController@syncBalance');
 });
 
 Route::group(['middleware' => ['auth.jwt']], function (){
