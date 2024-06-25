@@ -1140,7 +1140,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-        $query->orderBy('id', 'DESC');
+        $query->orderBy('lo_number', 'ASC');
 
         return $query->get()->toArray();
     }
@@ -1275,7 +1275,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-        $query->orderBy('time_end', 'DESC');
+        $query->orderBy('lo_number', 'ASC');
         $results = $query->get()->groupBy(function ($date) {
             return Carbon::parse($date->created_at)->format('Y-m-d'); // Group by date
         });
