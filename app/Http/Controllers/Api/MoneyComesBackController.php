@@ -484,7 +484,7 @@ class MoneyComesBackController extends Controller
         $total_payment['total_money'] = (int)$total_money; // tổng tiền thành tiền từ trước đến nay
         $total_payment['total_withdraw_pos'] = (int)$total_withdraw_fill; // tiền rút pos theo lọc ngày
         $total_payment['total_cash'] = (int)$total_money - (int)$total_withdraw; // tiền tồn pos thực tế
-        $total_payment['total_cash_ket_toan'] = (int)$total_money_ket_toan - (int)total_withdraw_fill; // tiền tồn pos thực tế
+        $total_payment['total_cash_ket_toan'] = (int)$total_money_ket_toan - (int)$total_withdraw_fill; // tiền tồn pos thực tế
         $total_payment['total_money_ket_toan'] = (int)$total_money_ket_toan; // tổng tiền thành tiền từ trước đến nay
         $total_payment['total_withdraw_fill'] = (int)$total_withdraw_fill; // tiền rút pos theo lọc ngày
 
