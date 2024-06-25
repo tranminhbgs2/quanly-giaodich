@@ -933,7 +933,7 @@ class MoneyComesBackRepo extends BaseRepo
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
             ->where('agent_id', '!=', 0)
-            ->whereBetween('created_at', [$date_from, $date_to]);
+            ->whereBetween('time_end', [$date_from, $date_to]);
 
         if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
             $query->where('created_by', auth()->user()->id);
@@ -974,7 +974,7 @@ class MoneyComesBackRepo extends BaseRepo
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
             ->where('agent_id', '!=', 0)
-            ->whereBetween('created_at', [$date_from, $date_to])
+            ->whereBetween('time_end', [$date_from, $date_to])
             ->get()
             ->groupBy(function ($transaction) {
                 return Carbon::parse($transaction->created_at)->toDateString();
@@ -1032,7 +1032,7 @@ class MoneyComesBackRepo extends BaseRepo
             ->where('status', Constants::USER_STATUS_ACTIVE)
             ->whereNotNull('agent_id')
             ->where('agent_id', '!=', 0)
-            ->whereBetween('created_at', [$date_from, $date_to])
+            ->whereBetween('time_end', [$date_from, $date_to])
             ->get()
             ->groupBy('agent_id');
 
