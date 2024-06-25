@@ -468,9 +468,14 @@ class MoneyComesBackController extends Controller
         $data = $this->money_repo->getListingAllHkd($params);
         $data_hkd = $this->withdrawPosRepo->getListByHkd($params);
         $data_new = [];
-        foreach($data as $value){
-            //$value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
-            $data_new[] = $value;
+        foreach($data as $key => $values){
+            $datav = []
+            foreach($values as $value)
+                {
+                    $value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
+                    $datav[] = $value;
+                }
+                    $data_new[$key] = $datav;
         }
         // Merge $data and $data_agent
         $mergedData = $this->mergeDataArraysHkd($data_new, $data_hkd);
