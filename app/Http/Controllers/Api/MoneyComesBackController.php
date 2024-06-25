@@ -513,7 +513,7 @@ class MoneyComesBackController extends Controller
 
     public function syncMoneyComesBack()
     {
-        $time_process = date('Y-m-d');
+        $time_process = request('time_process', date('Y-m-d'));
         $data = $this->money_repo->getByTimeProcess($time_process);
         foreach ($data as $item) {
             $params['id'] = $item['id'];
