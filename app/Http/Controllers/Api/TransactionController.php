@@ -178,6 +178,13 @@ class TransactionController extends Controller
         $params['note'] = request('note', null); // số lô
         $params['type_card'] = request('type_card', null); // số lô
         $params['bank_code'] = request('bank_code', null); // số lô
+        $params['price_array'] = request('price_array', null); // số tiền bù
+
+        if (is_array($params['price_array'])) {
+            // Chuyển đổi mảng thành chuỗi JSON
+            $params['price_array'] = json_encode($params['price_array']);
+        }
+
         if ($params['time_payment']) {
             $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
         }
@@ -356,7 +363,12 @@ class TransactionController extends Controller
             $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
             $params['type_card'] = request('type_card', null); // số lô
             $params['bank_code'] = request('bank_code', null); // số lô
+            $params['price_array'] = request('price_array', null); // số tiền bù
 
+            if (is_array($params['price_array'])) {
+                // Chuyển đổi mảng thành chuỗi JSON
+                $params['price_array'] = json_encode($params['price_array']);
+            }
             if ($params['lo_number'] > 0) {
                 if ($params['time_payment']) {
                     $time_process = date('Y-m-d', strtotime($params['time_payment']));

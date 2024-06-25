@@ -521,6 +521,7 @@ class TransactionRepo extends BaseRepo
             'bank_code',
             'transfer_by',
             'total_fee',
+            'price_array',
         ];
 
         $insert = [];
@@ -577,6 +578,7 @@ class TransactionRepo extends BaseRepo
             'bank_code',
             'transfer_by',
             'total_fee',
+            'price_array'
         ];
 
         $update = [];

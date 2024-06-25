@@ -41,6 +41,7 @@ class Transaction extends Model
         'status_fee',
         'transfer_by',
         'total_fee',
+        'price_array',
     ];
 
     /**
@@ -149,5 +150,13 @@ class Transaction extends Model
     public function getTotalFeeAttribute($value)
     {
         return (int) $value;
+    }
+
+    public function getPriceArrayAttribute($value)
+    {
+        if (empty($value)) {
+            return null;
+        }
+        return json_decode($value, true);
     }
 }
