@@ -425,17 +425,16 @@ class MoneyComesBackController extends Controller
 
         $params['date_from'] = str_replace('/', '-', $params['date_from']);
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
-
+        $params_transfer['agent_date_to'] =  $params['date_to'];
+        $params_transfer['agent_date_from'] =  $params['date_from'];
+        $params_transfer['agent_id'] = $params['agent_id'];
         $data = $this->money_repo->getListingAllAgent($params);
-        $data_agent = $this->transfer_repo->getListAgent($params);
+        $data_agent = $this->transfer_repo->getListAgent($params_transfer);
 
         // Merge $data and $data_agent
         $mergedData = $this->mergeDataArrays($data, $data_agent);
-        $params_transfer['agent_id'] = $params['agent_id'];
-        $params_transfer['date_from'] = $params['date_from'];
-        $params_transfer['date_to'] = $params['date_to'];
         $total_transfer = $this->transfer_repo->getTotalAgent($params_transfer);
-        $total_payment = $this->money_repo->getTotalAgent($params_transfer);
+        $total_payment = $this->money_repo->getTotalAgent($params);
         if (count($total_transfer) > 0) {
             $total_payment['total_transfer'] = (int)$total_transfer['total_transfer'];
             $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'];
