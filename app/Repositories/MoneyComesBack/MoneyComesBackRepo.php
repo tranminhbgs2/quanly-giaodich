@@ -1050,14 +1050,14 @@ class MoneyComesBackRepo extends BaseRepo
             // Get total transfer amount
             $total_transfer_data_to = $transferRepo->getTotalAgent([
                 'agent_id' => $group->first()->agent_id,
-                'date_from' => $date_from,
-                'date_to' => $date_to,
+                'agent_date_from' => $date_from,
+                'agent_date_to' => $date_to,
                 'type' => 'TO'
             ]);
             $total_transfer_data_from = $transferRepo->getTotalAgent([
                 'agent_id' => $group->first()->agent_id,
-                'date_from' => $date_from,
-                'date_to' => $date_to,
+                'agent_date_from' => $date_from,
+                'agent_date_to' => $date_to,
                 'type' => 'FROM'
             ]);
 
