@@ -475,7 +475,7 @@ class MoneyComesBackController extends Controller
                 {
                     $value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
                     $datav[] = $value;
-                    $total_payment += $value['payment'];
+                    $total_payment = (int)($total_payment + $value['payment']);
                 }
                     $data_new[$key] = $datav;
         }
@@ -506,8 +506,7 @@ class MoneyComesBackController extends Controller
             'total' => [
                 'total_payment' => $total_payment,
             ],
-            'data' => $mergedData,
-                                'aa' => $data
+            'data' => $mergedData
         ]);
     }
 
