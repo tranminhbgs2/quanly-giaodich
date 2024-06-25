@@ -338,10 +338,11 @@ class UserController extends Controller
 
             if ($balance_new != $user['balance']) {
                 $this->user_repo->updateBalance($user['id'], $balance_new, "SYNC_BALANCE_USER");
-                $bank_account = $bank_acc->getAccountStaff($user['id']);
-                if ($bank_account && $bank_account->balance != $balance_new) {
-                    $bank_acc->updateBalance($bank_account->id, $balance_new, "SYNC_BALANCE_BANK_". $bank_account->id);
-                }
+            }
+
+            $bank_account = $bank_acc->getAccountStaff($user['id']);
+            if ($bank_account && $bank_account->balance != $balance_new) {
+                $bank_acc->updateBalance($bank_account->id, $balance_new, "SYNC_BALANCE_BANK_". $bank_account->id);
             }
         }
             return response()->json([

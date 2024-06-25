@@ -12,6 +12,8 @@ use App\Http\Requests\Agent\StoreRequest;
 use App\Http\Requests\Agent\UpdateRequest;
 use App\Repositories\Agent\AgentRepo;
 use App\Repositories\BankAccount\BankAccountRepo;
+use App\Repositories\MoneyComesBack\MoneyComesBackRepo;
+use App\Repositories\Transfer\TransferRepo;
 
 class AgentController extends Controller
 {
@@ -115,7 +117,7 @@ class AgentController extends Controller
                 if ($check_bank) {
                     return response()->json([
                         'code' => 400,
-                        'error' => 'Tài khoản '.$account_name .' đã tồn tại',
+                        'error' => 'Tài khoản ' . $account_name . ' đã tồn tại',
                         'data' => null
                     ]);
                 }
@@ -214,7 +216,7 @@ class AgentController extends Controller
                     if ($check_bank) {
                         return response()->json([
                             'code' => 400,
-                            'error' => 'Tài khoản '.$account_name .' đã tồn tại',
+                            'error' => 'Tài khoản ' . $account_name . ' đã tồn tại',
                             'data' => null
                         ]);
                     }
@@ -246,13 +248,13 @@ class AgentController extends Controller
             $resutl = $this->agent_repo->update($params, $params['id']);
 
             if ($resutl) {
-            if (count($insert_banks) > 0) {
-                foreach ($insert_banks as $key => $value) {
-                    $value['agent_id'] = $params['id'];
-                    $value['type'] = "AGENCY";
-                    $this->bankAccountRepo->store($value);
+                if (count($insert_banks) > 0) {
+                    foreach ($insert_banks as $key => $value) {
+                        $value['agent_id'] = $params['id'];
+                        $value['type'] = "AGENCY";
+                        $this->bankAccountRepo->store($value);
+                    }
                 }
-            }
                 return response()->json([
                     'code' => 200,
                     'error' => 'Cập nhật thông tin thành công',
@@ -329,6 +331,51 @@ class AgentController extends Controller
             'code' => 200,
             'error' => 'Danh sách Đại lý',
             'data' => $data
+        ]);
+    }
+
+
+    public function syncBalance()
+    {
+        $transfer_repo = new TransferRepo();
+        $money_repo = new MoneyComesBackRepo();
+
+        $data = $this->agent_repo->getAll();
+        $datas = [];
+        foreach ($data as $agent) {
+            $agent_id = $agent['id'];
+
+            //Lấy tổng số tiền đã được chuyển khoản và số tiền đã chuyển khoản đi
+            $params_transfer['agent_id'] = $agent_id;
+            $params['agent_id'] = $agent_id;
+            // Merge $data and $data_agent
+            $total_transfer_to = $transfer_repo->getTotalAgent($params_transfer); // tiền nhận
+            $params_transfer['type'] = "FROM";
+            $total_transfer_from = $transfer_repo->getTotalAgent($params_transfer); // tiền nhận
+            $total_payment = $money_repo->getTotalAgent($params);
+
+            $total_payment['total_transfer'] = (int)$total_transfer_to['total_transfer'] - (int)$total_transfer_from['total_transfer'];
+            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'];
+            $datas[] = [
+                'agent_id' => $agent_id,
+                'total_payment' => $total_payment,
+                'total_transfer_to' => $total_transfer_to,
+                'total_transfer_from' => $total_transfer_from
+            ];
+            if ($agent) {
+                $agent_balance = $total_payment['total_cash'];
+                $this->agent_repo->updateBalance($agent_id, $agent_balance, "SYNC_BALANCE_AGENCY_" . $agent_id);
+            }
+            $bank_account = $this->bankAccountRepo->getAccountAgency($agent_id);
+            if ($bank_account) {
+                $bank_account->balance = $total_payment['total_cash'];
+                $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "SYNC_BALANCE_AGENCY_" . $agent_id);
+            }
+        }
+        return response()->json([
+            'code' => 200,
+            'error' => 'Đồng bộ số dư đại lý thành công',
+            'data' => $datas
         ]);
     }
 }

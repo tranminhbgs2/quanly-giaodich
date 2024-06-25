@@ -200,7 +200,9 @@ class TransactionController extends Controller
                         $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
                         break;
                     case 'NAPAS':
-                        $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
+                        if ($params['bank_code'] == "VIB") {
+                            $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
+                        }
                         break;
                     case 'AMEX':
                         $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
@@ -394,7 +396,9 @@ class TransactionController extends Controller
                             $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
                             break;
                         case 'NAPAS':
-                            $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
+                            if ($params['bank_code'] == "VIB") {
+                                $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
+                            }
                             break;
                         case 'AMEX':
                             $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
