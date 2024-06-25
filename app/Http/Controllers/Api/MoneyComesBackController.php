@@ -537,7 +537,8 @@ class MoneyComesBackController extends Controller
         return response()->json([
             'code' => 200,
             'error' => 'Đồng bộ dữ liệu lô tiền về thành công',
-            'data' => null
+            'data' => $data,
+            'time_process' => $time_process
         ]);
     }
 
