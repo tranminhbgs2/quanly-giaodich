@@ -357,7 +357,7 @@ class AgentController extends Controller
             $total_payment = $money_repo->getTotalAgent($params);
 
             $total_payment['total_transfer'] = (int)$total_transfer_to['total_transfer'] - (int)$total_transfer_from['total_transfer'];
-            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'];
+            $total_payment['total_cash'] = $total_payment['total_transfer'] - $total_payment['total_payment_agent'];
             $datas[] = [
                 'agent_id' => $agent_id,
                 'total_payment' => $total_payment,
