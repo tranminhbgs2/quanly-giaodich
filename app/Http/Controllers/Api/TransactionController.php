@@ -240,9 +240,12 @@ class TransactionController extends Controller
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['total_fee'];
-                if ($params['lo_number'] == 0) {
-                    $params['lo_number'] = $params['pos_id'] . date('dmy');
+                if ($params['time_payment']) {
+                    $time_lo = date('dmy', strtotime($params['time_payment']));
+                } else {
+                    $time_lo = date('dmy');
                 }
+                $params['lo_number'] = $params['pos_id'] . $time_lo;
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
@@ -412,9 +415,14 @@ class TransactionController extends Controller
             if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
                 $params['price_nop'] = 0;
                 $params['fee_paid'] = $params['total_fee'];
-                if ($params['lo_number'] == 0) {
-                    $params['lo_number'] = $params['pos_id'] . date('dmy');
-                }
+                // if ($params['lo_number'] == 0) {
+                    if ($params['time_payment']) {
+                        $time_lo = date('dmy', strtotime($params['time_payment']));
+                    } else {
+                        $time_lo = date('dmy');
+                    }
+                    $params['lo_number'] = $params['pos_id'] . $time_lo;
+                // }
             } else {
                 $params['fee_paid'] = 0;
                 $params['price_transfer'] = 0;
