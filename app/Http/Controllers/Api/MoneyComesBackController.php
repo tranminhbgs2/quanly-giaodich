@@ -469,7 +469,7 @@ class MoneyComesBackController extends Controller
         $data_hkd = $this->withdrawPosRepo->getListByHkd($params);
         $data_new = [];
         foreach($data as $key => $values){
-            $datav = []
+            $datav = [];
             foreach($values as $value)
                 {
                     $value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
