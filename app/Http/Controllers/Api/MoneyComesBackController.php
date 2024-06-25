@@ -467,7 +467,9 @@ class MoneyComesBackController extends Controller
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
         $data = $this->money_repo->getListingAllHkd($params);
         $data_hkd = $this->withdrawPosRepo->getListByHkd($params);
-
+        foreach($data as $value){
+            $value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
+        }
         // Merge $data and $data_agent
         $mergedData = $this->mergeDataArraysHkd($data, $data_hkd);
         $params_transfer['date_from'] = $params['date_from'];
