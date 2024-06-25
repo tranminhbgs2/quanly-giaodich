@@ -1140,7 +1140,7 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
 
-        $query->orderBy('lo_number', 'ASC');
+        $query->orderBy('id', 'DESC');
 
         return $query->get()->toArray();
     }
