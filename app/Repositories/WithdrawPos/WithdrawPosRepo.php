@@ -445,7 +445,7 @@ class WithdrawPosRepo extends BaseRepo
         }
 
         // Sắp xếp kết quả theo thời gian rút tiền giảm dần
-        $query->orderBy('time_withdraw', 'DESC');
+        $query->orderBy('time_withdraw', 'ASC');
 
         // Lấy kết quả từ câu truy vấn
         $results = $query->get();
