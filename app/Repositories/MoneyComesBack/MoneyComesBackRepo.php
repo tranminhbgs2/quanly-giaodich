@@ -1012,9 +1012,9 @@ class MoneyComesBackRepo extends BaseRepo
 
     public function ketToanLo($id, $time_process, $time_end)
     {
-        if(empty($time_end)){
+        if (empty($time_end)) {
             $status = Constants::USER_STATUS_LOCKED;
-        }else {
+        } else {
             $status = Constants::USER_STATUS_ACTIVE;
         }
 
@@ -1188,6 +1188,7 @@ class MoneyComesBackRepo extends BaseRepo
         $date_from = $params['date_from'] ?? null;
         $date_to = $params['date_to'] ?? null;
         $is_all = $params['is_all'] ?? false;
+        $is_ket_toan = $params['is_ket_toan'] ?? false;
 
         // Lấy tất cả các bản ghi theo hkd_id và status
         $query = MoneyComesBack::where('hkd_id', $hkd_id)
@@ -1195,27 +1196,30 @@ class MoneyComesBackRepo extends BaseRepo
 
         // Áp dụng điều kiện ngày tháng nếu có
 
-        if($is_all){
+        if ($is_all) {
 
-        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
-            try {
-                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
-                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
-                $query->whereBetween('time_end', [$date_from, $date_to]);
-            } catch (\Exception $e) {
-                // Handle invalid date format
+            if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
+                try {
+                    $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                    $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                    $query->whereBetween('time_end', [$date_from, $date_to]);
+                } catch (\Exception $e) {
+                    // Handle invalid date format
+                }
             }
-        }
+            if($is_ket_toan){
+                $query->whereNotNull('time_end');
+            }
         } else {
-        if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
-            try {
-                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
-                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
-                $query->whereBetween('created_at', [$date_from, $date_to]);
-            } catch (\Exception $e) {
-                // Handle invalid date format
+            if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
+                try {
+                    $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                    $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                    $query->whereBetween('created_at', [$date_from, $date_to]);
+                } catch (\Exception $e) {
+                    // Handle invalid date format
+                }
             }
-        }
         }
 
         // Lấy kết quả của truy vấn

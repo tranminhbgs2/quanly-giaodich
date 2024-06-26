@@ -17,10 +17,13 @@ use App\Repositories\WithdrawPos\WithdrawPosRepo;
 class HoKinhDoanhController extends Controller
 {
     protected $hkd_repo;
-
-    public function __construct(HoKinhDoanhRepo $hkdRepo)
+    protected $withdrawPosRepo;
+    protected $money_repo;
+    public function __construct(HoKinhDoanhRepo $hkdRepo, WithdrawPosRepo $withdrawPosRepo, MoneyComesBackRepo $money_repo)
     {
         $this->hkd_repo = $hkdRepo;
+        $this->withdrawPosRepo = $withdrawPosRepo;
+        $this->money_repo = $money_repo;
     }
 
     /**
@@ -39,6 +42,18 @@ class HoKinhDoanhController extends Controller
         $params['account_type'] = auth()->user()->account_type;
 
         $data = $this->hkd_repo->getListing($params, false);
+        foreach ($data as $key => $value) {
+            // $params_transfer['date_from'] = $params['date_from'];
+            // $params_transfer['date_to'] = $params['date_to'];
+            $params_transfer['hkd_id'] = $params['hkd_id'];
+            $total_withdraw_fill = $this->withdrawPosRepo->getTotalByHkd($value['id'], $params_transfer); // toàn bộ GD rút tiền pos
+
+            $params_transfer['is_all'] = true;
+            $params_transfer['is_ket_toan'] = true;
+            $total_money_ket_toan = $this->money_repo->getTotalPriceByHkd($value['id'], $params_transfer); // các GD đã kết toán
+
+            $data[$key]['total_cash_ket_toan'] = (int)$total_money_ket_toan - (int)$total_withdraw_fill;
+        }
         $total = $this->hkd_repo->getListing($params, true);
         $total_balance = $this->hkd_repo->getTotal($params);
         return response()->json([
