@@ -207,14 +207,19 @@ class TransactionController extends Controller
                         $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
                         break;
                     case 'NAPAS':
-                        if ($params['bank_code'] == "VIB") {
-                            $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
-                        }
                         break;
                     case 'AMEX':
-                        $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
+                        if ($params['bank_code'] == "VIB") {
+                            $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
+                        } else {
+                            $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
+                        }
                         break;
                 }
+            }
+
+            if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIB" && $params['type_card'] == "AMEX") {
+                $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
             }
         }
 
@@ -254,7 +259,7 @@ class TransactionController extends Controller
                 $params['price_transfer'] = 0;
                 $params['transfer_by'] = auth()->user()->id;
             }
-            if($pos->method == "GATEWAY" || $pos->method == "QR_CODE"){
+            if ($pos->method == "GATEWAY" || $pos->method == "QR_CODE") {
                 if ($params['time_payment']) {
                     $time_lo = date('dmy', strtotime($params['time_payment']));
                 } else {
@@ -398,8 +403,8 @@ class TransactionController extends Controller
                 $params['fee_cashback'] = $pos->fee_cashback;
                 $params['original_fee'] = $pos->total_fee;
                 $params['hkd_id'] = $pos->hkd_id;
-                if ($pos->bank_code == "VIETCOMBANK"  && $params['bank_code'] == "VIETCOMBANK") {
-                    switch ($params['type_card']) {
+                if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIETCOMBANK") {
+                    switch (trim($params['type_card'])) {
                         case 'JCB':
                             $params['original_fee'] = $pos->fee_jcb + $pos->fee_cashback;
                             break;
@@ -410,14 +415,15 @@ class TransactionController extends Controller
                             $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
                             break;
                         case 'NAPAS':
-                            if ($params['bank_code'] == "VIB") {
-                                $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
-                            }
                             break;
                         case 'AMEX':
-                            $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
+                                $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
                             break;
                     }
+                }
+
+                if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIB" && $params['type_card'] == "AMEX") {
+                    $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
                 }
             }
 
@@ -438,8 +444,8 @@ class TransactionController extends Controller
                 $params['price_transfer'] = 0;
                 $params['transfer_by'] = auth()->user()->id;
             }
-            
-            if($pos->method == "GATEWAY" || $pos->method == "QR_CODE"){
+
+            if ($pos->method == "GATEWAY" || $pos->method == "QR_CODE") {
                 if ($params['time_payment']) {
                     $time_lo = date('dmy', strtotime($params['time_payment']));
                 } else {
