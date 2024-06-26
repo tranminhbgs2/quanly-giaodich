@@ -29,7 +29,6 @@ class KetToanLoRequest extends FormRequest
     {
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
-            'time_end' => 'date_format:Y/m/d H:i:s',
         ];
 
         return $rule;
@@ -48,7 +47,6 @@ class KetToanLoRequest extends FormRequest
             'id.required' => 'Truyền thiếu tham số id',
             'id.integer' => 'Mã giao dịch phải là số nguyên dương',
             'id.min' => 'Mã giao dịch phải là số nguyên dương, nhỏ nhất là 1',
-            'time_end.required' => 'Thời gian kết toán không được để trống',
         ];
     }
 
@@ -66,6 +64,13 @@ class KetToanLoRequest extends FormRequest
                 }
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy lô tiền về');
+            }
+            // check định dạng của time_end
+            if (!empty($this->request->get('time_end'))) {
+                $time_end = strtotime($this->request->get('time_end'));
+                if ($time_end === false) {
+                    $validator->errors()->add('time_end', 'Thời gian kết toán không đúng định dạng Y/m/d H:i:s');
+                }
             }
         });
     }
