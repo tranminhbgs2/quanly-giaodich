@@ -377,9 +377,15 @@ class MoneyComesBackController extends Controller
     {
         $params['id'] = request('id', null);
         $params['time_end'] = request('time_end', null); // id đại lý
-        $params['time_end'] = str_replace('/', '-', $params['time_end']);
-        if (request('time_end')) {
-            $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
+        if(!empty($params['time_end'])){
+            $params['time_end'] = str_replace('/', '-', $params['time_end']);
+            if (request('time_end')) {
+                $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
+            }
+        } else {
+            $money = $this->money_repo->getById($params['id']);
+            $params['time_process'] = $money->time_process;
+            $params['time_end'] = null;
         }
         $resutl = $this->money_repo->ketToanLo($params['id'], $params['time_process'], $params['time_end']);
 

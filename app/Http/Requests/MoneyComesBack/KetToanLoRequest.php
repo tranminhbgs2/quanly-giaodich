@@ -29,7 +29,7 @@ class KetToanLoRequest extends FormRequest
     {
         $rule = [
             'id' => ['required', 'integer', 'min:1'],
-            'time_end' => 'required|date_format:Y/m/d H:i:s',
+            'time_end' => 'date_format:Y/m/d H:i:s',
         ];
 
         return $rule;

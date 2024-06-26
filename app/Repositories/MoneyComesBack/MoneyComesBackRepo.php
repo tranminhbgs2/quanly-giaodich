@@ -1012,10 +1012,16 @@ class MoneyComesBackRepo extends BaseRepo
 
     public function ketToanLo($id, $time_process, $time_end)
     {
+        if(empty($time_end)){
+            $status = Constants::USER_STATUS_LOCKED;
+        }else {
+            $status = Constants::USER_STATUS_ACTIVE;
+        }
+
         $update = [
             'time_process' => $time_process,
             'time_end' => $time_end,
-            'status' => Constants::USER_STATUS_ACTIVE
+            'status' => $status
         ];
 
         return MoneyComesBack::where('id', $id)->update($update);
@@ -1188,9 +1194,9 @@ class MoneyComesBackRepo extends BaseRepo
             ->where('status', '!=', Constants::USER_STATUS_DELETED);
 
         // Áp dụng điều kiện ngày tháng nếu có
-        
+
         if($is_all){
-            
+
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
