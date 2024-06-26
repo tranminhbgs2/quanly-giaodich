@@ -191,34 +191,36 @@ class TransactionController extends Controller
         $params['hkd_id'] = 0;
         $pos = $this->pos_repo->getById($params['pos_id'], false);
 
+        $check = 0;
         if ($pos) {
             $params['fee_cashback'] = $pos->fee_cashback; // phí hoàn
             $params['original_fee'] = $pos->total_fee;
             $params['hkd_id'] = $pos->hkd_id;
             if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIETCOMBANK") {
-                switch ($params['type_card']) {
+                switch (trim($params['type_card'])) {
                     case 'JCB':
+                        $check = 1;
                         $params['original_fee'] = $pos->fee_jcb + $pos->fee_cashback;
                         break;
                     case 'VISA':
+                        $check = 2;
                         $params['original_fee'] = $pos->fee_visa + $pos->fee_cashback;
                         break;
                     case 'MASTER':
+                        $check = 3;
                         $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
                         break;
                     case 'NAPAS':
                         break;
                     case 'AMEX':
-                        if ($params['bank_code'] == "VIB") {
-                            $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
-                        } else {
-                            $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
-                        }
+                        $check = 4;
+                        $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
                         break;
                 }
             }
 
             if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIB" && $params['type_card'] == "AMEX") {
+                $check = 5;
                 $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
             }
         }
@@ -265,7 +267,11 @@ class TransactionController extends Controller
                 } else {
                     $time_lo = date('dmy');
                 }
-                $params['lo_number'] = $params['pos_id'] . $time_lo;
+                if ($check > 0) {
+                    $params['lo_number'] = $check . $params['pos_id'] . $time_lo;
+                } else {
+                    $params['lo_number'] = $params['pos_id'] . $time_lo;
+                }
             }
         }
 
@@ -399,6 +405,7 @@ class TransactionController extends Controller
             }
             $pos = $this->pos_repo->getById($params['pos_id'], false);
             $params['hkd_id'] = 0;
+            $check = 0;
             if ($pos) {
                 $params['fee_cashback'] = $pos->fee_cashback;
                 $params['original_fee'] = $pos->total_fee;
@@ -406,23 +413,28 @@ class TransactionController extends Controller
                 if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIETCOMBANK") {
                     switch (trim($params['type_card'])) {
                         case 'JCB':
+                            $check = 1;
                             $params['original_fee'] = $pos->fee_jcb + $pos->fee_cashback;
                             break;
                         case 'VISA':
+                            $check = 2;
                             $params['original_fee'] = $pos->fee_visa + $pos->fee_cashback;
                             break;
                         case 'MASTER':
+                            $check = 3;
                             $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
                             break;
                         case 'NAPAS':
                             break;
                         case 'AMEX':
-                                $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
+                            $check = 4;
+                            $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
                             break;
                     }
                 }
 
                 if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIB" && $params['type_card'] == "AMEX") {
+                    $check = 5;
                     $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
                 }
             }
@@ -451,7 +463,11 @@ class TransactionController extends Controller
                 } else {
                     $time_lo = date('dmy');
                 }
-                $params['lo_number'] = $params['pos_id'] . $time_lo;
+                if ($check > 0) {
+                    $params['lo_number'] = $check . $params['pos_id'] . $time_lo;
+                } else {
+                    $params['lo_number'] = $params['pos_id'] . $time_lo;
+                }
             }
 
             $resutl = $this->tran_repo->update($params);
