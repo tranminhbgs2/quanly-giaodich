@@ -433,8 +433,8 @@ class WithdrawPosRepo extends BaseRepo
         // Áp dụng điều kiện ngày tháng nếu có
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
-                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
-                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                // $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                // $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
                 $query->whereBetween('time_withdraw', [$date_from, $date_to]);
             } catch (\Exception $e) {
                 // Xử lý khi định dạng ngày tháng không hợp lệ
