@@ -51,28 +51,59 @@ class SettingController extends Controller
      */
     public function getHinhThuc()
     {
-        $data = [
-            0 => [
-                'id' => 1,
-                'name' => 'Đáo hạn',
-                'code' => 'DAO_HAN'
-            ],
-            1 => [
-                'id' => 2,
-                'name' => 'Rút tiền mặt',
-                'code' => 'RUT_TIEN_MAT'
-            ],
-            2 => [
-                'id' => 3,
-                'name' => 'Online',
-                'code' => 'ONLINE'
-            ],
-            3 => [
-                'id' => 4,
-                'name' => 'QR Code',
-                'code' => 'QR_CODE'
-            ],
-        ];
+        //Kế toán này chỉ xem dc GD POSS
+        if (auth()->user()->id == 2372) {
+            $data = [
+                0 => [
+                    'id' => 1,
+                    'name' => 'Đáo hạn',
+                    'code' => 'DAO_HAN'
+                ],
+                1 => [
+                    'id' => 2,
+                    'name' => 'Rút tiền mặt',
+                    'code' => 'RUT_TIEN_MAT'
+                ],
+            ];
+        } elseif (auth()->user()->id == 2373 || auth()->user()->id == 2370) {
+            //Kế toán này chỉ xem dc GD Online
+
+            $data = [
+                2 => [
+                    'id' => 3,
+                    'name' => 'Online',
+                    'code' => 'ONLINE'
+                ],
+                3 => [
+                    'id' => 4,
+                    'name' => 'QR Code',
+                    'code' => 'QR_CODE'
+                ],
+            ];
+        } else {
+            $data = [
+                0 => [
+                    'id' => 1,
+                    'name' => 'Đáo hạn',
+                    'code' => 'DAO_HAN'
+                ],
+                1 => [
+                    'id' => 2,
+                    'name' => 'Rút tiền mặt',
+                    'code' => 'RUT_TIEN_MAT'
+                ],
+                2 => [
+                    'id' => 3,
+                    'name' => 'Online',
+                    'code' => 'ONLINE'
+                ],
+                3 => [
+                    'id' => 4,
+                    'name' => 'QR Code',
+                    'code' => 'QR_CODE'
+                ],
+            ];
+        }
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách hình thức thanh toán',
