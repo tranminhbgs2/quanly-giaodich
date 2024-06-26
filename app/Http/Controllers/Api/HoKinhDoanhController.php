@@ -45,7 +45,7 @@ class HoKinhDoanhController extends Controller
         foreach ($data as $key => $value) {
             // $params_transfer['date_from'] = $params['date_from'];
             // $params_transfer['date_to'] = $params['date_to'];
-            $params_transfer['hkd_id'] = $params['hkd_id'];
+            $params_transfer['hkd_id'] = $value['id'];
             $total_withdraw_fill = $this->withdrawPosRepo->getTotalByHkd($value['id'], $params_transfer); // toàn bộ GD rút tiền pos
 
             $params_transfer['is_all'] = true;
