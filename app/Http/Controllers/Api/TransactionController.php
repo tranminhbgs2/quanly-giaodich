@@ -439,7 +439,7 @@ class TransactionController extends Controller
                 $params['transfer_by'] = auth()->user()->id;
             }
             
-            if(($pos->method == "GATEWAY" || $pos->method == "QR_CODE") && $params['lo_number'] == 0){
+            if($pos->method == "GATEWAY" || $pos->method == "QR_CODE"){
                 if ($params['time_payment']) {
                     $time_lo = date('dmy', strtotime($params['time_payment']));
                 } else {
