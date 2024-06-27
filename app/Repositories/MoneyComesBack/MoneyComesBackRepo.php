@@ -1300,7 +1300,7 @@ class MoneyComesBackRepo extends BaseRepo
         } else {
             $query->where('status', '!=', Constants::USER_STATUS_DELETED);
         }
-
+        $query->where('total_price', '>', 0);
         $query->orderBy('lo_number', 'ASC');
         $results = $query->get()->groupBy(function ($date) {
             return Carbon::parse($date->created_at)->format('Y-m-d'); // Group by date
