@@ -492,8 +492,8 @@ class MoneyComesBackController extends Controller
         $params_transfer['hkd_id'] = $params['hkd_id'];
 
         $total_withdraw = $this->withdrawPosRepo->getTotalByHkd($params['hkd_id']);
+        $total_money = $this->money_repo->getTotalPriceByHkd($params['hkd_id']);
         $total_withdraw_fill = $this->withdrawPosRepo->getTotalByHkd($params['hkd_id'], $params_transfer);
-        $total_money = $this->money_repo->getTotalPriceByHkd($params['hkd_id'], $params_transfer);
         $params_transfer['is_all'] = true;
         $total_money_ket_toan = $this->money_repo->getTotalPriceByHkd($params['hkd_id'], $params_transfer); // các GD đã kết toán
         $total_payment = $this->money_repo->getTotalHkd($params_transfer);
