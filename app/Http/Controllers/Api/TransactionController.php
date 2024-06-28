@@ -522,7 +522,7 @@ class TransactionController extends Controller
                                 'pos_id' => $tran_old->pos_id,
                                 'hkd_id' => $money_come_old->hkd_id,
                                 'lo_number' => $tran_old->lo_number,
-                                'time_process' => $time_process,
+                                'time_process' => $time_process_old,
                                 'fee' => $tran_old->original_fee,
                                 'total_price' => $total_price,
                                 'payment' => $payment,
@@ -535,9 +535,9 @@ class TransactionController extends Controller
                                 $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
                             }
                             $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
-                        } else {
-                            $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
                         }
+                        // khởi tạo mới hoặc cập nhật cho lô sắp update
+                        $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
                     } else {
                         $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
 
