@@ -353,214 +353,26 @@ class TransactionController extends Controller
      */
     public function update(UpdateRequest $request)
     {
-        $params['id'] = request('id', null);
+        $params = $this->getRequestParams();
+
         if ($params['id']) {
-
-            $params['bank_card'] = request('bank_card', null);
-            $params['method'] = request('method', null);
-            $params['category_id'] = request('category_id', 0);
-            $params['pos_id'] = request('pos_id', 0);
-            $params['fee'] = floatval(request('fee', 0));
-            $params['time_payment'] = request('time_payment', null);
-            $params['customer_name'] = request('customer_name', null);
-            $params['price_nop'] = floatval(request('price_nop', 0));
-            $params['price_rut'] = floatval(request('price_rut', 0));
-            $params['price_fee'] = floatval(request('price_fee', 0)); // số tiền bù
-            $params['price_transfer'] = floatval(request('price_transfer', 0));
-            $params['price_repair'] = floatval(request('price_repair', 0));
-            // $params['created_by'] = auth()->user()->id;
-            $params['status'] = request('status', Constants::USER_STATUS_ACTIVE);
-            $params['customer_id'] = request('customer_id', 0);
-            $params['lo_number'] = request('lo_number', 0);
-            $params['note'] = request('note', null); // số lô
-            $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
-            $params['type_card'] = request('type_card', null); // số lô
-            $params['bank_code'] = request('bank_code', null); // số lô
-            $params['price_array'] = request('price_array', null); // số tiền bù
-
-            if (is_array($params['price_array'])) {
-                // Chuyển đổi mảng thành chuỗi JSON
-                $params['price_array'] = json_encode($params['price_array']);
-            }
-            if ($params['lo_number'] > 0) {
-                if ($params['time_payment']) {
-                    $time_process = date('Y-m-d', strtotime($params['time_payment']));
-                } else {
-                    $time_process = date('Y-m-d');
-                }
-                $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
-                if ($money_come && !empty($money_come->time_end)) {
-                    return response()->json([
-                        'code' => 400,
-                        'error' => 'Không thể thêm mới giao dịch cho lô đã kết toán',
-                        'data' => null
-                    ]);
-                }
+            if ($this->isLotClosed($params)) {
+                return response()->json([
+                    'code' => 400,
+                    'error' => 'Không thể thêm mới giao dịch cho lô đã kết toán',
+                    'data' => null
+                ]);
             }
 
             $tran_old = $this->tran_repo->getById($params['id'], false);
-
-            if ($tran_old->status == Constants::USER_STATUS_DRAFT) {
-                $params['status'] = Constants::USER_STATUS_ACTIVE;
-            }
-            $pos = $this->pos_repo->getById($params['pos_id'], false);
-            $params['hkd_id'] = 0;
-            $check = 0;
-            if ($pos) {
-                $params['fee_cashback'] = $pos->fee_cashback;
-                $params['original_fee'] = $pos->total_fee;
-                $params['hkd_id'] = $pos->hkd_id;
-                if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIETCOMBANK") {
-                    switch (trim($params['type_card'])) {
-                        case 'JCB':
-                            $check = 1;
-                            $params['original_fee'] = $pos->fee_jcb + $pos->fee_cashback;
-                            break;
-                        case 'VISA':
-                            $check = 2;
-                            $params['original_fee'] = $pos->fee_visa + $pos->fee_cashback;
-                            break;
-                        case 'MASTER':
-                            $check = 3;
-                            $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
-                            break;
-                        case 'NAPAS':
-                            break;
-                        case 'AMEX':
-                            $check = 4;
-                            $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
-                            break;
-                    }
-                }
-
-                if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIB" && $params['type_card'] == "AMEX") {
-                    $check = 5;
-                    $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
-                }
-            }
-
-            if ($params['price_fee'] == 0) {
-                $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair']; // số tiền phí
-            }
-            //tổng phí
-            $params['total_fee'] = $params['price_fee'] + $params['price_repair'];
-
-            $params['profit'] = $params['price_fee']  - $params['original_fee'] * $params['price_rut'] / 100;
-
-
-            if ($params['method'] == 'ONLINE' || $params['method'] == 'RUT_TIEN_MAT' || $params['method'] == 'QR_CODE') {
-                $params['price_nop'] = 0;
-                $params['fee_paid'] = $params['total_fee'];
-            } else {
-                $params['fee_paid'] = 0;
-                $params['price_transfer'] = 0;
-                $params['transfer_by'] = auth()->user()->id;
-            }
-
-            if ($pos->method == "GATEWAY" || $pos->method == "QR_CODE") {
-                if ($params['time_payment']) {
-                    $time_lo = date('dmy', strtotime($params['time_payment']));
-                } else {
-                    $time_lo = date('dmy');
-                }
-                if ($check > 0) {
-                    $params['lo_number'] = $check . $params['pos_id'] . $time_lo;
-                } else {
-                    $params['lo_number'] = $params['pos_id'] . $time_lo;
-                }
-            }
+            $this->prepareParamsForUpdate($params, $tran_old);
 
             $resutl = $this->tran_repo->update($params);
 
             if ($resutl) {
-                if ($params['lo_number'] > 0) {
-                    if ($params['time_payment']) {
-                        $time_process = date('Y-m-d', strtotime($params['time_payment']));
-                    } else {
-                        $time_process = date('Y-m-d');
-                    }
-                    if ($tran_old->time_payment) {
-                        $time_process_old = date('Y-m-d', strtotime($tran_old->time_payment));
-                    } else {
-                        $time_process_old = date('Y-m-d');
-                    }
-                    if ($tran_old->pos_id != $params['pos_id']) {
-                        $money_come_old = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $tran_old->lo_number, 'time_process' => $time_process_old]);
-                        $money_come_new = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $tran_old->lo_number, 'time_process' => $time_process]);
-                        if ($money_come_old) {
-                            // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
-                            $total_price = $money_come_old->total_price - $tran_old->price_rut;
-                            $payment = $money_come_old->payment - ($tran_old->price_rut - $tran_old->price_fee);
-                            $money_comes_back = [
-                                'pos_id' => $tran_old->pos_id,
-                                'hkd_id' => $money_come_old->hkd_id,
-                                'lo_number' => $tran_old->lo_number,
-                                'time_process' => $time_process,
-                                'fee' => $tran_old->original_fee,
-                                'total_price' => $total_price,
-                                'payment' => $payment,
-                                'created_by' => auth()->user()->id,
-                                'status' => $money_come_old->status,
-                            ];
-                            $pos = $this->pos_repo->getById($tran_old->pos_id, false);
-                            $price_rut = 0;
-                            if ($pos) {
-                                $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
-                            }
-                            $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
-                        } else {
-                            $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
-                        }
-                    } elseif ($tran_old->lo_number != $params['lo_number']) {
-                        $money_come_old = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $tran_old->lo_number, 'time_process' => $time_process_old]);
-                        $money_come_new = $this->money_comes_back_repo->getByLoTime(['pos_id' => $tran_old->pos_id, 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
-                        if ($money_come_old) {
-                            // Do đã công 1 lần r nên phải trừ đi lần cũ rồi cộng lại
-                            $total_price = $money_come_old->total_price - $tran_old->price_rut;
-                            $payment = $money_come_old->payment - ($tran_old->price_rut - $tran_old->price_fee);
-                            $money_comes_back = [
-                                'pos_id' => $tran_old->pos_id,
-                                'hkd_id' => $money_come_old->hkd_id,
-                                'lo_number' => $tran_old->lo_number,
-                                'time_process' => $time_process_old,
-                                'fee' => $tran_old->original_fee,
-                                'total_price' => $total_price,
-                                'payment' => $payment,
-                                'created_by' => auth()->user()->id,
-                                'status' => $money_come_old->status,
-                            ];
-                            $pos = $this->pos_repo->getById($tran_old->pos_id, false);
-                            $price_rut = 0;
-                            if ($pos) {
-                                $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
-                            }
-                            $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
-                        }
-                        // khởi tạo mới hoặc cập nhật cho lô sắp update
-                        $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
-                    } else {
-                        $money_come = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
+                $this->handleMoneyComesBackUpdates($params, $tran_old);
+                $this->handleUserBalanceUpdates($params, $tran_old);
 
-                        $this->CreateMoneyComesBack($money_come, $tran_old, $params, $time_process, "UPDATED");
-                    }
-                }
-                $user_balance = 0;
-                //Xử lý trừ tiền của nhân viên
-                if ($params['method'] == 'DAO_HAN') {
-                    $user = $this->userRepo->getById(auth()->user()->id);
-                    if ($tran_old->method == 'DAO_HAN') {
-                        $user_balance = $user->balance + $tran_old->price_nop - $params['price_nop'];
-                    } else {
-                        $user_balance = $user->balance - $params['price_nop'];
-                    }
-                    $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
-                    //cộng tiền vào tài khoản ngân hàng hưởng thụ nhân viên
-                    $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
-                    if ($bank_account) {
-                        $bank_account->balance += $tran_old->price_nop - $params['price_nop'];
-                        $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
-                    }
-                }
                 return response()->json([
                     'code' => 200,
                     'error' => 'Cập nhật thông tin thành công',
@@ -579,6 +391,203 @@ class TransactionController extends Controller
                 'error' => 'ID không hợp lệ',
                 'data' => null
             ]);
+        }
+    }
+
+    private function getRequestParams()
+    {
+        $params = request()->all();
+        $params['fee'] = floatval(request('fee', 0));
+        $params['price_nop'] = floatval(request('price_nop', 0));
+        $params['price_rut'] = floatval(request('price_rut', 0));
+        $params['price_fee'] = floatval(request('price_fee', 0));
+        $params['price_transfer'] = floatval(request('price_transfer', 0));
+        $params['price_repair'] = floatval(request('price_repair', 0));
+        $params['category_id'] = request('category_id', 0);
+        $params['pos_id'] = request('pos_id', 0);
+
+        $params['customer_id'] = request('customer_id', 0);
+        $params['lo_number'] = request('lo_number', 0);
+        $params['time_payment'] = str_replace('/', '-', $params['time_payment']);
+
+        if (is_array(request('price_array'))) {
+            $params['price_array'] = json_encode(request('price_array'));
+        }
+
+        return $params;
+    }
+
+    /**
+     * Kiểm tra lô đã kết toán hay chưa
+     */
+    private function isLotClosed($params)
+    {
+        if ($params['lo_number'] > 0) {
+            $time_process = $params['time_payment'] ? date('Y-m-d', strtotime($params['time_payment'])) : date('Y-m-d');
+            $money_come = $this->money_comes_back_repo->getByLoTime([
+                'pos_id' => $params['pos_id'],
+                'lo_number' => $params['lo_number'],
+                'time_process' => $time_process
+            ]);
+
+            return $money_come && !empty($money_come->time_end);
+        }
+        return false;
+    }
+
+    // Xử lý param đầu vào
+    private function prepareParamsForUpdate(&$params, $tran_old)
+    {
+        if ($tran_old->status == Constants::USER_STATUS_DRAFT) {
+            $params['status'] = Constants::USER_STATUS_ACTIVE;
+        }
+
+        $pos = $this->pos_repo->getById($params['pos_id'], false);
+        $params['hkd_id'] = 0;
+        $check = 0;
+
+        if ($pos) {
+            $params['fee_cashback'] = $pos->fee_cashback;
+            $params['original_fee'] = $pos->total_fee;
+            $params['hkd_id'] = $pos->hkd_id;
+
+            // Check phí theo loại thẻ của Vietcombank
+            if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIETCOMBANK") {
+                switch (trim($params['type_card'])) {
+                    case 'JCB':
+                        $check = 1;
+                        $params['original_fee'] = $pos->fee_jcb + $pos->fee_cashback;
+                        break;
+                    case 'VISA':
+                        $check = 2;
+                        $params['original_fee'] = $pos->fee_visa + $pos->fee_cashback;
+                        break;
+                    case 'MASTER':
+                        $check = 3;
+                        $params['original_fee'] = $pos->fee_master + $pos->fee_cashback;
+                        break;
+                    case 'AMEX':
+                        $check = 4;
+                        $params['original_fee'] = $pos->fee_amex + $pos->fee_cashback;
+                        break;
+                }
+            }
+
+            if ($pos->bank_code == "VIETCOMBANK" && $params['bank_code'] == "VIB" && $params['type_card'] == "AMEX") {
+                $check = 5;
+                $params['original_fee'] = $pos->fee_napas + $pos->fee_cashback;
+            }
+        }
+
+        // Tính phí
+        if ($params['price_fee'] == 0) {
+            $params['price_fee'] = ($params['fee'] * $params['price_rut']) / 100 + $params['price_repair'];
+        }
+
+        $params['total_fee'] = $params['price_fee'] + $params['price_repair'];
+        $params['profit'] = $params['price_fee'] - $params['original_fee'] * $params['price_rut'] / 100;
+
+        if (in_array($params['method'], ['ONLINE', 'RUT_TIEN_MAT', 'QR_CODE'])) {
+            $params['price_nop'] = 0;
+            $params['fee_paid'] = $params['total_fee'];
+        } else {
+            $params['fee_paid'] = 0;
+            $params['price_transfer'] = 0;
+            $params['transfer_by'] = auth()->user()->id;
+        }
+
+        // Xử lý tạo số lô
+        if ($pos && in_array($pos->method, ["GATEWAY", "QR_CODE"])) {
+            $time_lo = $params['time_payment'] ? date('dmy', strtotime($params['time_payment'])) : date('dmy');
+            $params['lo_number'] = $check > 0 ? $check . $params['pos_id'] . $time_lo : $params['pos_id'] . $time_lo;
+        }
+    }
+
+    // Xử lý tạo mới thông tin lô tiền về
+    private function handleMoneyComesBackUpdates($params, $tran_old)
+    {
+        if ($params['lo_number'] > 0) {
+            $time_process = $params['time_payment'] ? date('Y-m-d', strtotime($params['time_payment'])) : date('Y-m-d');
+            $time_process_old = $tran_old->time_payment ? date('Y-m-d', strtotime($tran_old->time_payment)) : date('Y-m-d');
+
+            if ($tran_old->pos_id != $params['pos_id']) {
+                $this->handleMoneyComesBack($tran_old, $params, $time_process, $time_process_old, 'pos_id');
+            } elseif ($tran_old->lo_number != $params['lo_number']) {
+                $this->handleMoneyComesBack($tran_old, $params, $time_process, $time_process_old, 'lo_number');
+            } elseif ($tran_old->time_payment != $params['time_payment']) {
+                $this->handleMoneyComesBack($tran_old, $params, $time_process, $time_process_old, 'time_payment');
+            } else {
+                $money_come = $this->money_comes_back_repo->getByLoTime([
+                    'pos_id' => $params['pos_id'],
+                    'lo_number' => $params['lo_number'],
+                    'time_process' => $time_process
+                ]);
+
+                $this->CreateMoneyComesBack($money_come, $tran_old, $params, $time_process, "UPDATED");
+            }
+        }
+    }
+
+    // Xử lý cập nhật hoặc tạo mới thông tin lô tiền về
+    private function handleMoneyComesBack($tran_old, $params, $time_process, $time_process_old, $type)
+    {
+        $money_come_old = $this->money_comes_back_repo->getByLoTime([
+            'pos_id' => $tran_old->pos_id,
+            'lo_number' => $tran_old->lo_number,
+            'time_process' => $time_process_old
+        ]);
+
+        $money_come_new = $this->money_comes_back_repo->getByLoTime([
+            'pos_id' => ($type == 'pos_id') ? $params['pos_id'] : $tran_old->pos_id,
+            'lo_number' => ($type == 'lo_number') ? $params['lo_number'] : $tran_old->lo_number,
+            'time_process' => $time_process
+        ]);
+
+        if ($money_come_old) {
+            $total_price = $money_come_old->total_price - $tran_old->price_rut;
+            $payment = $money_come_old->payment - ($tran_old->price_rut - $tran_old->price_fee);
+
+            $money_comes_back = [
+                'pos_id' => $tran_old->pos_id,
+                'hkd_id' => $money_come_old->hkd_id,
+                'lo_number' => $tran_old->lo_number,
+                'time_process' => $time_process_old,
+                'fee' => $tran_old->original_fee,
+                'total_price' => $total_price,
+                'payment' => $payment,
+                'created_by' => auth()->user()->id,
+                'status' => $money_come_old->status,
+            ];
+
+            $pos = $this->pos_repo->getById($tran_old->pos_id, false);
+            $price_rut = 0;
+
+            if ($pos) {
+                $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
+            }
+
+            $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
+        }
+
+        $this->CreateMoneyComesBack($money_come_new, $tran_old, $params, $time_process, "NEW");
+    }
+
+    // Xử lý cập nhật tiền cho user và bank account
+    private function handleUserBalanceUpdates($params, $tran_old)
+    {
+        if ($params['method'] == 'DAO_HAN') {
+            $user = $this->userRepo->getById(auth()->user()->id);
+            $user_balance = ($tran_old->method == 'DAO_HAN')
+                ? $user->balance + $tran_old->price_nop - $params['price_nop']
+                : $user->balance - $params['price_nop'];
+
+            $this->userRepo->updateBalance(auth()->user()->id, $user_balance, "UPDATE_TRANSACTION_" . $params['id']);
+
+            $bank_account = $this->bankAccountRepo->getAccountStaff(auth()->user()->id);
+            if ($bank_account) {
+                $bank_account->balance += $tran_old->price_nop - $params['price_nop'];
+                $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "UPDATE_TRANSACTION_" . $params['id']);
+            }
         }
     }
 

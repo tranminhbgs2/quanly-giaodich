@@ -606,6 +606,21 @@ class TransactionRepo extends BaseRepo
                 'ip_address' => request()->ip()
             ]));
         }
+        // Lưu log qua event
+        if (isset($update['time_payment']) && $update['time_payment'] != $tran->time_payment) {
+            event(new ActionLogEvent([
+                'actor_id' => auth()->user()->id ?? 0,
+                'username' => auth()->user()->username ?? 0,
+                'action' => 'UPDATED_TRANSACTION',
+                'description' => 'UPDATED_TRANSACTION_' . $tran->id . ' Cập nhật price_nop Transaction ' . $tran->id . ' từ ' . $tran->time_payment . ' thành ' . $update['time_payment'],
+                'data_new' => $update['time_payment'],
+                'data_old' => $tran->time_payment,
+                'model' => 'Transaction',
+                'table' => 'transactions',
+                'record_id' => $tran->id,
+                'ip_address' => request()->ip()
+            ]));
+        }
 
         if (isset($update['price_transfer']) && $update['price_transfer'] != $tran->price_transfer) {
             event(new ActionLogEvent([
