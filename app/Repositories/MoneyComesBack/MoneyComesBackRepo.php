@@ -830,7 +830,9 @@ class MoneyComesBackRepo extends BaseRepo
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
-                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                if (Carbon::parse($date_to)->format('H:i:s') == '00:00:00') {
+                    $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                }
                 $query->whereBetween('time_end', [$date_from, $date_to]);
             } catch (\Exception $e) {
                 // Handle invalid date format
@@ -891,7 +893,9 @@ class MoneyComesBackRepo extends BaseRepo
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
                 $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
-                $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                if (Carbon::parse($date_to)->format('H:i:s') == '00:00:00') {
+                    $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+                }
                 $query->whereBetween('time_end', [$date_from, $date_to]);
             } catch (\Exception $e) {
                 // Handle invalid date format
