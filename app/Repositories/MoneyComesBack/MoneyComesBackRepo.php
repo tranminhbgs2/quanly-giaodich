@@ -55,8 +55,7 @@ class MoneyComesBackRepo extends BaseRepo
         // if ($account_type == Constants::ACCOUNT_TYPE_STAFF) {
         $query->where('total_price', '>', 0);
         // }
-        if($status == Constants::USER_STATUS_ACTIVE)
-        {
+        if ($status == Constants::USER_STATUS_ACTIVE) {
             if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
                 try {
                     $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
@@ -827,8 +826,7 @@ class MoneyComesBackRepo extends BaseRepo
             });
         }
 
-        if($status == Constants::USER_STATUS_ACTIVE)
-        {
+        if ($status == Constants::USER_STATUS_ACTIVE) {
             if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
                 try {
                     $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
@@ -925,7 +923,6 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
-        $query->where('total_price', '>', 0);
         $query->whereNotNull('agent_id');
 
         if ($agent_id > 0) {
@@ -1168,11 +1165,12 @@ class MoneyComesBackRepo extends BaseRepo
             $query->where('lo_number', $lo_number);
         }
 
-        $query->where('total_price', '>', 0);
         $query->whereNotNull('agent_id');
         $query->where('agent_id', '!=', 0);
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
+        } else {
+            $query->where('total_price', '>', 0);
         }
 
         if ($status > 0) {
@@ -1242,7 +1240,7 @@ class MoneyComesBackRepo extends BaseRepo
                     // Handle invalid date format
                 }
             }
-            if($is_ket_toan){
+            if ($is_ket_toan) {
                 $query->whereNotNull('time_end');
             }
         } else {
