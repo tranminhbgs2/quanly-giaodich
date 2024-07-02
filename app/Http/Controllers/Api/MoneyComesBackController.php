@@ -101,6 +101,8 @@ class MoneyComesBackController extends Controller
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
 
         $params_transfer['agent_id'] = $params['agent_id'];
+        $params_transfer['agent_date_to'] =  $params['date_to'];
+        $params_transfer['agent_date_from'] =  $params['date_from'];
 
         $data = $this->money_repo->getListingAgent($params, false, true);
         $total = $this->money_repo->getListingAgent($params, true, true);
