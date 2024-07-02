@@ -1171,8 +1171,6 @@ class MoneyComesBackRepo extends BaseRepo
         $query->where('agent_id', '!=', 0);
         if ($agent_id > 0) {
             $query->where('agent_id', $agent_id);
-        } else {
-            $query->where('total_price', '>', 0);
         }
 
         if ($status > 0) {
