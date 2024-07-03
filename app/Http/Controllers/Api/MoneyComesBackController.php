@@ -450,7 +450,7 @@ class MoneyComesBackController extends Controller
         $total_payment = $this->money_repo->getTotalAgent($params);
         if (count($total_transfer) > 0) {
             $total_payment['total_transfer'] = (int)$total_transfer['total_transfer'];
-            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'] - $total_transfer_from['total_transfer'];
+            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'] + $total_transfer_from['total_transfer'];
         }
 
         return response()->json([
