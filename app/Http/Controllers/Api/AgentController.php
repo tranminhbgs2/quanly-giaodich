@@ -353,7 +353,7 @@ class AgentController extends Controller
             $total_transfer_to = $transfer_repo->getTotalAgent($params_transfer_to); // tiền nhận
             $params_transfer_from['agent_id'] = $agent_id;
             $params_transfer_from['type'] = "FROM";
-            $total_transfer_from = $transfer_repo->getTotalAgent($params_transfer_from); // tiền nhận
+            $total_transfer_from = $transfer_repo->getTotalAgent($params_transfer_from); // tiền chuyển
             $total_payment = $money_repo->getTotalAgent($params);
 
             $total_payment['total_transfer'] = (int)$total_transfer_to['total_transfer'] - (int)$total_transfer_from['total_transfer'];

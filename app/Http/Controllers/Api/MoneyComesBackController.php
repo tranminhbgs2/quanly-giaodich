@@ -442,10 +442,15 @@ class MoneyComesBackController extends Controller
         // Merge $data and $data_agent
         $mergedData = $this->mergeDataArrays($data, $data_agent);
         $total_transfer = $this->transfer_repo->getTotalAgent($params_transfer);
+
+        $params_transfer_from['agent_id'] = $params['agent_id'];
+        $params_transfer_from['type'] = "FROM";
+        $total_transfer_from = $this->transfer_repo->getTotalAgent($params_transfer_from); // tiền chuyển
+
         $total_payment = $this->money_repo->getTotalAgent($params);
         if (count($total_transfer) > 0) {
             $total_payment['total_transfer'] = (int)$total_transfer['total_transfer'];
-            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'];
+            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'] - $total_transfer_from['total_transfer'];
         }
 
         return response()->json([

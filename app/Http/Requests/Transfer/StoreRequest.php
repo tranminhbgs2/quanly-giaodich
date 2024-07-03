@@ -44,7 +44,7 @@ class StoreRequest extends FormRequest
             'acc_bank_to_id' => ['required'],
             'type_to' => ['required', 'in:STAFF,AGENCY,MASTER,FEE'],
             'type_from' => ['required', 'in:STAFF,AGENCY,MASTER,FEE'],
-            'price' => ['required', 'numeric', 'min:0'],
+            'price' => ['required', 'numeric'],
             'time_payment' => ['required', 'date_format:Y/m/d H:i:s'],
             'is_duplicate' => 'boolean',
 
@@ -74,7 +74,6 @@ class StoreRequest extends FormRequest
             'type_to.in' => 'Truyền tham số type_to không hợp lệ',
             'price.required' => 'Truyền thiếu tham số price',
             'price.numeric' => 'Truyền tham số price phải là số',
-            'price.min' => 'Truyền tham số price phải lớn hơn hoặc bằng 0',
             'time_payment.required' => 'Truyền thiếu tham số time_payment',
             'time_payment.date_format' => 'Truyền tham số time_payment không đúng định dạng Y/m/d H:i:s',
             'type_from.required' => 'Truyền thiếu tham số type_from',
