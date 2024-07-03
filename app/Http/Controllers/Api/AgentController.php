@@ -371,10 +371,23 @@ class AgentController extends Controller
                 $agent_balance = $total_payment['total_cash'];
                 $this->agent_repo->updateBalance($agent_id, $agent_balance, "SYNC_BALANCE_AGENCY_" . $agent_id);
             }
+            $payment_agent = $total_payment['total_payment_agent'];
             $bank_account = $this->bankAccountRepo->getAccountAgency($agent_id);
-            if ($bank_account) {
-                $bank_account->balance = $total_payment['total_cash'];
-                $this->bankAccountRepo->updateBalance($bank_account->id, $bank_account->balance, "SYNC_BALANCE_AGENCY_" . $agent_id);
+            foreach ($bank_account as $bank) {
+                if($bank['balance'] > 0) {
+                    if($total_payment['total_cash'] == 0){
+                        $bank['balance'] = $total_payment['total_cash'];
+                    } else {
+                        if ($bank['balance'] > $payment_agent && $payment_agent >= 0) {
+                            $bank['balance'] = $bank['balance'] - $payment_agent;
+                            $payment_agent = 0;
+                        } elseif ($bank['balance'] < $payment_agent) {
+                            $payment_agent = $payment_agent - $bank['balance'];
+                            $bank['balance'] = 0;
+                        }
+                    }
+                    $this->bankAccountRepo->updateBalance($bank['id'], $bank['balance'], "SYNC_BALANCE_AGENCY_" . $agent_id);
+                }
             }
         }
         return response()->json([

@@ -298,7 +298,7 @@ class BankAccountRepo extends BaseRepo
     }
     public function getAccountAgency($id)
     {
-        $dep = BankAccounts::where('type', Constants::ACCOUNT_TYPE_AGENCY)->where('agent_id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
+        $dep = BankAccounts::where('type', Constants::ACCOUNT_TYPE_AGENCY)->where('agent_id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->get()->toArray();
 
         return $dep;
     }
