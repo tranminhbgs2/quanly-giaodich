@@ -28,6 +28,7 @@ class MoneyComesBack extends Model
         'status',
         'fee_agent',
         'payment_agent',
+        'note',
     ];
 
     /**

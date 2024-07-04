@@ -1397,4 +1397,13 @@ class MoneyComesBackRepo extends BaseRepo
 
         return $tran->get()->toArray();
     }
+
+    public function updateNote($note, $id)
+    {
+        $update = [
+            'note' => $note
+        ];
+
+        return MoneyComesBack::where('id', $id)->update($update);
+    }
 }

@@ -18,6 +18,7 @@ Route::group(['prefix' => 'lo-tien-ve'], function (){
         Route::get('/get-top-agency', 'MoneyComesBackController@getTopAgency');
         Route::get('/get-all-agency', 'MoneyComesBackController@getAllAgency');
         Route::get('/get-all-hkd', 'MoneyComesBackController@getAllHkd');
+        Route::post('/update-note', 'MoneyComesBackController@updateNote');
     });
 
 });

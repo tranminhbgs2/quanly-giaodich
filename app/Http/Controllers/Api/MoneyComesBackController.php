@@ -696,4 +696,27 @@ class MoneyComesBackController extends Controller
 
         return $flattenedResults;
     }
+
+
+    public function updateNote()
+    {
+        $id = request('id', null);
+        $note = request('note', null);
+
+        $resutl = $this->money_repo->updateNote($note, $id);
+
+        if ($resutl) {
+            return response()->json([
+                'code' => 200,
+                'error' => 'Cập nhật ghi chú thành công',
+                'data' => null
+            ]);
+        }
+
+        return response()->json([
+            'code' => 400,
+            'error' => 'Cập nhật ghi chú không thành công',
+            'data' => null
+        ]);
+    }
 }
