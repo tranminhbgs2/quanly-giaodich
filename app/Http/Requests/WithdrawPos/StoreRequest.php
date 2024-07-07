@@ -31,7 +31,7 @@ class StoreRequest extends FormRequest
             'hkd_id' => ['required', 'integer', 'min:1'],
             'account_bank_id' => ['required', 'integer', 'min:1'],
             'time_payment' => ['date_format:Y/m/d H:i:s'],
-            'price_withdraw' => ['required', 'numeric', 'min:0'],
+            'price_withdraw' => ['required', 'numeric'],
 
         ];
 
@@ -53,7 +53,6 @@ class StoreRequest extends FormRequest
         return [
             'required' => ':attribute không được để trống',
             'integer' => ':attribute phải là số nguyên',
-            'min' => ':attribute phải lớn hơn hoặc bằng :min',
             'numeric' => ':attribute phải là số',
             'date_format' => ':attribute không đúng định dạng Y/m/d H:i:s',
         ];

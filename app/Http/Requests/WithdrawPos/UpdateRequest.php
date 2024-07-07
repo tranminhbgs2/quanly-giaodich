@@ -32,7 +32,7 @@ class UpdateRequest extends FormRequest
             'hkd_id' => ['required', 'integer', 'min:1'],
             'account_bank_id' => ['required', 'integer', 'min:1'],
             'time_payment' => ['date_format:Y/m/d H:i:s'],
-            'price_withdraw' => ['required', 'numeric', 'min:0'],
+            'price_withdraw' => ['required', 'numeric'],
             'status' => ['integer', 'in:' . Constants::USER_STATUS_ACTIVE . ',' . Constants::USER_STATUS_DELETED . ',' . Constants::USER_STATUS_LOCKED ],
         ];
 
@@ -56,7 +56,6 @@ class UpdateRequest extends FormRequest
         return [
             'required' => ':attribute không được để trống',
             'integer' => ':attribute phải là số nguyên',
-            'min' => ':attribute phải lớn hơn hoặc bằng :min',
             'numeric' => ':attribute phải là số',
             'date_format' => ':attribute không đúng định dạng Y/m/d H:i:s',
             'in' => ':attribute không hợp lệ',
@@ -81,30 +80,6 @@ class UpdateRequest extends FormRequest
             } else {
                 $validator->errors()->add('check_exist', 'Không tìm thấy GD rút tiền');
             }
-
-            // // Check theo email
-            // if ($this->request->get('name')) {
-            //     $user = Categories::where('name', $this->request->get('name'))
-            //         ->whereNotIn('id', [$this->request->get('id')])
-            //         ->whereNotNull('name')
-            //         ->withTrashed()
-            //         ->first();
-            //     if ($user) {
-            //         $validator->errors()->add('check_exist', 'Tên danh mục đã được đăng ký');
-            //     }
-            // }
-
-            // // Check theo identifier
-            // if ($this->request->get('code')) {
-            //     $user = Categories::where('code', $this->request->get('code'))
-            //         ->whereNotIn('id', [$this->request->get('id')])
-            //         ->whereNotNull('code')
-            //         ->withTrashed()
-            //         ->first();
-            //     if ($user) {
-            //         $validator->errors()->add('check_exist', 'Mã danh mục đã được đăng ký');
-            //     }
-            // }
         });
     }
 
