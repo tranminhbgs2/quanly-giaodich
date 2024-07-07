@@ -96,7 +96,7 @@ class WithdrawPosController extends Controller
         $params['account_bank_id'] = request('account_bank_id', 0); // hình thức
         $params['time_withdraw'] = request('time_withdraw', null); // máy pos
         $params['pos_id'] = request('pos_id', 0); // phí
-        $params['price_withdraw'] = request('price_withdraw', 0); // phí
+        $params['price_withdraw'] = request('price_withdraw', 0); // tiền rút pos. Nếu nhập âm thì tiền đó là tiền nạp vào HKD
         $params['status'] = request('status', Constants::USER_STATUS_ACTIVE); // trạng thái
         $params['created_by'] = auth()->user()->id; // người tạo
         $params['time_withdraw'] = str_replace('/', '-', $params['time_withdraw']);

@@ -534,6 +534,7 @@ class MoneyComesBackController extends Controller
     {
         $time_process = request('time_process', date('Y-m-d'));
         $data = $this->money_repo->getByTimeProcess($time_process);
+        $total = [];
         foreach ($data as $item) {
             $params['id'] = $item['id'];
             // Sử dụng Carbon để thiết lập date_from và date_to
@@ -550,6 +551,7 @@ class MoneyComesBackController extends Controller
                     $update['payment'] = $total_tran['price_rut'] - $total_tran['price_fee'];
                 }
             }
+            $total[] = [$total_tran, $params['lo_number']];
             if (count($update) > 0) {
                 $this->money_repo->updateSync($update, $params['id']);
             }
@@ -557,6 +559,7 @@ class MoneyComesBackController extends Controller
         return response()->json([
             'code' => 200,
             'error' => 'Đồng bộ dữ liệu lô tiền về thành công',
+            'total' => $total,
             'data' => $data,
             'time_process' => $time_process
         ]);
