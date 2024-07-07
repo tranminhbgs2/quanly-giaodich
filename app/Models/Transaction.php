@@ -155,7 +155,7 @@ class Transaction extends Model
     public function getPriceArrayAttribute($value)
     {
         if (empty($value)) {
-            return null;
+            return [];
         }
         return json_decode($value, true);
     }
