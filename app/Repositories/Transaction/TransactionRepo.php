@@ -872,7 +872,6 @@ class TransactionRepo extends BaseRepo
                     } elseif ($transaction->method == 'DAO_HAN') {
                         $staffs[$createdBy->id]['total_price_transfer'] += $transaction->price_nop;
                     }
-
                 }
             }
         }
@@ -885,6 +884,15 @@ class TransactionRepo extends BaseRepo
                 ->whereBetween('created_at', [$date_from, $date_to])
                 ->get();
             $staff['total_mester_transfer'] = $query_transfer->sum('price');
+
+            // nhân viên ck lại cho tk nguồn
+            $query_transfer_from = Transfer::select('from_agent_id', 'price')
+                ->where('status', Constants::USER_STATUS_ACTIVE)
+                ->where('from_agent_id', $staff['id'])
+                ->where('type_from', Constants::ACCOUNT_TYPE_STAFF)
+                ->whereBetween('created_at', [$date_from, $date_to])
+                ->get();
+            $staff['total_mester_transfer'] -= $query_transfer_from->sum('price');
         }
         // Sort by total price rutted and return all results
         $topStaff = collect($staffs)->sortByDesc('total_price_rut')->values()->all();
@@ -895,10 +903,10 @@ class TransactionRepo extends BaseRepo
     public function changeFeePaid($fee_paid, $id, $transfer_by,  $type = "")
     {
         $tran = Transaction::where('id', $id)->where('status', Constants::USER_STATUS_ACTIVE)->first();
-        if($tran->fee_paid == $tran->total_fee){
+        if ($tran->fee_paid == $tran->total_fee) {
             $status_fee = 3;
             $fee_paid_new = $fee_paid;
-        } else{
+        } else {
             $fee_paid_new = $tran->fee_paid + $fee_paid;
             if ($fee_paid_new == $tran->total_fee) {
                 $status_fee = 3;
