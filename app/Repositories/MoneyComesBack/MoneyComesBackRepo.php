@@ -906,7 +906,10 @@ class MoneyComesBackRepo extends BaseRepo
 
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
-                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+
+                // if (Carbon::parse($date_from)->format('H:i:s') == '00:00:00') {
+                //     $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->endOfDay();
+                // }
                 if (Carbon::parse($date_to)->format('H:i:s') == '00:00:00') {
                     $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
                 }
@@ -1150,7 +1153,9 @@ class MoneyComesBackRepo extends BaseRepo
 
         if ($date_from && $date_to && strtotime($date_from) <= strtotime($date_to) && !empty($date_from) && !empty($date_to)) {
             try {
-                $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+                // if (Carbon::parse($date_from)->format('H:i:s') == '00:00:00') {
+                //     $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->endOfDay();
+                // }
                 if (Carbon::parse($date_to)->format('H:i:s') == '00:00:00') {
                     $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
                 }
