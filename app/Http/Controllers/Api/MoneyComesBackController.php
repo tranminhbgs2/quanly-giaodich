@@ -420,10 +420,18 @@ class MoneyComesBackController extends Controller
         $params['date_to'] = str_replace('/', '-', $params['date_to']);
 
         $data = $this->money_repo->getTopAgency($params);
+        $total_rut = 0;
+        foreach ($data as $key => $value) {
+            $total_rut += $value['total_price_rut'];
+        }
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách top đại lý',
-            'data' => $data
+            'data' => $data,
+            'total' => [
+                'total_rut' => $total_rut
+
+            ],
         ]);
     }
     public function getAllAgency()

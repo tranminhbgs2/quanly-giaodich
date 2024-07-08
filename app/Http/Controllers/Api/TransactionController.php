@@ -958,10 +958,18 @@ class TransactionController extends Controller
         $params['account_type'] = auth()->user()->account_type;
         $params['created_by'] = auth()->user()->id;
         $data = $this->tran_repo->topStaffTransaction($params);
+        $total_rut = 0;
+        foreach ($data as $key => $value) {
+            $total_rut += $value['total_price_rut'];
+        }
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách top nhân viên',
             'data' => $data,
+            'total' => [
+                'total_rut' => $total_rut
+
+            ],
         ]);
     }
 
