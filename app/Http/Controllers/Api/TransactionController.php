@@ -234,22 +234,6 @@ class TransactionController extends Controller
 
         $params['profit'] = $params['price_fee'] - ($params['original_fee'] * $params['price_rut'] / 100); // lợi nhuận
 
-        if ($params['lo_number'] > 0) {
-            if ($params['time_payment']) {
-                $time_process = date('Y-m-d', strtotime($params['time_payment']));
-            } else {
-                $time_process = date('Y-m-d');
-            }
-            $money_comeb = $this->money_comes_back_repo->getByLoTime(['pos_id' => $params['pos_id'], 'lo_number' => $params['lo_number'], 'time_process' => $time_process]);
-            if ($money_comeb && !empty($money_comeb->time_end)) {
-                return response()->json([
-                    'code' => 400,
-                    'error' => 'Không thể thêm mới giao dịch cho lô đã kết toán',
-                    'data' => null
-                ]);
-            }
-        }
-
         if ($params['lo_number'] <= 0 && $params['pos_id'] == 0) {
             $params['status'] = Constants::USER_STATUS_DRAFT;
         } else {
@@ -272,6 +256,14 @@ class TransactionController extends Controller
                 } else {
                     $params['lo_number'] = $params['pos_id'] . $time_lo;
                 }
+            }
+
+            if ($this->isLotClosed($params)) {
+                return response()->json([
+                    'code' => 400,
+                    'error' => 'Không thể thêm mới giao dịch cho lô đã kết toán',
+                    'data' => null
+                ]);
             }
         }
 
