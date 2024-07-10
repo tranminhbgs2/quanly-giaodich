@@ -429,7 +429,12 @@ class TransactionController extends Controller
                 'lo_number' => $params['lo_number'],
                 'time_process' => $time_process
             ]);
-
+            return response()->json([
+                'code' => 422,
+                'error' => 'ID không hợp lệ',
+                'data' => $money_come,
+                'params' => $params
+            ]);
             return $money_come && !empty($money_come->time_end);
         }
         return false;
