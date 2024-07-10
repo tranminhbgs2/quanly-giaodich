@@ -541,6 +541,10 @@ class MoneyComesBackController extends Controller
     public function syncMoneyComesBack()
     {
         $time_process = request('time_process', date('Y-m-d'));
+        if (strlen($time_process) == 10) {
+            // Nếu không, thêm giờ mặc định là 00:00:00
+            $time_process .= ' 00:00:00';
+        }
         $data = $this->money_repo->getByTimeProcess($time_process);
         $total = [];
         // foreach ($data as $item) {
