@@ -545,6 +545,13 @@ class MoneyComesBackController extends Controller
             // Nếu không, thêm giờ mặc định là 00:00:00
             $time_process .= ' 00:00:00';
         }
+        // Tạo ngày bắt đầu và ngày kết thúc từ thời gian truyền vào theo múi giờ UTC+7
+        $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $time_process, 'UTC+7')->startOfDay();
+        $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $time_process, 'UTC+7')->endOfDay();
+
+        // Chuyển đổi thời gian sang múi giờ UTC+7
+        $date_from->setTimezone('UTC+7');
+        $date_to->setTimezone('UTC+7');
         // $data = $this->money_repo->getByTimeProcess($time_process);
         $total = [];
         // foreach ($data as $item) {
@@ -574,7 +581,8 @@ class MoneyComesBackController extends Controller
             'total' => $total,
             'totsal' => $time_process,
             // 'data' => $data,
-            'time_process' => Carbon::createFromFormat('Y-m-d H:i:s', $time_process)->startOfDay()
+            'time_process' => $date_from,
+            'date_to' => $date_to
         ]);
     }
 
