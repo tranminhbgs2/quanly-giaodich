@@ -772,12 +772,10 @@ class MoneyComesBackRepo extends BaseRepo
         try {
             $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $time_process, 'UTC')->startOfDay();
             $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $time_process, 'UTC')->endOfDay();
-            echo $date_from . ' - ' . $date_to;
             $tran->whereBetween('updated_at', [$date_from, $date_to]);
         } catch (\Exception $e) {
             // Handle invalid date format
         }
-        print_r($tran->toSql());die;
         return $tran->get()->toArray();
     }
     /**
