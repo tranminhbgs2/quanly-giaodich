@@ -545,7 +545,7 @@ class MoneyComesBackController extends Controller
             // Nếu không, thêm giờ mặc định là 00:00:00
             $time_process .= ' 00:00:00';
         }
-        $data = $this->money_repo->getByTimeProcess($time_process);
+        // $data = $this->money_repo->getByTimeProcess($time_process);
         $total = [];
         // foreach ($data as $item) {
         //     $params['id'] = $item['id'];
@@ -572,7 +572,8 @@ class MoneyComesBackController extends Controller
             'code' => 200,
             'error' => 'Đồng bộ dữ liệu lô tiền về thành công',
             'total' => $total,
-            'data' => $data,
+            'totsal' => $time_process,
+            // 'data' => $data,
             'time_process' => Carbon::createFromFormat('Y-m-d H:i:s', $time_process)->startOfDay()
         ]);
     }
