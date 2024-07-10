@@ -545,41 +545,36 @@ class MoneyComesBackController extends Controller
             // Nếu không, thêm giờ mặc định là 00:00:00
             $time_process .= ' 00:00:00';
         }
-        // Tạo ngày bắt đầu và ngày kết thúc từ thời gian truyền vào theo múi giờ UTC+7
-        $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $time_process, 'Asia/Ho_Chi_Minh')->startOfDay();
-        $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $time_process, 'Asia/Ho_Chi_Minh')->endOfDay();
 
-        // $data = $this->money_repo->getByTimeProcess($time_process);
+        $data = $this->money_repo->getByTimeProcess($time_process);
         $total = [];
-        // foreach ($data as $item) {
-        //     $params['id'] = $item['id'];
-        //     // Sử dụng Carbon để thiết lập date_from và date_to
-        //     $params['date_from'] = Carbon::parse($time_process)->startOfDay();
-        //     $params['date_to'] = Carbon::parse($time_process)->endOfDay();
-        //     $params['hkd_id'] = $item['hkd_id'];
-        //     $params['pos_id'] = $item['pos_id'];
-        //     $params['lo_number'] = $item['lo_number'];
-        //     $total_tran = $this->transaction_repo->getPriceLoNumber($params);
-        //     $update = [];
-        //     if ($total_tran) {
-        //         if ($item['total_price'] != $total_tran['price_rut']) {
-        //             $update['total_price'] = $total_tran['price_rut'];
-        //             $update['payment'] = $total_tran['price_rut'] - $total_tran['price_fee'];
-        //         }
-        //     }
-        //     $total[] = [$total_tran, $params['lo_number']];
-        //     if (count($update) > 0) {
-        //         $this->money_repo->updateSync($update, $params['id']);
-        //     }
-        // }
+        foreach ($data as $item) {
+            $params['id'] = $item['id'];
+            // Sử dụng Carbon để thiết lập date_from và date_to
+            $params['date_from'] = Carbon::parse($time_process)->startOfDay();
+            $params['date_to'] = Carbon::parse($time_process)->endOfDay();
+            $params['hkd_id'] = $item['hkd_id'];
+            $params['pos_id'] = $item['pos_id'];
+            $params['lo_number'] = $item['lo_number'];
+            $total_tran = $this->transaction_repo->getPriceLoNumber($params);
+            $update = [];
+            if ($total_tran) {
+                if ($item['total_price'] != $total_tran['price_rut']) {
+                    $update['total_price'] = $total_tran['price_rut'];
+                    $update['payment'] = $total_tran['price_rut'] - $total_tran['price_fee'];
+                }
+            }
+            $total[] = [$total_tran, $params['lo_number']];
+            if (count($update) > 0) {
+                $this->money_repo->updateSync($update, $params['id']);
+            }
+        }
         return response()->json([
             'code' => 200,
             'error' => 'Đồng bộ dữ liệu lô tiền về thành công',
             'total' => $total,
-            'totsal' => $time_process,
-            // 'data' => $data,
-            'time_process' => $date_from,
-            'date_to' => $date_to
+            'data' => $data,
+            'time_process' => $time_process
         ]);
     }
 

@@ -770,8 +770,8 @@ class MoneyComesBackRepo extends BaseRepo
     {
         $tran = MoneyComesBack::where('agent_id', 0);
         try {
-            $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $time_process)->startOfDay();
-            $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $time_process)->endOfDay();
+            $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $time_process, 'UTC')->startOfDay();
+            $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $time_process, 'UTC')->endOfDay();
             $tran->whereBetween('updated_at', [$date_from, $date_to]);
         } catch (\Exception $e) {
             // Handle invalid date format
