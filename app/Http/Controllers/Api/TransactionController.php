@@ -356,6 +356,10 @@ class TransactionController extends Controller
         $params = $this->getRequestParams();
 
         if ($params['id']) {
+
+            $tran_old = $this->tran_repo->getById($params['id'], false);
+            $this->prepareParamsForUpdate($params, $tran_old);
+
             if ($this->isLotClosed($params)) {
                 return response()->json([
                     'code' => 400,
@@ -363,10 +367,6 @@ class TransactionController extends Controller
                     'data' => null
                 ]);
             }
-
-            $tran_old = $this->tran_repo->getById($params['id'], false);
-            $this->prepareParamsForUpdate($params, $tran_old);
-
             $resutl = $this->tran_repo->update($params);
 
             if ($resutl) {
