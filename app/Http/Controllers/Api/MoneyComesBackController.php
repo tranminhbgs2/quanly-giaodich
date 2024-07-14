@@ -551,8 +551,8 @@ class MoneyComesBackController extends Controller
         foreach ($data as $item) {
             $params['id'] = $item['id'];
             // Sử dụng Carbon để thiết lập date_from và date_to
-            $params['date_from'] = Carbon::parse($time_process)->startOfDay();
-            $params['date_to'] = Carbon::parse($time_process)->endOfDay();
+            $params['date_from'] = Carbon::parse($item['time_process'])->startOfDay();
+            $params['date_to'] = Carbon::parse($item['time_process'])->endOfDay();
             $params['hkd_id'] = $item['hkd_id'];
             $params['pos_id'] = $item['pos_id'];
             $params['lo_number'] = $item['lo_number'];
