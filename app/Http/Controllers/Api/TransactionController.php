@@ -692,7 +692,7 @@ class TransactionController extends Controller
         $tran_day = $this->tran_repo->ReportDashboard([]);
         $transfer_day = $this->transfer_repo->getTotalMaster([]);
 
-        if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
+        if (!in_array(auth()->user()->account_type, [Constants::ACCOUNT_TYPE_SYSTEM, Constants::ACCOUNT_TYPE_ACCOUNTANT])) {
             $data_day = [
                 'san_luong' => $tran_day['san_luong'], // tổng số tiền GD trong ngày
                 'tien_nhan' => (int)$transfer_day['total_transfer'], // Tiền master chuyển khoản
@@ -715,7 +715,7 @@ class TransactionController extends Controller
         $transfer_month = $this->transfer_repo->getTotalMaster($params);
         $data_month_agent = $this->money_comes_back_repo->ReportDashboardAgent($params);
 
-        if (auth()->user()->account_type !== Constants::ACCOUNT_TYPE_SYSTEM) {
+        if (!in_array(auth()->user()->account_type, [Constants::ACCOUNT_TYPE_SYSTEM, Constants::ACCOUNT_TYPE_ACCOUNTANT])) {
             $data_month = [
                 'san_luong' => $tran_month['san_luong'], // tổng số tiền GD trong tháng
                 'tien_nhan' => (int)$transfer_month['total_transfer'], // Tiền master chuyển khoản
