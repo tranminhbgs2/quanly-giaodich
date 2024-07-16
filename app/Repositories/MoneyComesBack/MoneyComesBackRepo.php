@@ -1418,4 +1418,14 @@ class MoneyComesBackRepo extends BaseRepo
 
         return MoneyComesBack::where('id', $id)->update($update);
     }
+
+    public function getProfitsMoney($startDate, $endDate)
+    {
+        return MoneyComesBack::selectRaw('DATE(time_end) as date, SUM(total_price * (fee_agent - fee) / 100) as profit_money')
+            ->whereBetween('time_end', [$startDate, $endDate])
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->where('agent_id', '!=', 0)
+            ->groupBy('date')
+            ->get();
+    }
 }

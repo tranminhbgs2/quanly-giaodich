@@ -384,7 +384,7 @@ class MoneyComesBackController extends Controller
     {
         $params['id'] = request('id', null);
         $params['time_end'] = request('time_end', null); // id đại lý
-        if(!empty($params['time_end'])){
+        if (!empty($params['time_end'])) {
             $params['time_end'] = str_replace('/', '-', $params['time_end']);
             if (request('time_end')) {
                 $params['time_process'] = date('Y-m-d', strtotime(request('time_end')));
@@ -462,9 +462,9 @@ class MoneyComesBackController extends Controller
 
         $total_payment = $this->money_repo->getTotalAgent($params);
         // if (count($total_transfer) > 0) {
-            $total_payment['total_transfer'] = (int)$total_transfer['total_transfer'];
-            $total_payment['total_transfer_from'] = (int)$total_transfer_from['total_transfer'];
-            $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'] + $total_transfer_from['total_transfer'];
+        $total_payment['total_transfer'] = (int)$total_transfer['total_transfer'];
+        $total_payment['total_transfer_from'] = (int)$total_transfer_from['total_transfer'];
+        $total_payment['total_cash'] = $total_payment['total_payment_agent'] - $total_payment['total_transfer'] + $total_transfer_from['total_transfer'];
         // }
 
         return response()->json([
@@ -496,15 +496,14 @@ class MoneyComesBackController extends Controller
         $data_hkd = $this->withdrawPosRepo->getListByHkd($params);
         $data_new = [];
         $total_payments = 0;
-        foreach($data as $key => $values){
+        foreach ($data as $key => $values) {
             $datav = [];
-            foreach($values as $value)
-                {
-                    $value['payment'] = (int)($value['total_price'] - (int)($value['total_price']* $value['fee'] /100));
-                    $datav[] = $value;
-                    $total_payments = (int)($total_payments + $value['payment']);
-                }
-                    $data_new[$key] = $datav;
+            foreach ($values as $value) {
+                $value['payment'] = (int)($value['total_price'] - (int)($value['total_price'] * $value['fee'] / 100));
+                $datav[] = $value;
+                $total_payments = (int)($total_payments + $value['payment']);
+            }
+            $data_new[$key] = $datav;
         }
         // Merge $data and $data_agent
         $mergedData = $this->mergeDataArraysHkd($data_new, $data_hkd);
@@ -534,7 +533,7 @@ class MoneyComesBackController extends Controller
                 'total_payment' => $total_payment,
             ],
             'data' => $mergedData,
-                                '$total_payment' => $total_payments
+            '$total_payment' => $total_payments
         ]);
     }
 
@@ -733,6 +732,57 @@ class MoneyComesBackController extends Controller
             'code' => 400,
             'error' => 'Cập nhật ghi chú không thành công',
             'data' => null
+        ]);
+    }
+
+    // Controller method
+    public function getProfit()
+    {
+
+        $startDate = request('date_from', null);
+        $endDate = request('date_to', null);
+        $startDate = Carbon::parse($startDate);
+        $endDate = Carbon::parse($endDate);
+
+        $startDate = Carbon::createFromFormat('Y-m-d H:i:s', $startDate, 'UTC')->startOfDay();
+        $endDate = Carbon::createFromFormat('Y-m-d H:i:s', $endDate, 'UTC')->endOfDay();
+        $date_from = date('Y-m-d H:i:s', strtotime($startDate));
+        $date_to = date('Y-m-d H:i:s', strtotime($endDate));
+
+        // Khởi tạo mảng kết quả với các ngày từ $startDate đến $endDate
+        $output = [];
+        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+            $output[$date->format('d/m/Y')] = [
+                'date' => $date->format('d/m/Y'),
+                'profit_trans' => 0,
+                'profit_money' => 0,
+                'total_profit' => 0,
+            ];
+        }
+
+        $transactions = $this->transaction_repo->getProfitTrans($date_from, $date_to);
+        $moneyComesBack = $this->money_repo->getProfitsMoney($date_from, $date_to);
+
+        foreach ($transactions as $transaction) {
+            $date = Carbon::parse($transaction->date)->format('d/m/Y');
+            if (isset($output[$date])) {
+                $output[$date]['profit_trans'] = $transaction->profit_trans;
+                $output[$date]['total_profit'] += $transaction->profit_trans;
+            }
+        }
+
+        foreach ($moneyComesBack as $money) {
+            $date = Carbon::parse($money->date)->format('d/m/Y');
+            if (isset($output[$date])) {
+                $output[$date]['profit_money'] = $money->profit_money;
+                $output[$date]['total_profit'] += $money->profit_money;
+            }
+        }
+
+        return response()->json([
+            'code' => 200,
+            'error' => 'Danh sách lợi nhuận',
+            'data' => $output,
         ]);
     }
 }
