@@ -755,27 +755,47 @@ class MoneyComesBackController extends Controller
             $output[$date->format('d/m/Y')] = [
                 'date' => $date->format('d/m/Y'),
                 'profit_trans' => 0,
+                'profit_online' => 0,
+                'profit_qr' => 0,
                 'profit_money' => 0,
                 'total_profit' => 0,
             ];
         }
 
-        $transactions = $this->transaction_repo->getProfitTrans($date_from, $date_to);
+        $transactions = $this->transaction_repo->getProfitTrans($date_from, $date_to, ['DAO_HAN', 'RUT_TIEN_MAT']);
+        $transOnline = $this->transaction_repo->getProfitTrans($date_from, $date_to, ['ONLINE']);
+        $transQR = $this->transaction_repo->getProfitTrans($date_from, $date_to, ['QR_CODE']);
         $moneyComesBack = $this->money_repo->getProfitsMoney($date_from, $date_to);
 
         foreach ($transactions as $transaction) {
             $date = Carbon::parse($transaction->date)->format('d/m/Y');
             if (isset($output[$date])) {
-                $output[$date]['profit_trans'] = $transaction->profit_trans;
-                $output[$date]['total_profit'] += $transaction->profit_trans;
+                $output[$date]['profit_trans'] = (int)$transaction->profit_trans;
+                $output[$date]['total_profit'] += (int)$transaction->profit_trans;
+            }
+        }
+
+        foreach ($transOnline as $tranOnline) {
+            $date = Carbon::parse($tranOnline->date)->format('d/m/Y');
+            if (isset($output[$date])) {
+                $output[$date]['profit_online'] = (int)$tranOnline->profit_trans;
+                $output[$date]['total_profit'] += (int)$tranOnline->profit_trans;
+            }
+        }
+
+        foreach ($transQR as $tranQR) {
+            $date = Carbon::parse($tranQR->date)->format('d/m/Y');
+            if (isset($output[$date])) {
+                $output[$date]['profit_qr'] = (int)$tranQR->profit_trans;
+                $output[$date]['total_profit'] += (int)$tranQR->profit_trans;
             }
         }
 
         foreach ($moneyComesBack as $money) {
             $date = Carbon::parse($money->date)->format('d/m/Y');
             if (isset($output[$date])) {
-                $output[$date]['profit_money'] = $money->profit_money;
-                $output[$date]['total_profit'] += $money->profit_money;
+                $output[$date]['profit_money'] = (int)$money->profit_money;
+                $output[$date]['total_profit'] += (int)$money->profit_money;
             }
         }
 

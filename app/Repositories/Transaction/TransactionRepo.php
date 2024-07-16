@@ -1065,11 +1065,13 @@ class TransactionRepo extends BaseRepo
         return $total;
     }
 
-    public function getProfitTrans($startDate, $endDate)
+    public function getProfitTrans($startDate, $endDate, $method)
     {
         // Truy vấn dữ liệu từ bảng transactions
         return Transaction::selectRaw('DATE(time_payment) as date, SUM(price_fee - (original_fee * price_rut / 100)) as profit_trans')
             ->whereBetween('time_payment', [$startDate, $endDate])
+            ->where('status', Constants::USER_STATUS_ACTIVE)
+            ->whereIn('method', $method)
             ->groupBy('date')
             ->get();
     }
