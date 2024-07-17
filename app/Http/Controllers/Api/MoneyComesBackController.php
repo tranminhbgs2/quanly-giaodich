@@ -751,6 +751,7 @@ class MoneyComesBackController extends Controller
 
         // Khởi tạo mảng kết quả với các ngày từ $startDate đến $endDate
         $output = [];
+        $totalProfit = 0; // Biến để lưu tổng lợi nhuận
         for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
             $output[$date->format('d/m/Y')] = [
                 'date' => $date->format('d/m/Y'),
@@ -772,6 +773,7 @@ class MoneyComesBackController extends Controller
             if (isset($output[$date])) {
                 $output[$date]['profit_trans'] = (int)$transaction->profit_trans;
                 $output[$date]['total_profit'] += (int)$transaction->profit_trans;
+                $totalProfit += (int)$transaction->profit_trans;
             }
         }
 
@@ -780,6 +782,7 @@ class MoneyComesBackController extends Controller
             if (isset($output[$date])) {
                 $output[$date]['profit_online'] = (int)$tranOnline->profit_trans;
                 $output[$date]['total_profit'] += (int)$tranOnline->profit_trans;
+                $totalProfit += (int)$tranOnline->profit_trans;
             }
         }
 
@@ -788,6 +791,7 @@ class MoneyComesBackController extends Controller
             if (isset($output[$date])) {
                 $output[$date]['profit_qr'] = (int)$tranQR->profit_trans;
                 $output[$date]['total_profit'] += (int)$tranQR->profit_trans;
+                $totalProfit += (int)$tranQR->profit_trans;
             }
         }
 
@@ -796,6 +800,7 @@ class MoneyComesBackController extends Controller
             if (isset($output[$date])) {
                 $output[$date]['profit_money'] = (int)$money->profit_money;
                 $output[$date]['total_profit'] += (int)$money->profit_money;
+                $totalProfit += (int)$money->profit_money;
             }
         }
 
@@ -803,6 +808,8 @@ class MoneyComesBackController extends Controller
             'code' => 200,
             'error' => 'Danh sách lợi nhuận',
             'data' => $output,
+            'data' => array_values($output),
+            'total' => $totalProfit, // Tổng lợi nhuận
         ]);
     }
 }
