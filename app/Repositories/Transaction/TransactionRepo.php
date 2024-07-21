@@ -820,7 +820,19 @@ class TransactionRepo extends BaseRepo
 
         // Initialize an array to store staff information
         $staffs = [];
+        $user_staff = User::select('id', 'fullname', 'status', 'balance')->where('status', Constants::USER_STATUS_ACTIVE)->whereIn('account_type', [Constants::ACCOUNT_TYPE_STAFF, Constants::ACCOUNT_TYPE_ACCOUNTANT])->orderBy('id', 'DESC')->get()->toArray();
 
+        foreach ($user_staff as $user) {
+            $staffs[$user['id']] = [
+                'id' => $user['id'],
+                'name' => $user['fullname'],
+                'total_price_rut' => 0,
+                'total_profit' => 0,
+                'total_price_transfer' => 0,
+                'user_balance' => $user['balance'],
+                'total_mester_transfer' => 0
+            ];
+        }
         // Calculate total_price_transfer for each staff
         foreach ($transactions as $group) {
             foreach ($group as $transaction) {
