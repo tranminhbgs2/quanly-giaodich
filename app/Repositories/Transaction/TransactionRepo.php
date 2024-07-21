@@ -904,7 +904,7 @@ class TransactionRepo extends BaseRepo
                 ->where('type_from', Constants::ACCOUNT_TYPE_STAFF)
                 ->whereBetween('created_at', [$date_from, $date_to])
                 ->get();
-            $staff['total_mester_transfer'] -= $query_transfer_from->sum('price');
+            $staffs[$staff['id']]['total_price_transfer'] += $query_transfer_from->sum('price');
         }
         // Sort by total price rutted and return all results
         $topStaff = collect($staffs)->sortByDesc('total_price_rut')->values()->all();
