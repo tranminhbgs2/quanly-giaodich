@@ -554,7 +554,7 @@ class TransactionController extends Controller
             $price_rut = 0;
 
             if ($pos) {
-                $price_rut = ($tran_old->price_rut - ($pos->fee * $tran_old->price_rut) / 100) * (-1);
+                $price_rut = ($tran_old->price_rut - ($tran_old->original_fee * $tran_old->price_rut) / 100) * (-1);
             }
 
             $this->money_comes_back_repo->updateKL($money_comes_back, $money_come_old->id, $price_rut, 'UPDATED');
@@ -615,7 +615,7 @@ class TransactionController extends Controller
                     $pos = $this->pos_repo->getById($tran->pos_id, false);
                     $price_rut = 0;
                     if ($pos) {
-                        $price_rut = ($tran->price_rut - ($pos->fee * $tran->price_rut) / 100) * (-1);
+                        $price_rut = ($tran->price_rut - ($tran->original_fee * $tran->price_rut) / 100) * (-1);
                     }
                     $this->money_comes_back_repo->updateKL($money_comes_back, $money_come->id, $price_rut, 'DELETED');
                 }

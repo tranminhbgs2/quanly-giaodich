@@ -807,7 +807,6 @@ class MoneyComesBackController extends Controller
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách lợi nhuận',
-            'data' => $output,
             'data' => array_values($output),
             'total' => $totalProfit, // Tổng lợi nhuận
         ]);
