@@ -794,15 +794,12 @@ class TransactionRepo extends BaseRepo
         // Đặt múi giờ mặc định cho toàn bộ ứng dụng (nếu cần)
         date_default_timezone_set('Asia/Ho_Chi_Minh'); // GMT+7
         // Set default date range if not provided
-        $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
-        $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
-
-        $date_from = Carbon::parse($date_from)->startOfDay();
-        $date_to = Carbon::parse($date_to)->endOfDay();
+        $date_from = $params['date_from'] . ' 00:00:00' ?? Carbon::now()->startOfDay();
+        $date_to = $params['date_to'] . ' 00:00:00' ?? Carbon::now()->endOfDay();
         
         // Chuyển đổi sang Carbon object với định dạng Y-m-d H:i:s
-        $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay()->setTimezone('Asia/Ho_Chi_Minh');
-        $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay()->setTimezone('Asia/Ho_Chi_Minh');
+        $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
+        $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
 
         // Query to get transactions within the date range and group by 'created_by'
         $transactionsQuery = Transaction::select([
@@ -820,7 +817,7 @@ class TransactionRepo extends BaseRepo
             $transactionsQuery->where('created_by', $params['created_by']);
         }
 
-        $transactions = $transactionsQuery->whereBetween('created_at', [$date_from->toDateTimeString(), $date_to->toDateTimeString()])
+        $transactions = $transactionsQuery->whereBetween('created_at', [$date_from, $date_to])
             ->get()
             ->groupBy('created_by');
 
@@ -837,8 +834,8 @@ class TransactionRepo extends BaseRepo
                 'total_price_transfer' => 0,
                 'user_balance' => $user['balance'],
                 'total_mester_transfer' => 0,
-                'date_from' => $date_from->toDateTimeString(),
-                'date_to' => $date_to->toDateTimeString(),
+                'date_from' => $date_from,
+                'date_to' => $date_to,
             ];
         }
         // Calculate total_price_transfer for each staff
@@ -901,7 +898,7 @@ class TransactionRepo extends BaseRepo
                 ->where('status', Constants::USER_STATUS_ACTIVE)
                 ->where('to_agent_id', $staff['id'])
                 ->where('type_to', Constants::ACCOUNT_TYPE_STAFF)
-                ->whereBetween('created_at', [$date_from->toDateTimeString(), $date_to->toDateTimeString()])
+                ->whereBetween('time_payment', [$date_from, $date_to])
                 ->get();
             $staff['total_mester_transfer'] = $query_transfer->sum('price');
 
@@ -910,7 +907,7 @@ class TransactionRepo extends BaseRepo
                 ->where('status', Constants::USER_STATUS_ACTIVE)
                 ->where('from_agent_id', $staff['id'])
                 ->where('type_from', Constants::ACCOUNT_TYPE_STAFF)
-                ->whereBetween('created_at', [$date_from->toDateTimeString(), $date_to->toDateTimeString()])
+                ->whereBetween('time_payment', [$date_from, $date_to])
                 ->get();
             $staffs[$staff['id']]['total_price_transfer'] += $query_transfer_from->sum('price');
         }
