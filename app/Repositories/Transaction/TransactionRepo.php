@@ -791,6 +791,8 @@ class TransactionRepo extends BaseRepo
     }
     public function topStaffTransaction($params)
     {
+        // Đặt múi giờ mặc định
+        date_default_timezone_set('Asia/Ho_Chi_Minh'); // GMT+7
         // Set default date range if not provided
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
         $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
@@ -848,7 +850,9 @@ class TransactionRepo extends BaseRepo
                         'total_profit' => 0,
                         'total_price_transfer' => 0,
                         'user_balance' => $createdBy->balance,
-                        'total_mester_transfer' => 0
+                        'total_mester_transfer' => 0,
+                        'date_from' => Carbon::parse($date_from)->startOfDay(),
+                        'date_to' => Carbon::parse($date_to)->endOfDay(),
                     ];
                 }
 
