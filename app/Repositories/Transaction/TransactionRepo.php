@@ -834,7 +834,7 @@ class TransactionRepo extends BaseRepo
                 'user_balance' => $user['balance'],
                 'total_mester_transfer' => 0,
                 'date_from' => Carbon::parse($date_from)->startOfDay(),
-                'date_to' => Carbon::parse($date_to)->endOfDay(),,
+                'date_to' => Carbon::parse($date_to)->endOfDay(),
                 'date_from1' => $date_from,
                 'date_to1' => $date_to,
             ];
