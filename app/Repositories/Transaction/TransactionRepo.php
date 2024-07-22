@@ -791,6 +791,8 @@ class TransactionRepo extends BaseRepo
     }
     public function topStaffTransaction($params)
     {
+        // Đặt múi giờ mặc định cho toàn bộ ứng dụng (nếu cần)
+        date_default_timezone_set('Asia/Ho_Chi_Minh'); // GMT+7
         // Set default date range if not provided
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
         $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
