@@ -799,6 +799,9 @@ class TransactionRepo extends BaseRepo
 
         $date_from = Carbon::parse($date_from)->startOfDay();
         $date_to = Carbon::parse($date_to)->endOfDay();
+        
+        $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from);
+        $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to);
 
         // Query to get transactions within the date range and group by 'created_by'
         $transactionsQuery = Transaction::select([
