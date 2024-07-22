@@ -836,7 +836,9 @@ class TransactionRepo extends BaseRepo
                 'total_profit' => 0,
                 'total_price_transfer' => 0,
                 'user_balance' => $user['balance'],
-                'total_mester_transfer' => 0
+                'total_mester_transfer' => 0,
+                'date_from' => $date_from->toDateTimeString(),
+                'date_to' => $date_to->toDateTimeString(),
             ];
         }
         // Calculate total_price_transfer for each staff
