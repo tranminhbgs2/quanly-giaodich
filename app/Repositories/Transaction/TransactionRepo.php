@@ -791,8 +791,6 @@ class TransactionRepo extends BaseRepo
     }
     public function topStaffTransaction($params)
     {
-        // Đặt múi giờ mặc định
-        date_default_timezone_set('Asia/Ho_Chi_Minh'); // GMT+7
         // Set default date range if not provided
         $date_from = $params['date_from'] ?? Carbon::now()->startOfDay();
         $date_to = $params['date_to'] ?? Carbon::now()->endOfDay();
@@ -820,7 +818,7 @@ class TransactionRepo extends BaseRepo
             $transactionsQuery->where('created_by', $params['created_by']);
         }
 
-        $transactions = $transactionsQuery->whereBetween('created_at', [$date_from, $date_to])
+        $transactions = $transactionsQuery->whereBetween('created_at', [$date_from->toDateTimeString(), $date_to->toDateTimeString()])
             ->get()
             ->groupBy('created_by');
 
@@ -836,11 +834,7 @@ class TransactionRepo extends BaseRepo
                 'total_profit' => 0,
                 'total_price_transfer' => 0,
                 'user_balance' => $user['balance'],
-                'total_mester_transfer' => 0,
-                'date_from' => $params['date_from'],
-                'date_to' => $params['date_to'],
-                'date_from1' => $date_from->toDateTimeString(),
-                'date_to1' => $date_to->toDateTimeString(),
+                'total_mester_transfer' => 0
             ];
         }
         // Calculate total_price_transfer for each staff
@@ -903,7 +897,7 @@ class TransactionRepo extends BaseRepo
                 ->where('status', Constants::USER_STATUS_ACTIVE)
                 ->where('to_agent_id', $staff['id'])
                 ->where('type_to', Constants::ACCOUNT_TYPE_STAFF)
-                ->whereBetween('created_at', [$date_from, $date_to])
+                ->whereBetween('created_at', [$date_from->toDateTimeString(), $date_to->toDateTimeString()])
                 ->get();
             $staff['total_mester_transfer'] = $query_transfer->sum('price');
 
@@ -912,7 +906,7 @@ class TransactionRepo extends BaseRepo
                 ->where('status', Constants::USER_STATUS_ACTIVE)
                 ->where('from_agent_id', $staff['id'])
                 ->where('type_from', Constants::ACCOUNT_TYPE_STAFF)
-                ->whereBetween('created_at', [$date_from, $date_to])
+                ->whereBetween('created_at', [$date_from->toDateTimeString(), $date_to->toDateTimeString()])
                 ->get();
             $staffs[$staff['id']]['total_price_transfer'] += $query_transfer_from->sum('price');
         }
