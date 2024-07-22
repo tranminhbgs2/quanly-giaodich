@@ -832,7 +832,11 @@ class TransactionRepo extends BaseRepo
                 'total_profit' => 0,
                 'total_price_transfer' => 0,
                 'user_balance' => $user['balance'],
-                'total_mester_transfer' => 0
+                'total_mester_transfer' => 0,
+                'date_from' => Carbon::parse($date_from)->startOfDay(),
+                'date_to' => Carbon::parse($date_to)->endOfDay(),,
+                'date_from1' => $date_from,
+                'date_to1' => $date_to,
             ];
         }
         // Calculate total_price_transfer for each staff
@@ -850,9 +854,7 @@ class TransactionRepo extends BaseRepo
                         'total_profit' => 0,
                         'total_price_transfer' => 0,
                         'user_balance' => $createdBy->balance,
-                        'total_mester_transfer' => 0,
-                        'date_from' => Carbon::parse($date_from)->startOfDay(),
-                        'date_to' => Carbon::parse($date_to)->endOfDay(),
+                        'total_mester_transfer' => 0
                     ];
                 }
 
