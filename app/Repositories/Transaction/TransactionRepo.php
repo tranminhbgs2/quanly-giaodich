@@ -800,8 +800,9 @@ class TransactionRepo extends BaseRepo
         $date_from = Carbon::parse($date_from)->startOfDay();
         $date_to = Carbon::parse($date_to)->endOfDay();
         
-        $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay();
-        $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay();
+        // Chuyển đổi sang Carbon object với định dạng Y-m-d H:i:s
+        $date_from = Carbon::createFromFormat('Y-m-d H:i:s', $date_from)->startOfDay()->setTimezone('Asia/Ho_Chi_Minh');
+        $date_to = Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay()->setTimezone('Asia/Ho_Chi_Minh');
 
         // Query to get transactions within the date range and group by 'created_by'
         $transactionsQuery = Transaction::select([
@@ -838,8 +839,8 @@ class TransactionRepo extends BaseRepo
                 'total_mester_transfer' => 0,
                 'date_from' => $params['date_from'],
                 'date_to' => $params['date_to'],
-                'date_from1' => $date_from,
-                'date_to1' => Carbon::createFromFormat('Y-m-d H:i:s', $date_to)->endOfDay(),
+                'date_from1' => $date_from->toDateTimeString(),
+                'date_to1' => $date_to->toDateTimeString(),
             ];
         }
         // Calculate total_price_transfer for each staff
