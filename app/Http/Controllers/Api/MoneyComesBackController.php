@@ -421,15 +421,18 @@ class MoneyComesBackController extends Controller
 
         $data = $this->money_repo->getTopAgency($params);
         $total_rut = 0;
+        $total_cash = 0;
         foreach ($data as $key => $value) {
             $total_rut += $value['total_price_rut'];
+            $total_cash += $value['total_cash'];
         }
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách top đại lý',
             'data' => $data,
             'total' => [
-                'total_rut' => $total_rut
+                'total_rut' => $total_rut,
+                'total_cash' => $total_cash,
 
             ],
         ]);
