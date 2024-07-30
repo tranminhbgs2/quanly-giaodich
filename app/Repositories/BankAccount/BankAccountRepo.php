@@ -7,6 +7,7 @@ use App\Models\BankAccounts;
 use App\Helpers\Constants;
 use App\Repositories\BaseRepo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class BankAccountRepo extends BaseRepo
 {
@@ -271,7 +272,9 @@ class BankAccountRepo extends BaseRepo
         ]));
 
         $update = ['balance' => $balance];
-        return BankAccounts::where('id', $id)->update($update);
+        Log::info('$bank->balance: ' . $bank->balance. ' $balance: ' . $balance . ' $id: ' . $id);
+        $res = BankAccounts::where('id', $id)->update($update);
+        return $res;
     }
 
     public function checkAccount($account_name, $account_number, $bank_code)
