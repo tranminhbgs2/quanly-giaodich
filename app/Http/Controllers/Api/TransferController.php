@@ -400,29 +400,34 @@ class TransferController extends Controller
                 // Return balance to bank account
                 $bank_from = $this->bank_acc_repo->getById($transfer->acc_bank_from_id);
                 $bank_from_balance = $bank_from->balance + $transfer->price;
-                $this->bank_acc_repo->updateBalance($transfer->acc_bank_from_id, $bank_from_balance, "DELETE_TRANSFER_" . $params['id']);
+                $res = $this->bank_acc_repo->updateBalance($transfer->acc_bank_from_id, $bank_from_balance, "DELETE_TRANSFER_" . $params['id']);
 
-                if ($bank_from->type == "AGENCY") {
-                    $agent = $this->agent_repo->getById($bank_from->agent_id);
-                    $agent_balance = $agent->balance - $transfer->price;
-                    $this->agent_repo->updateBalance($agent->id, $agent_balance, "DELETE_TRANSFER_" . $params['id']);
-                } elseif ($bank_from->type == Constants::ACCOUNT_TYPE_STAFF) {
-                    $user = $this->userRepo->getById($bank_from->staff_id);
-                    $user_balance = $user->balance + $transfer->price;
-                    $this->userRepo->updateBalance($bank_from->staff_id, $user_balance, "DELETE_TRANSFER_" . $params['id']);
-                }
+                if($res){
+                    if ($bank_from->type == "AGENCY") {
+                        $agent = $this->agent_repo->getById($bank_from->agent_id);
+                        $agent_balance = $agent->balance - $transfer->price;
+                        $this->agent_repo->updateBalance($agent->id, $agent_balance, "DELETE_TRANSFER_" . $params['id']);
+                    } else if ($bank_from->type == Constants::ACCOUNT_TYPE_STAFF) {
+                        $user = $this->userRepo->getById($bank_from->staff_id);
+                        $user_balance = $user->balance + $transfer->price;
+                        $this->userRepo->updateBalance($bank_from->staff_id, $user_balance, "DELETE_TRANSFER_" . $params['id']);
+                    }
 
-                $bank_to = $this->bank_acc_repo->getById($transfer->acc_bank_to_id);
-                $bank_to_balance = $bank_to->balance - $transfer->price;
-                $this->bank_acc_repo->updateBalance($transfer->acc_bank_to_id, $bank_to_balance, "DELETE_TRANSFER_" . $params['id']);
-                if ($bank_to->type == "AGENCY") {
-                    $agent = $this->agent_repo->getById($bank_to->agent_id);
-                    $agent_balance = $agent->balance + $transfer->price;
-                    $this->agent_repo->updateBalance($agent->id, $agent_balance, "DELETE_TRANSFER_" . $params['id']);
-                } elseif ($bank_to->type == Constants::ACCOUNT_TYPE_STAFF) {
-                    $user = $this->userRepo->getById($bank_to->staff_id);
-                    $user_balance = $user->balance - $transfer->price;
-                    $this->userRepo->updateBalance($bank_to->staff_id, $user_balance, "DELETE_TRANSFER_" . $params['id']);
+                    $bank_to = $this->bank_acc_repo->getById($transfer->acc_bank_to_id);
+                    $bank_to_balance = $bank_to->balance - $transfer->price;
+                    $ress = $this->bank_acc_repo->updateBalance($transfer->acc_bank_to_id, $bank_to_balance, "DELETE_TRANSFER_" . $params['id']);
+
+                    if($ress){
+                        if ($bank_to->type == "AGENCY") {
+                            $agent = $this->agent_repo->getById($bank_to->agent_id);
+                            $agent_balance = $agent->balance + $transfer->price;
+                            $this->agent_repo->updateBalance($agent->id, $agent_balance, "DELETE_TRANSFER_" . $params['id']);
+                        } elseif ($bank_to->type == Constants::ACCOUNT_TYPE_STAFF) {
+                            $user = $this->userRepo->getById($bank_to->staff_id);
+                            $user_balance = $user->balance - $transfer->price;
+                            $this->userRepo->updateBalance($bank_to->staff_id, $user_balance, "DELETE_TRANSFER_" . $params['id']);
+                        }
+                    }
                 }
                 $data = $this->cate_repo->delete($params);
             } else {
