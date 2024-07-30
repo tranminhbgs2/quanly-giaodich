@@ -271,7 +271,7 @@ class BankAccountRepo extends BaseRepo
         ]));
 
         $update = ['balance' => $balance];
-        return $bank->update($update);
+        return BankAccounts::where('id', $id)->update($update);
     }
 
     public function checkAccount($account_name, $account_number, $bank_code)

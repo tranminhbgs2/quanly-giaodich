@@ -149,10 +149,12 @@ class TransferController extends Controller
         }
 
         $resutl = $this->cate_repo->store($params);
-
+        $data = [];
         if ($resutl) {
             //tính tiền nhận được và trừ đi của tk ngân hàng
             $bank_from_balance = $bank_from->balance - $params['price'];
+            $data['bank_from_balance'] = $bank_from_balance;
+            $data['bank_from_id'] = $bank_from->balance;
             $res = $this->bank_acc_repo->updateBalance($params['acc_bank_from_id'], $bank_from_balance, "CREATED_TRANSFER_" . $resutl->id);
             if ($res) {
                 if ($bank_from->type == "AGENCY") {
@@ -166,6 +168,7 @@ class TransferController extends Controller
                 }
 
                 $bank_to_balance = $bank_to->balance + $params['price'];
+                $data['bank_to_balance'] = $bank_to_balance;
                 $this->bank_acc_repo->updateBalance($params['acc_bank_to_id'], $bank_to_balance, "CREATED_TRANSFER_" . $resutl->id);
                 if ($bank_to->type == "AGENCY") {
                     $agent = $this->agent_repo->getById($bank_to->agent_id);
@@ -181,7 +184,8 @@ class TransferController extends Controller
             return response()->json([
                 'code' => 200,
                 'error' => 'Thêm mới thành công',
-                'data' => null
+                'data' => $data,
+                'params' => $params
             ]);
         }
 
