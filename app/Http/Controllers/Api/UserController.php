@@ -337,18 +337,20 @@ class UserController extends Controller
             $balance_new = $balance - $total_transfer;
 
             if ($balance_new != $user['balance']) {
+                $data[] = ['user_name' => $user['username'], 'balance_old' => $user['balance'], '$balance_new' => $balance_new ];
                 $this->user_repo->updateBalance($user['id'], $balance_new, "SYNC_BALANCE_USER");
             }
 
             $bank_account = $bank_acc->getAccountStaff($user['id']);
             if ($bank_account && $bank_account->balance != $balance_new) {
+                $data[] = ['user_name' => $bank_account->account_name, 'balance_old' => $bank_account->balance, '$balance_new' => $balance_new ];
                 $bank_acc->updateBalance($bank_account->id, $balance_new, "SYNC_BALANCE_BANK_". $bank_account->id);
             }
         }
             return response()->json([
                 'code' => 200,
                 'error' => 'Đồng bộ số dư nhân viên thành công',
-                'data' => null
+                'data' => $data
             ]);
     }
 }
