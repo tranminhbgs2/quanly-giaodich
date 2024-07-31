@@ -274,7 +274,7 @@ class BankAccountRepo extends BaseRepo
         ]));
 
         $update = ['balance' => $balance];
-        Log::info(json_decode($bank));
+        Log::info(json_encode($bank));
         $res = BankAccounts::where('id', $id)->update($update);
         return $res;
     }
