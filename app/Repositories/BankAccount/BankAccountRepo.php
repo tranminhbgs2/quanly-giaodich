@@ -298,6 +298,50 @@ class BankAccountRepo extends BaseRepo
         return true;
     }
 
+    public function updateBalanceTransfer($id, $price_transfer, $action = "")
+    {
+        Log::info('Dữ liệu đầu vào updateBalanceTransfer - ID: ' . $id . ', price_transfer: ' . $price_transfer);
+
+        $bank = BankAccounts::find($id);
+
+        if (!$bank) {
+            Log::error('Không tìm thấy tài khoản ngân hàng với ID: ' . $id);
+            return false;
+        }
+        $bank_balance = $bank->balance;
+        $balance = $bank_balance - $price_transfer;
+        // Ghi log trước khi thực hiện cập nhật
+        Log::info('Trước khi cập nhật - Số dư cũ: ' . $bank_balance . ', Số dư mới: ' . $balance . ', ID: ' . $id);
+
+        // Thực hiện cập nhật
+        $bank->balance = $balance;
+        $bank->save();
+
+        // Ghi log sau khi cập nhật
+        Log::info('Sau khi cập nhật - ID: ' . $id . ', Số dư mới: ' . $balance);
+
+        // Lưu log qua event
+        event(new ActionLogEvent([
+            'actor_id' => auth()->user()->id ?? 0,
+            'username' => auth()->user()->username ?? 'unknown',
+            'action' => 'UPDATE_BALANCE_ACC_BANK',
+            'description' => $action . ' Cập nhật số tiền cho TKHT ' . $bank->account_number . ' từ ' . $bank_balance . ' thành ' . $balance,
+            'data_new' => $balance,
+            'data_old' => $bank_balance,
+            'model' => 'BankAccounts',
+            'table' => 'bank_accounts',
+            'record_id' => $id,
+            'ip_address' => request()->ip()
+        ]));
+
+        // Tải lại dữ liệu từ database để kiểm tra
+        $bank->refresh();
+
+        // Ghi log giá trị sau khi tải lại từ database
+        Log::info('Giá trị sau khi tải lại từ database updateBalanceTransfer - ID: ' . $id . ', Số dư: ' . $bank->balance);
+
+        return true;
+    }
 
     public function checkAccount($account_name, $account_number, $bank_code)
     {

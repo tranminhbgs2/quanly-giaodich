@@ -155,7 +155,7 @@ class TransferController extends Controller
             $bank_from_balance = $bank_from->balance - $params['price'];
             $data['bank_from_balance'] = $bank_from_balance;
             $data['bank_from_id'] = $bank_from->balance;
-            $res = $this->bank_acc_repo->updateBalance($params['acc_bank_from_id'], $bank_from_balance, "CREATED_TRANSFER_" . $resutl->id);
+            $res = $this->bank_acc_repo->updateBalanceTransfer($params['acc_bank_from_id'], $params['price'], "CREATED_TRANSFER_" . $resutl->id);
             if ($res) {
                 if ($bank_from->type == "AGENCY") {
                     $agent = $this->agent_repo->getById($bank_from->agent_id);
