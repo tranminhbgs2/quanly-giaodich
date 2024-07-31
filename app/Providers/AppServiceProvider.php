@@ -17,6 +17,7 @@ use App\Repositories\Transfer\TransferRepo;
 use App\Repositories\User\UserRepo;
 use App\Repositories\WithdrawPos\WithdrawPosRepo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
@@ -58,10 +59,10 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         //
         DB::listen(function ($query) {
-            // $query->sql;
-            // $query->bindings;
-            // $query->time;
-            //Log::info(json_encode($query->sql));
+            DB::listen(function ($query) {
+                Log::info('Query SQL: ' . $query->sql);
+                Log::info('Bindings: ' . implode(', ', $query->bindings));
+            });
         });
     }
 }
