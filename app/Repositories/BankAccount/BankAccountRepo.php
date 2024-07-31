@@ -259,6 +259,7 @@ class BankAccountRepo extends BaseRepo
     {
         $bank = BankAccounts::where('id', $id)->first();
         // Lưu log qua event
+        Log::info('$bank->balance: ' . $bank->balance. ' $balance: ' . $balance . ' $id: ' . $id);
         event(new ActionLogEvent([
             'actor_id' => auth()->user()->id ?? 0,
             'username' => auth()->user()->username ?? 0,
@@ -273,7 +274,7 @@ class BankAccountRepo extends BaseRepo
         ]));
 
         $update = ['balance' => $balance];
-        Log::info('$bank->balance: ' . $bank->balance. ' $balance: ' . $balance . ' $id: ' . $id);
+        Log::info(json_decode($bank));
         $res = BankAccounts::where('id', $id)->update($update);
         return $res;
     }
