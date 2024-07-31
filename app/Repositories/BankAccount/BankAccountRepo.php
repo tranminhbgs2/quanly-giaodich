@@ -129,6 +129,7 @@ class BankAccountRepo extends BaseRepo
             }
         }
 
+        Log::info('$bank->balance: update ' . $update['balance'] . ' $id: ' . $id);
         return BankAccounts::where('id', $id)->update($update);
     }
 
