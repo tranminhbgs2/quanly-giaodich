@@ -175,7 +175,6 @@ class BankAccountRepo extends BaseRepo
                 $bankAccount->deleted_at = Carbon::now();
                 $bankAccount->save();
             }
-
         }
         return true;
     }
@@ -257,14 +256,17 @@ class BankAccountRepo extends BaseRepo
 
     public function updateBalance($id, $balance, $action = "")
     {
-        $bank = BankAccounts::where('id', $id)->first();
+        $bank = BankAccounts::find($id);
+        if (!$bank) {
+            return false;
+        }
         // Lưu log qua event
-        Log::info('$bank->balance: ' . $bank->balance. ' $balance: ' . $balance . ' $id: ' . $id);
+        Log::info('$bank->balance: ' . $bank->balance . ' $balance: ' . $balance . ' $id: ' . $id);
         event(new ActionLogEvent([
             'actor_id' => auth()->user()->id ?? 0,
             'username' => auth()->user()->username ?? 0,
             'action' => 'UPDATE_BANLANCE_ACC_BANK',
-            'description' => $action. ' Cập nhật số tiền cho TKHT ' . $bank->account_number . ' từ ' . $bank->balance . ' thành ' . $balance,
+            'description' => $action . ' Cập nhật số tiền cho TKHT ' . $bank->account_number . ' từ ' . $bank->balance . ' thành ' . $balance,
             'data_new' => $balance,
             'data_old' => $bank->balance,
             'model' => 'BankAccounts',
@@ -273,9 +275,9 @@ class BankAccountRepo extends BaseRepo
             'ip_address' => request()->ip()
         ]));
 
-        $update = ['balance' => $balance];
+        $bank->balance = $balance;
+        $res = $bank->save();
         Log::info(json_encode($bank));
-        $res = BankAccounts::where('id', $id)->update($update);
         return $res;
     }
 
