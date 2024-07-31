@@ -256,16 +256,20 @@ class BankAccountRepo extends BaseRepo
 
     public function updateBalance($id, $balance, $action = "")
     {
+        Log::info('Dữ liệu đầu vào - ID: ' . $id . ', Balance: ' . $balance);
+
         $bank = BankAccounts::find($id);
+
         if (!$bank) {
+            Log::error('Không tìm thấy tài khoản ngân hàng với ID: ' . $id);
             return false;
         }
+
         // Lưu log qua event
-        Log::info('$bank->balance: ' . $bank->balance . ' $balance: ' . $balance . ' $id: ' . $id);
         event(new ActionLogEvent([
             'actor_id' => auth()->user()->id ?? 0,
-            'username' => auth()->user()->username ?? 0,
-            'action' => 'UPDATE_BANLANCE_ACC_BANK',
+            'username' => auth()->user()->username ?? 'unknown',
+            'action' => 'UPDATE_BALANCE_ACC_BANK',
             'description' => $action . ' Cập nhật số tiền cho TKHT ' . $bank->account_number . ' từ ' . $bank->balance . ' thành ' . $balance,
             'data_new' => $balance,
             'data_old' => $bank->balance,
@@ -275,11 +279,25 @@ class BankAccountRepo extends BaseRepo
             'ip_address' => request()->ip()
         ]));
 
+        // Ghi log trước khi thực hiện cập nhật
+        Log::info('Trước khi cập nhật - Số dư cũ: ' . $bank->balance . ', Số dư mới: ' . $balance . ', ID: ' . $id);
+
+        // Thực hiện cập nhật
         $bank->balance = $balance;
-        $res = $bank->save();
-        Log::info(json_encode($bank));
-        return $res;
+        $bank->save();
+
+        // Ghi log sau khi cập nhật
+        Log::info('Sau khi cập nhật - ID: ' . $id . ', Số dư mới: ' . $balance);
+
+        // Tải lại dữ liệu từ database để kiểm tra
+        $bank->refresh();
+
+        // Ghi log giá trị sau khi tải lại từ database
+        Log::info('Giá trị sau khi tải lại từ database - ID: ' . $id . ', Số dư: ' . $bank->balance);
+
+        return true;
     }
+
 
     public function checkAccount($account_name, $account_number, $bank_code)
     {
