@@ -7,6 +7,7 @@ use App\Models\BankAccounts;
 use App\Helpers\Constants;
 use App\Repositories\BaseRepo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class BankAccountRepo extends BaseRepo
@@ -269,8 +270,6 @@ class BankAccountRepo extends BaseRepo
         Log::info('Trước khi cập nhật - Số dư cũ: ' . $bank->balance . ', Số dư mới: ' . $balance . ', ID: ' . $id);
 
         // Thực hiện cập nhật
-        $bank->balance = $balance;
-        $bank->save();
 
         // Ghi log sau khi cập nhật
         Log::info('Sau khi cập nhật - ID: ' . $id . ', Số dư mới: ' . $balance);
@@ -289,6 +288,13 @@ class BankAccountRepo extends BaseRepo
             'ip_address' => request()->ip()
         ]));
 
+        // Thực hiện cập nhật bằng câu lệnh SQL
+        $sql = "UPDATE bank_accounts SET balance = :balance WHERE id = :id";
+        $bindings = ['balance' => $balance, 'id' => $id];
+        Log::info('Câu lệnh SQL: ' . $sql);
+        Log::info('Ràng buộc: ' . json_encode($bindings));
+        DB::statement($sql, $bindings);
+        
         // Tải lại dữ liệu từ database để kiểm tra
         $bank->refresh();
 
