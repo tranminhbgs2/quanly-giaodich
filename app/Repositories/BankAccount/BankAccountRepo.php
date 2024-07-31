@@ -269,8 +269,8 @@ class BankAccountRepo extends BaseRepo
         Log::info('Trước khi cập nhật - Số dư cũ: ' . $bank->balance . ', Số dư mới: ' . $balance . ', ID: ' . $id);
 
         // Thực hiện cập nhật
-        // $bank->balance = $balance;
-        // $bank->save();
+        $bank->balance = $balance;
+        $bank->save();
 
         // Ghi log sau khi cập nhật
         Log::info('Sau khi cập nhật - ID: ' . $id . ', Số dư mới: ' . $balance);

@@ -404,7 +404,11 @@ class TransferController extends Controller
                 // Return balance to bank account
                 $bank_from = $this->bank_acc_repo->getById($transfer->acc_bank_from_id);
                 $bank_from_balance = $bank_from->balance + $transfer->price;
-                $res = $this->bank_acc_repo->updateBalance($transfer->acc_bank_from_id, $bank_from_balance, "DELETE_TRANSFER_" . $params['id']);
+                $update = [
+                    'balance' => $bank_from_balance
+                ];
+                $res = $this->bank_acc_repo->update($update, $transfer->acc_bank_from_id);
+                // $res = $this->bank_acc_repo->updateBalance($transfer->acc_bank_from_id, $bank_from_balance, "DELETE_TRANSFER_" . $params['id']);
 
                 if($res){
                     if ($bank_from->type == "AGENCY") {
