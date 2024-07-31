@@ -265,6 +265,16 @@ class BankAccountRepo extends BaseRepo
             return false;
         }
 
+        // Ghi log trước khi thực hiện cập nhật
+        Log::info('Trước khi cập nhật - Số dư cũ: ' . $bank->balance . ', Số dư mới: ' . $balance . ', ID: ' . $id);
+
+        // Thực hiện cập nhật
+        $bank->balance = $balance;
+        $bank->save();
+
+        // Ghi log sau khi cập nhật
+        Log::info('Sau khi cập nhật - ID: ' . $id . ', Số dư mới: ' . $balance);
+
         // Lưu log qua event
         event(new ActionLogEvent([
             'actor_id' => auth()->user()->id ?? 0,
@@ -278,16 +288,6 @@ class BankAccountRepo extends BaseRepo
             'record_id' => $id,
             'ip_address' => request()->ip()
         ]));
-
-        // Ghi log trước khi thực hiện cập nhật
-        Log::info('Trước khi cập nhật - Số dư cũ: ' . $bank->balance . ', Số dư mới: ' . $balance . ', ID: ' . $id);
-
-        // Thực hiện cập nhật
-        $bank->balance = $balance;
-        $bank->save();
-
-        // Ghi log sau khi cập nhật
-        Log::info('Sau khi cập nhật - ID: ' . $id . ', Số dư mới: ' . $balance);
 
         // Tải lại dữ liệu từ database để kiểm tra
         $bank->refresh();
