@@ -337,7 +337,7 @@ class UserController extends Controller
             $balance_new = $balance - $total_transfer;
 
             if ($balance_new != $user['balance']) {
-                $data[] = ['user_name' => $user['username'], 'balance_old' => $user['balance'], '$balance_new' => $balance_new ];
+                $data[] = ['user_name' => $user['fullname'], 'balance_old' => $user['balance'], '$balance_new' => $balance_new ];
                 $this->user_repo->updateBalance($user['id'], $balance_new, "SYNC_BALANCE_USER");
             }
 
