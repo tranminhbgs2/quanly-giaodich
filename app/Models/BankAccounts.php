@@ -17,6 +17,7 @@ class BankAccounts extends Model
         'account_number',
         'account_name',
         'balance',
+        'balances',
         'status',
         'staff_id',
         'type',
