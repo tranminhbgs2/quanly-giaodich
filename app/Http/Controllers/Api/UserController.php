@@ -152,7 +152,7 @@ class UserController extends Controller
 
         // Gán lại giá trị vào mảng
         $params['birthday'] = $birthday;
-        $resutl = $this->user_repo->store($params);
+        $resutl = $this->cus_repo->store($params);
 
         if ($resutl) {
             $this->cus_repo->attachPositions($resutl, request('action_ids', []) ?? []);
@@ -199,7 +199,7 @@ class UserController extends Controller
             $params['birthday'] = $birthday;
 
             $action_ids = request('action_ids', []) ?? [];
-            $resutl = $this->user_repo->update($params, $params['id']);
+            $resutl = $this->cus_repo->update($params, $params['id']);
 
             if ($resutl) {
                 //Xóa các permission cũ
