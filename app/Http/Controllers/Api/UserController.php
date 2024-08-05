@@ -45,8 +45,8 @@ class UserController extends Controller
         $params['page_size'] = request('page_size', 10);
         //$params['account_type'] = auth()->user()->account_type;
 
-        $data = $this->cus_repo->getListing($params, false);
-        $total = $this->cus_repo->getListing($params, true);
+        $data = $this->user_repo->getListing($params, false);
+        $total = $this->user_repo->getListing($params, true);
         return response()->json([
             'code' => 200,
             'error' => 'Danh sách User',
