@@ -339,8 +339,8 @@ class BankAccountRepo extends BaseRepo
         ]));
 
         // Thực hiện cập nhật bằng câu lệnh SQL
-        $sql = "UPDATE bank_accounts SET balance = :balance WHERE id = :id";
-        $bindings = ['balance' => $bank_balance, 'id' => $id];
+        $sql = "UPDATE bank_accounts SET balances = :balances WHERE id = :id";
+        $bindings = ['balances' => $bank_balance, 'id' => $id];
         Log::info('Câu lệnh SQL: ' . $sql);
         Log::info('Ràng buộc: ' . json_encode($bindings));
         DB::statement($sql, $bindings);
