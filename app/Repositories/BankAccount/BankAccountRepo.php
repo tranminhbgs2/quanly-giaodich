@@ -327,7 +327,7 @@ class BankAccountRepo extends BaseRepo
         // Lưu log qua event
         event(new ActionLogEvent([
             'actor_id' => auth()->user()->id ?? 0,
-            'username' => auth()->user()->username ?? 'unknown',
+            'username' => auth()->user()->username ?? '0',
             'action' => 'UPDATE_BALANCE_ACC_BANK',
             'description' => $action . ' Cập nhật số tiền cho TKHT ' . $bank->account_number . ' từ ' . $bank_balance . ' thành ' . $balance,
             'data_new' => $balance,
