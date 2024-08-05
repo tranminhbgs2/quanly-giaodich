@@ -316,7 +316,7 @@ class BankAccountRepo extends BaseRepo
             Log::error('Không tìm thấy tài khoản ngân hàng với ID: ' . $id);
             return false;
         }
-        $bank_balance = $bank->balance;
+        $bank_balance = $bank->balances;
         $balance = $bank_balance - $price_transfer;
         // Ghi log trước khi thực hiện cập nhật
         Log::info('Trước khi cập nhật - Số dư cũ: ' . $bank_balance . ', Số dư mới: ' . $balance . ', ID: ' . $id);
@@ -349,7 +349,7 @@ class BankAccountRepo extends BaseRepo
         $bank->refresh();
 
         // Ghi log giá trị sau khi tải lại từ database
-        Log::info('Giá trị sau khi tải lại từ database updateBalanceTransfer - ID: ' . $id . ', Số dư: ' . $bank->balance);
+        Log::info('Giá trị sau khi tải lại từ database updateBalanceTransfer - ID: ' . $id . ', Số dư: ' . $bank->balances);
 
         return true;
     }
