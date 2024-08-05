@@ -269,7 +269,8 @@ class TransferController extends Controller
                     //cộng lại tiền cho tk cũ
                     $bank_from_old = $this->bank_acc_repo->getById($transfer_old->acc_bank_from_id);
                     $bank_from_old_balance = $bank_from_old->balance + $transfer_old->price;
-                    $res = $this->bank_acc_repo->updateBalance($transfer_old->acc_bank_from_id, $bank_from_old_balance, "UPDATE_TRANSFER_" . $params['id']);
+                    // $res = $this->bank_acc_repo->updateBalance($transfer_old->acc_bank_from_id, $bank_from_old_balance, "UPDATE_TRANSFER_" . $params['id']);
+                    $res = $this->bank_acc_repo->updateBalanceTransfer($transfer_old->acc_bank_from_id, $transfer_old->price*(-1), "UPDATE_TRANSFER_" .$params['id']);
                     if ($res) {
                         // tiền nhận được sẽ trừ đi tiền cũ để lấy số âm làm dư nợ
                         if ($bank_from_old->type == "AGENCY") {
@@ -284,7 +285,8 @@ class TransferController extends Controller
 
                         $bank_from_new = $this->bank_acc_repo->getById($params['acc_bank_from_id']);
                         $bank_from_new_balance = $bank_from_new->balance - $params['price'];
-                        $ress = $this->bank_acc_repo->updateBalance($params['acc_bank_from_id'], $bank_from_new_balance, "UPDATE_TRANSFER_" . $params['id']);
+                        // $ress = $this->bank_acc_repo->updateBalance($params['acc_bank_from_id'], $bank_from_new_balance, "UPDATE_TRANSFER_" . $params['id']);
+                        $ress = $this->bank_acc_repo->updateBalanceTransfer($params['acc_bank_from_id'], $params['price'], "UPDATE_TRANSFER_" .$params['id']);
 
                         if ($ress) {
                             // tiền nhận được sẽ trừ đi tiền cũ để lấy số âm làm dư nợ
@@ -300,8 +302,10 @@ class TransferController extends Controller
                         }
                     }
                 } else {
-                    $bank_from_balance = $bank_from->balance - $params['price'] + $transfer_old->price;
-                    $this->bank_acc_repo->updateBalance($params['acc_bank_from_id'], $bank_from_balance, "UPDATE_TRANSFER_" . $params['id']);
+                    // $bank_from_balance = $bank_from->balance - $params['price'] + $transfer_old->price;
+                    // $this->bank_acc_repo->updateBalance($params['acc_bank_from_id'], $bank_from_balance, "UPDATE_TRANSFER_" . $params['id']);
+                    $bank_from_balance =  ($transfer_old->price - $params['price'])*(-1); ;
+                    $this->bank_acc_repo->updateBalanceTransfer($params['acc_bank_from_id'], $bank_from_balance, "UPDATE_TRANSFER_" .$params['id']);
 
                     // tiền nhận được sẽ trừ đi tiền cũ để lấy số âm làm dư nợ
                     if ($bank_from->type == "AGENCY") {
