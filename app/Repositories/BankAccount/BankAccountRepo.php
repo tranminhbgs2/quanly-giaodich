@@ -259,7 +259,7 @@ class BankAccountRepo extends BaseRepo
 
     public function updateBalance($id, $balance, $action = "")
     {
-        Log::info('Dữ liệu đầu vào - ID: ' . $id . ', Balance: ' . $balance);
+        Log::info('Dữ liệu đầu vào - ID: ' . $id . ', Balance: ' . $balance. ', Action: ' . $action);
 
         $bank = BankAccounts::find($id);
 
