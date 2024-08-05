@@ -286,7 +286,7 @@ class TransferController extends Controller
                         $bank_from_new_balance = $bank_from_new->balance - $params['price'];
                         $ress = $this->bank_acc_repo->updateBalance($params['acc_bank_from_id'], $bank_from_new_balance, "UPDATE_TRANSFER_" . $params['id']);
 
-                        if($ress){
+                        if ($ress) {
                             // tiền nhận được sẽ trừ đi tiền cũ để lấy số âm làm dư nợ
                             if ($bank_from_new->type == "AGENCY") {
                                 $agent_new = $this->agent_repo->getById($bank_from_new->agent_id);
@@ -321,7 +321,7 @@ class TransferController extends Controller
                     $bank_to_old_balance = $bank_to_old->balance - $transfer_old->price;
                     $resup = $this->bank_acc_repo->updateBalance($transfer_old->acc_bank_to_id, $bank_to_old_balance, "UPDATE_TRANSFER_" . $params['id']);
 
-                    if($resup) {
+                    if ($resup) {
                         // tiền nhận được sẽ trừ đi tiền cũ để lấy số âm làm dư nợ
                         if ($bank_to_old->type == "AGENCY") {
                             $agent_old = $this->agent_repo->getById($bank_to_old->agent_id);
@@ -336,7 +336,7 @@ class TransferController extends Controller
                         $bank_to_new = $this->bank_acc_repo->getById($params['acc_bank_to_id']);
                         $bank_to_new_balance = $bank_to_new->balance + $params['price'];
                         $ep = $this->bank_acc_repo->updateBalance($params['acc_bank_to_id'], $bank_to_new_balance, "UPDATE_TRANSFER_" . $params['id']);
-                        if($ep) {
+                        if ($ep) {
                             // tiền nhận được sẽ trừ đi tiền cũ để lấy số âm làm dư nợ
                             if ($bank_to_new->type == "AGENCY") {
                                 $agent_new = $this->agent_repo->getById($bank_to_new->agent_id);
@@ -405,9 +405,10 @@ class TransferController extends Controller
                 $bank_from = $this->bank_acc_repo->getById($transfer->acc_bank_from_id);
                 $bank_from_balance = $bank_from->balance + $transfer->price;
                 // $res = $this->bank_acc_repo->update($update, $transfer->acc_bank_from_id);
-                $res = $this->bank_acc_repo->updateBalance($transfer->acc_bank_from_id, $bank_from_balance, "DELETE_TRANSFER_" . $params['id']);
+                $res = $this->bank_acc_repo->updateBalanceTransfer($transfer->acc_bank_from_id, $transfer->price*(-1), "DELETE_TRANSFER_" .$params['id']);
+                // $res = $this->bank_acc_repo->updateBalance($transfer->acc_bank_from_id, $bank_from_balance, "DELETE_TRANSFER_" . $params['id']);
 
-                if($res){
+                if ($res) {
                     if ($bank_from->type == "AGENCY") {
                         $agent = $this->agent_repo->getById($bank_from->agent_id);
                         $agent_balance = $agent->balance - $transfer->price;
@@ -422,7 +423,7 @@ class TransferController extends Controller
                     $bank_to_balance = $bank_to->balance - $transfer->price;
                     $ress = $this->bank_acc_repo->updateBalance($transfer->acc_bank_to_id, $bank_to_balance, "DELETE_TRANSFER_" . $params['id']);
 
-                    if($ress){
+                    if ($ress) {
                         if ($bank_to->type == "AGENCY") {
                             $agent = $this->agent_repo->getById($bank_to->agent_id);
                             $agent_balance = $agent->balance + $transfer->price;
